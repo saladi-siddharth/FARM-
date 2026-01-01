@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Farm Central | Smart Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; background: #020617; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        .hover-lift:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.3); transition: all 0.3s ease; }
+    </style>
+</head>
+<body>
+    <div id="canvas-bg"></div>
+
+    <div id="auth-section" class="flex items-center justify-center min-h-screen">
+        <div class="glass p-10 rounded-3xl w-full max-w-md shadow-2xl border-t-4 border-green-500">
+            <h2 id="auth-title" class="text-3xl font-black text-center mb-6">FARMER LOGIN</h2>
+            <form id="auth-form" class="space-y-4">
+                <input type="text" id="reg-name" placeholder="Full Name" class="hidden w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none">
+                <input type="email" id="email" placeholder="Email" required class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none">
+                <input type="password" id="pass" placeholder="Password" required class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none">
+                <button type="submit" id="auth-btn" class="w-full bg-green-600 hover:bg-green-500 py-4 rounded-xl font-bold uppercase tracking-widest">Enter Hub</button>
+            </form>
+            <p class="text-center mt-6 text-sm text-gray-400">
+                <button onclick="toggleAuth()" id="toggle-link" class="text-green-400 font-bold hover:underline">New Farmer? Create Account</button>
+            </p>
+        </div>
+    </div>
+
+    <div id="hub-section" class="hidden min-h-screen p-6 md:p-12">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-5xl font-black text-green-400 tracking-tighter">FARM CENTRAL</h1>
+                <p class="text-gray-400 font-medium">Welcome back, <span id="farmer-name" class="text-white font-bold">Farmer</span></p>
+            </div>
+            <button onclick="logout()" class="glass px-6 py-2 rounded-full border border-red-500/30 text-red-400 font-bold hover:bg-red-500/10 transition">Logout</button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass p-8 rounded-3xl border-l-4 border-green-500 hover-lift">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Inventory Assets</h3>
+                <p id="stat-assets" class="text-4xl font-black text-white">₹0</p>
+            </div>
+            <div class="glass p-8 rounded-3xl border-l-4 border-red-500 hover-lift">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Total Expenses</h3>
+                <p id="stat-expenses" class="text-4xl font-black text-white">₹0</p>
+            </div>
+            <div class="glass p-8 rounded-3xl border-l-4 border-blue-500 hover-lift">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Tasks List</h3>
+                <p id="stat-tasks" class="text-4xl font-black text-white">0</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <button onclick="location.href='inventory.html'" class="glass p-10 rounded-3xl hover:bg-green-500/10 transition border border-white/5">
+                <div class="text-5xl mb-4">📦</div>
+                <h3 class="text-xl font-bold">Inventory</h3>
+            </button>
+            <button onclick="location.href='tasks.html'" class="glass p-10 rounded-3xl hover:bg-blue-500/10 transition border border-white/5">
+                <div class="text-5xl mb-4">🗓️</div>
+                <h3 class="text-xl font-bold">Tasks</h3>
+            </button>
+            <button onclick="location.href='expenses.html'" class="glass p-10 rounded-3xl hover:bg-yellow-500/10 transition border border-white/5">
+                <div class="text-5xl mb-4">💰</div>
+                <h3 class="text-xl font-bold text-yellow-500">Expenses</h3>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 3D BG ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-bg').appendChild(renderer.domElement);
+        const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+        const material = new THREE.MeshNormalMaterial({ wireframe: true });
+        const torus = new THREE.Mesh(geometry, material);
+        scene.add(torus);
+        camera.position.z = 30;
+        function animate() { requestAnimationFrame(animate); torus.rotation.x += 0.005; renderer.render(scene, camera); }
+        animate();
+
+        // --- LOGIC ---
+        let isLogin = true;
+        const token = localStorage.getItem('token');
+        if(token) showHub();
+
+        function toggleAuth() {
+            isLogin = !isLogin;
+            document.getElementById('reg-name').classList.toggle('hidden');
+            document.getElementById('auth-title').innerText = isLogin ? 'FARMER LOGIN' : 'CREATE ACCOUNT';
+            document.getElementById('auth-btn').innerText = isLogin ? 'Enter Hub' : 'Register Farm';
+        }
+
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const endpoint = isLogin ? '/api/auth/signin' : '/api/auth/signup';
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email.value,
+                    password: pass.value,
+                    username: document.getElementById('reg-name').value
+                })
+            });
+            const data = await res.json();
+            if(res.ok) {
+                if(isLogin) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username);
+                    showHub();
+                } else { alert("Registered! Please login."); toggleAuth(); }
+            } else { alert(data.error); }
+        };
+
+        async function showHub() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('hub-section').classList.remove('hidden');
+            document.getElementById('farmer-name').innerText = localStorage.getItem('username');
+
+            // FETCH REFRESHED STATS
+            try {
+                const res = await fetch('/api/dashboard/summary', {
+                    headers: { 'Authorization': localStorage.getItem('token') }
+                });
+                const stats = await res.json();
+                
+                // Note: Keys must match server/routes/dashboard.js
+                document.getElementById('stat-assets').innerText = `₹${Number(stats.inventoryValue).toLocaleString()}`;
+                document.getElementById('stat-expenses').innerText = `₹${Number(stats.totalExpenses).toLocaleString()}`;
+                document.getElementById('stat-tasks').innerText = stats.taskCount;
+            } catch (err) { console.error("Sync Error"); }
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+    </script>
+</body>
+</html>

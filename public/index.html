@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Farming AI - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        #canvas-container { position: fixed; top: 0; left: 0; z-index: -1; }
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div id="canvas-container"></div>
+    <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-md text-white">
+        <h1 id="title" class="text-3xl font-bold text-center mb-6">Farmer Login</h1>
+        <form id="authForm" class="space-y-4">
+            <input type="text" id="user" placeholder="Name" class="hidden w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+            <input type="email" id="email" placeholder="Email" required class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+            <input type="password" id="pass" placeholder="Password" required class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+            <button type="submit" class="w-full bg-green-500 py-3 rounded font-bold hover:bg-green-600 transition">Go</button>
+        </form>
+        <p class="mt-4 text-center cursor-pointer text-sm opacity-70" id="toggle">Need an account? Sign Up</p>
+    </div>
+
+    <script>
+        // --- THREE.JS 3D SCENE ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const stars = new THREE.BufferGeometry();
+        const starCount = 5000;
+        const posArray = new Float32Array(starCount * 3);
+        for(let i=0; i<starCount*3; i++) posArray[i] = (Math.random() - 0.5) * 100;
+        stars.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const material = new THREE.PointsMaterial({ size: 0.05, color: 0x4ade80 });
+        const starMesh = new THREE.Points(stars, material);
+        scene.add(starMesh);
+        camera.position.z = 2;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            starMesh.rotation.y += 0.002;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- AUTH LOGIC ---
+        let isLogin = true;
+        const toggle = document.getElementById('toggle');
+        const userInp = document.getElementById('user');
+
+        toggle.onclick = () => {
+            isLogin = !isLogin;
+            userInp.classList.toggle('hidden');
+            toggle.innerText = isLogin ? "Need an account? Sign Up" : "Back to Login";
+            document.getElementById('title').innerText = isLogin ? "Farmer Login" : "Farmer Sign Up";
+        };
+
+        document.getElementById('authForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const body = { email: email.value, password: pass.value, username: user.value };
+            const res = await fetch(isLogin ? '/api/auth/signin' : '/api/auth/signup', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            if(res.ok) {
+                if(isLogin) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', data.username);
+                    window.location.href = 'dashboard.html';
+                } else { alert("Registered! Now Login."); toggle.click(); }
+            } else { alert(data.error); }
+        };
+    </script>
+</body>
+</html>
