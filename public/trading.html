@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trade Hub | Farm Central</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #020617;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+    <div id="canvas-bg"></div>
+
+    <div class="max-w-6xl mx-auto min-h-screen">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-orange-400">TRADE HUB</h1>
+                <p class="text-gray-400">Buy & Sell Crops Directly (Peer-to-Peer)</p>
+            </div>
+            <button onclick="location.href='dashboard.html'"
+                class="glass px-6 py-2 rounded-full hover:bg-orange-500/20 transition font-bold">Back to Hub</button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Sell Form -->
+            <div class="glass p-6 rounded-3xl h-fit border-t-4 border-orange-500">
+                <h2 class="text-xl font-bold mb-4">📢 Sell Your Crop</h2>
+                <form id="sellForm" class="flex flex-col gap-4">
+                    <input type="text" id="sCrop" placeholder="Crop Name (e.g. Rice)" required
+                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
+                    <input type="number" id="sQty" placeholder="Quantity (kg)" required
+                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
+                    <input type="number" id="sPrice" placeholder="Price per kg (₹)" required
+                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
+                    <input type="text" id="sLoc" placeholder="Location" required
+                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
+                    <button type="submit"
+                        class="bg-orange-600 hover:bg-orange-500 py-3 rounded-xl font-bold transition">List for
+                        Sale</button>
+                </form>
+            </div>
+
+            <!-- Listings Feed -->
+            <div class="md:col-span-2">
+                <h2 class="text-xl font-bold mb-4">🛒 Available Listings</h2>
+                <div id="listings" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Cards Injected Here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Gateway Modal -->
+    <dialog id="payModal"
+        class="glass rounded-2xl p-0 backdrop:backdrop-blur-xl text-white w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="bg-gradient-to-r from-orange-600 to-red-600 p-6">
+            <h3 class="text-2xl font-black flex items-center gap-2">💳 Secure Checkout</h3>
+            <p class="text-white/80 text-sm">Powered by FarmPay Shield</p>
+        </div>
+        <form class="p-8 space-y-6" onsubmit="processPayment(event)">
+            <!-- Bill Details -->
+            <div class="bg-white/5 p-4 rounded-xl space-y-2 border border-white/10">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Item Cost</span>
+                    <span id="payItemCost">₹0</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-orange-400">Platform Fee (5%)</span>
+                    <span id="payComm">₹0</span>
+                </div>
+                <div class="h-px bg-white/20 my-2"></div>
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Total To Pay</span>
+                    <span id="payTotal" class="text-green-400">₹0</span>
+                </div>
+                <input type="hidden" id="payListingId">
+                <input type="hidden" id="payAmountRaw">
+            </div>
+
+            <!-- Card Details -->
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 uppercase font-bold ml-1">Card Number</label>
+                    <div class="relative">
+                        <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" required
+                            class="w-full bg-black/40 p-3 pl-10 rounded-lg border border-white/20 outline-none focus:border-orange-500 font-mono tracking-widest">
+                        <span class="absolute left-3 top-3.5 text-gray-500">💳</span>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-400 uppercase font-bold ml-1">Expiry</label>
+                        <input type="text" placeholder="MM/YY" maxlength="5" required
+                            class="w-full bg-black/40 p-3 rounded-lg border border-white/20 outline-none focus:border-orange-500 font-mono text-center">
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-400 uppercase font-bold ml-1">CVV</label>
+                        <input type="password" placeholder="123" maxlength="3" required
+                            class="w-full bg-black/40 p-3 rounded-lg border border-white/20 outline-none focus:border-orange-500 font-mono text-center">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <button type="submit" id="payBtn"
+                class="w-full bg-green-600 hover:bg-green-500 py-4 rounded-xl font-bold text-lg shadow-lg hover:scale-[1.02] transition flex justify-center items-center gap-2">
+                <span>🔒 Pay Securely</span>
+            </button>
+            <button type="button" onclick="payModal.close()"
+                class="w-full text-center text-gray-400 text-sm hover:text-white">Cancel Transaction</button>
+        </form>
+    </dialog>
+
+    <script>
+        // --- 3D BG (Golden Ring) ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-bg').appendChild(renderer.domElement);
+        const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+        const material = new THREE.MeshBasicMaterial({ color: 0xf97316, wireframe: true, transparent: true, opacity: 0.1 });
+        const torus = new THREE.Mesh(geometry, material);
+        scene.add(torus);
+        camera.position.z = 30;
+        function animate() { requestAnimationFrame(animate); torus.rotation.x += 0.01; torus.rotation.y += 0.01; renderer.render(scene, camera); }
+        animate();
+
+        // --- TRADING LOGIC ---
+        const token = localStorage.getItem('token');
+        if (!token) location.href = 'dashboard.html';
+        const commissionRate = 0.05; // 5%
+
+        async function loadListings() {
+            try {
+                const res = await fetch('/api/trading', { headers: { 'Authorization': token } });
+                const data = await res.json();
+
+                const container = document.getElementById('listings');
+                if (!data.length) {
+                    container.innerHTML = '<div class="col-span-full text-center text-gray-500 p-10 glass rounded-xl">No active listings available.</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(l => `
+                    <div class="glass p-6 rounded-2xl relative group hover:bg-white/5 transition border border-white/5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-orange-300">${l.crop_name}</h3>
+                            <span class="bg-white/10 text-xs px-2 py-1 rounded">@${l.username}</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-300 mb-4">
+                            <span>📍 ${l.location}</span>
+                            <span>${l.quantity} kg</span>
+                        </div>
+                        <div class="flex justify-between items-end border-t border-white/10 pt-4">
+                            <div>
+                                <p class="text-xs text-gray-500">Price/Unit</p>
+                                <p class="text-lg font-bold">₹${l.price_per_unit}</p>
+                            </div>
+                            <button onclick="openPaymentModal(${l.id}, ${l.price_per_unit * l.quantity})" 
+                                class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg font-bold text-sm transition shadow-lg hover:shadow-green-500/20">Buy Now</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        function openPaymentModal(id, cost) {
+            const commission = cost * commissionRate;
+            const total = cost + commission;
+
+            document.getElementById('payListingId').value = id;
+            document.getElementById('payAmountRaw').value = cost;
+            document.getElementById('payItemCost').innerText = `₹${cost.toLocaleString()}`;
+            document.getElementById('payComm').innerText = `₹${commission.toLocaleString()}`;
+            document.getElementById('payTotal').innerText = `₹${total.toLocaleString()}`;
+
+            document.getElementById('payModal').showModal();
+        }
+
+        async function processPayment(e) {
+            e.preventDefault();
+            const btn = document.getElementById('payBtn');
+            const originalText = btn.innerHTML;
+
+            // 1. Loading State
+            btn.innerHTML = `<span class="animate-spin text-xl">↻</span> Processing...`;
+            btn.disabled = true;
+
+            const id = document.getElementById('payListingId').value;
+            const cost = parseFloat(document.getElementById('payAmountRaw').value);
+            const commission = cost * commissionRate;
+
+            // 2. Mock Delay for realism
+            await new Promise(r => setTimeout(r, 2000));
+
+            try {
+                // 3. Backend Call
+                const res = await fetch(`/api/trading/buy/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                    body: JSON.stringify({ amount: cost, commission: commission, paymentMethod: 'card' })
+                });
+
+                if (res.ok) {
+                    btn.innerHTML = `✅ Payment Successful!`;
+                    btn.classList.replace('bg-green-600', 'bg-blue-600');
+                    setTimeout(() => {
+                        document.getElementById('payModal').close();
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        btn.classList.replace('bg-blue-600', 'bg-green-600');
+                        loadListings();
+                        alert(`🎉 Order Confirmed!\n\nCommission of ₹${commission.toLocaleString()} collected for Admin.`);
+                    }, 1000);
+                } else {
+                    const d = await res.json();
+                    alert("Payment Failed: " + d.error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Network Error");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        document.getElementById('sellForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const payload = {
+                crop: document.getElementById('sCrop').value,
+                qty: document.getElementById('sQty').value,
+                price: document.getElementById('sPrice').value,
+                location: document.getElementById('sLoc').value
+            };
+
+            const res = await fetch('/api/trading', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert("Listing Posted Successfully!");
+                document.getElementById('sellForm').reset();
+                loadListings();
+            } else {
+                alert("Failed to post listing");
+            }
+        };
+
+        // Auto-refresh every 10 seconds to show new items from other users
+        setInterval(loadListings, 10000);
+        loadListings();
+    </script>
+</body>
+
+</html>

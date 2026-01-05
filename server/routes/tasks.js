@@ -2,11 +2,18 @@ const express = require('express'); // 1. Import Express
 const router = express.Router();    // 2. Define the router
 const db = require('../config/db');
 const auth = require('../middleware/auth');
+const sendAlert = require('../utils/mailer');
 
 // GET Tasks
 router.get('/', auth, async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT * FROM tasks WHERE user_id = ?', [req.user.id]);
+        // Show only future tasks
+        const [rows] = await db.execute(`
+            SELECT * FROM tasks 
+            WHERE user_id = ? 
+            AND TIMESTAMP(task_date, task_time) > NOW()
+            ORDER BY task_date ASC, task_time ASC
+        `, [req.user.id]);
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });

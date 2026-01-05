@@ -46,8 +46,13 @@
                 <h1 class="text-4xl font-black text-yellow-500 tracking-tighter">FINANCIAL TRACKER</h1>
                 <p class="text-gray-400">Monitor your farm's cash outflow</p>
             </div>
-            <button onclick="location.href='dashboard.html'"
-                class="glass px-6 py-2 rounded-full border border-yellow-500/30 hover:bg-yellow-500/10 transition font-bold">Dashboard</button>
+            <div class="flex gap-4">
+                <button onclick="exportCSV()"
+                    class="glass px-6 py-2 rounded-full border border-blue-500/30 font-bold hover:bg-blue-500/10 transition text-blue-400">Export
+                    CSV</button>
+                <button onclick="location.href='dashboard.html'"
+                    class="glass px-6 py-2 rounded-full border border-yellow-500/30 hover:bg-yellow-500/10 transition font-bold">Dashboard</button>
+            </div>
         </header>
 
         <form id="expForm"
@@ -201,6 +206,26 @@
 
         // Initialize
         loadExpenses();
+
+        async function exportCSV() {
+            try {
+                const res = await fetch('/api/expenses', { headers: { 'Authorization': token } });
+                const data = await res.json();
+
+                if (!data.length) return alert("No data to export");
+
+                const csvContent = "data:text/csv;charset=utf-8,"
+                    + "ID,Date,Category,Description,Amount\n"
+                    + data.map(e => `${e.id},${e.expense_date.split('T')[0]},${e.category},${e.description},${e.amount}`).join("\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "expense_report.csv");
+                document.body.appendChild(link);
+                link.click();
+            } catch (e) { console.error(e); }
+        }
 
         // Responsive 3D
         window.addEventListener('resize', () => {
