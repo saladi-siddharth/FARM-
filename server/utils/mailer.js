@@ -17,12 +17,12 @@ const createTransporter = () => {
     });
 };
 
-const transporter = createTransporter();
-
-// 2. The generic send function
 const sendAlert = async (toEmail, subject, text) => {
     try {
-        if (!transporter) {
+        // Re-check env vars every time (helpful for some cloud envs)
+        const currentTransporter = createTransporter();
+
+        if (!currentTransporter) {
             console.log('⚠️ Email alerts disabled (EMAIL_USER/PASS not set in .env)');
             return;
         }
@@ -40,7 +40,7 @@ const sendAlert = async (toEmail, subject, text) => {
                    </div>`
         };
 
-        await transporter.sendMail(mailOptions);
+        await currentTransporter.sendMail(mailOptions);
         console.log(`✅ Alert sent to ${toEmail}`);
     } catch (err) {
         console.error("❌ Email failed to send:", err);
