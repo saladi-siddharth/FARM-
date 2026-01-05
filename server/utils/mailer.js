@@ -1,20 +1,32 @@
 const nodemailer = require('nodemailer');
 
 // 1. Configure the transporter (Using Gmail as an example)
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
+const createTransporter = () => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        return null;
     }
-});
+    return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+};
+
+const transporter = createTransporter();
 
 // 2. The generic send function
 const sendAlert = async (toEmail, subject, text) => {
     try {
+        if (!transporter) {
+            console.log('⚠️ Email alerts disabled (EMAIL_USER/PASS not set in .env)');
+            return;
+        }
+
         const mailOptions = {
             from: `"Smart Farm Alerts" <${process.env.EMAIL_USER}>`,
             to: toEmail,

@@ -56,6 +56,7 @@ async function setup() {
                 task_time TIME NOT NULL,
                 description TEXT NOT NULL,
                 status ENUM('pending', 'completed') DEFAULT 'pending',
+                is_notified BOOLEAN DEFAULT FALSE,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         `);
