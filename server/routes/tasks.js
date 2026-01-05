@@ -30,12 +30,12 @@ router.post('/', auth, async (req, res) => {
         );
 
         // Send Email Alert
-        try {
-            const [user] = await db.execute('SELECT email FROM users WHERE id = ?', [req.user.id]);
-            await sendAlert(user[0].email, "New Task Assigned", `A new task "${description}" has been added to your planner.`);
-        } catch (emailErr) {
-            console.error("Email failed usually but task saved:", emailErr);
-        }
+        const [user] = await db.execute('SELECT email FROM users WHERE id = ?', [req.user.id]);
+        sendAlert(
+            user[0].email,
+            "New Task Assigned",
+            `A new task "${description}" has been added to your planner.`
+        ).catch(e => console.error("Task Email Failed:", e.message));
 
         res.status(201).json({ message: "Task Saved" });
     } catch (err) {

@@ -29,11 +29,11 @@ router.post('/', auth, async (req, res) => {
 
         // Send Email Alert
         const [user] = await db.execute('SELECT email, username FROM users WHERE id = ?', [req.user.id]);
-        await sendAlert(
+        sendAlert(
             user[0].email,
             "💸 New Expense Recorded",
             `Hello ${user[0].username}, an expense of ₹${amount} for "${category}" has been recorded on ${expense_date}.`
-        );
+        ).catch(e => console.error("Expense Email Failed:", e.message));
 
         res.status(201).json({ message: "Expense recorded successfully" });
     } catch (err) {

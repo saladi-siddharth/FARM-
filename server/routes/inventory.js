@@ -42,7 +42,11 @@ router.post('/', auth, async (req, res) => {
             message += ` Warning: Stock levels are now low (${quantity} left).`;
         }
 
-        await sendAlert(user[0].email, subject, message);
+        sendAlert(
+            user[0].email,
+            subject,
+            message
+        ).catch(e => console.error("Inventory Email Failed:", e.message));
 
         res.status(201).json({ message: "Inventory updated successfully" });
     } catch (err) {
