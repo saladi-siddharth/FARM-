@@ -13,9 +13,10 @@ const createTransporter = () => {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         },
-        connectionTimeout: 10000, // 10 seconds
+        connectionTimeout: 10000,
         greetingTimeout: 10000,
         socketTimeout: 10000,
+        family: 4, // <--- FORCE IPv4 (Fixes Render/Gmail timeouts)
         tls: {
             rejectUnauthorized: false
         }
