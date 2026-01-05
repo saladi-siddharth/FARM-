@@ -56,6 +56,18 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/dashboard.html'));
 });
 
+// Debug Route to check Env Vars (Access via /api/debug-env)
+app.get('/api/debug-env', (req, res) => {
+    res.json({
+        has_db_host: !!process.env.DB_HOST,
+        has_db_user: !!process.env.DB_USER,
+        has_email_user: !!process.env.EMAIL_USER,
+        email_user_value: process.env.EMAIL_USER || "MISSING",
+        has_email_pass: !!process.env.EMAIL_PASS,
+        node_env: process.env.NODE_ENV
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 const startScheduler = require('./scheduler');
 startScheduler();
