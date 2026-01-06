@@ -1,47 +1,78 @@
-# 🚀 How to Fix Email on Render Deployment
+# 🚀 Comprehensive Render Deployment Guide
 
-If emails (SMTP) are not working when you deploy to Render, it is almost certainly because the **Environment Variables** are missing or incorrect on the Render Dashboard.
-
-Follow these 2 simple steps to fix it.
+Follow this guide to ensure your **Email**, **Database**, and **Real-Time Features** work perfectly on Render.
 
 ---
 
-## Step 1: Get a Google App Password (Required)
-You CANNOT use your regular Gmail password. Google Blocks it for security.
+## ✅ Part 1: Database Setup (TiDB / MySQL)
 
-1. Go to your **Google Account Settings**.
-2. Search for **"App Passwords"** (If you don't see it, enable **2-Step Verification** first).
-3. Create a new App Password:
-   - **App Name:** `Farm App`
-   - Click **Create**.
-4. **COPY** the 16-character code (e.g., `abcd efgh ijkl mnop`). This is your password.
+Your app requires a MySQL-compatible database. Render does **NOT** provide a free MySQL database. You must use a free external provider like **TiDB Cloud** or **Aiven**.
 
----
+### 1. Create a Free Database (Recommended: TiDB)
+1.  Go to [TiDB Cloud](https://tidbcloud.com/) and sign up.
+2.  Create a **Serverless Tier** cluster (Free forever).
+3.  Once created, click **"Connect"**.
+4.  Select "Node.js" or look for the connection parameters.
+5.  **Copy** these 5 values:
+    *   Host (e.g., `gateway01.us-west-2.prod.aws.tidbcloud.com`)
+    *   Port (e.g., `4000`)
+    *   User (e.g., `2SeE...prefix.root`)
+    *   Password (The one you created)
+    *   Database Name (e.g., `test` or `farming`)
 
-## Step 2: Add Variables to Render
-
-1. Log in to your **Render Dashboard**.
-2. Click on your **Web Service** (the backend API).
-3. Click on the **"Environment"** tab on the left.
-4. Add the following **Environment Variables**:
+### 2. Add Variables to Render
+1.  Go to your **Render Dashboard** -> **Environment**.
+2.  Add these keys:
 
 | Key | Value |
 | :--- | :--- |
-| `EMAIL_USER` | `your-email@gmail.com` (Your extensive real email) |
-| `EMAIL_PASS` | `abcd efgh ijkl mnop` (The 16-char App Password from Step 1) |
-
-5. Click **"Save Changes"**.
+| `DB_HOST` | *(Your TiDB Host)* |
+| `DB_PORT` | `4000` (or 3306) |
+| `DB_USER` | *(Your TiDB User)* |
+| `DB_PASSWORD` | *(Your TiDB Password)* |
+| `DB_NAME` | `farming` (or whatever you named it) |
 
 ---
 
-## Step 3: Verify
+## ✅ Part 2: Email Setup (Google SMTP)
 
-I have updated the server code to **automatically check the connection** when it starts.
-1. Go to the **"Logs"** tab in Render.
-2. Wait for the server to restart (or manually Deploy -> Restart Service).
-3. Look for this message in the logs:
+If emails are failing, you need to provide your Google App Password.
 
-> ✅ **SMTP Server Connection Established (Ready to send emails)**
+1.  Go to `myaccount.google.com` -> Security.
+2.  Enable **2-Step Verification**.
+3.  Search for **"App Passwords"** and create one named "Farm App".
+4.  **Copy** the 16-character code.
 
-If you see this, your email system is 100% working! 
-If you see "Command failed" or "Auth failed", check your password again.
+### Add to Render Environment:
+
+| Key | Value |
+| :--- | :--- |
+| `EMAIL_USER` | `your-email@gmail.com` |
+| `EMAIL_PASS` | `abcd efgh ijkl mnop` (Your 16-char App Password) |
+
+---
+
+## ✅ Part 3: Real-Time Chat & Node Version
+
+Ensure Render uses a modern Node.js version.
+
+1.  In Render -> **Environment**.
+2.  Add/Check this variable:
+
+| Key | Value |
+| :--- | :--- |
+| `NODE_VERSION` | `20.11.0` (or higher) |
+
+---
+
+## 🛠️ Debugging
+
+After adding these variables:
+1.  Go to the **Events** tab in Render.
+2.  Click **"Manual Deploy"** -> **"Clear Build Cache & Deploy"**.
+3.  Watch the **Logs**. You should see:
+
+> ✅ Connected to MySQL ...
+> ✅ SMTP Server Connection Established ...
+
+If you see these green checks, your app is 100% online! 🚀
