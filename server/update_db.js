@@ -43,6 +43,56 @@ async function updateSchema() {
         `);
         console.log("✅ Created 'forum_posts' table");
 
+        // 4. Create 'trade_listings' table
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS trade_listings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                seller_id INT NOT NULL,
+                crop_name VARCHAR(255) NOT NULL,
+                quantity FLOAT NOT NULL,
+                price_per_unit DECIMAL(10, 2) NOT NULL,
+                description TEXT,
+                status ENUM('active', 'sold', 'cancelled') DEFAULT 'active',
+                buyer_id INT DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        `);
+        console.log("✅ Created 'trade_listings' table");
+
+        // 5. Create 'transactions' table
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                listing_id INT NOT NULL,
+                buyer_id INT NOT NULL,
+                seller_id INT NOT NULL,
+                total_amount DECIMAL(10, 2) NOT NULL,
+                status VARCHAR(50) DEFAULT 'completed',
+                transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (listing_id) REFERENCES trade_listings(id) ON DELETE CASCADE,
+                FOREIGN KEY (buyer_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (seller_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        `);
+        console.log("✅ Created 'transactions' table");
+
+        // 6. Create 'medical_reports' table (AI Doctor)
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS medical_reports (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                scan_id VARCHAR(50) NOT NULL,
+                diagnosis VARCHAR(255) NOT NULL,
+                confidence VARCHAR(50),
+                treatment TEXT,
+                image_url VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        `);
+        console.log("✅ Created 'medical_reports' table");
+
         console.log("🎉 Database Update Complete!");
         process.exit();
     } catch (err) {

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Farming AI - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            color: #f8fafc;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen">
+    <div id="canvas-container"></div>
+    <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-md text-white">
+        <h1 id="title" class="text-3xl font-bold text-center mb-6">Farmer Login</h1>
+        <form id="authForm" class="space-y-4">
+            <input type="text" id="user" placeholder="Name"
+                class="hidden w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+            <input type="email" id="email" placeholder="Email" required
+                class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+            <div class="relative">
+                <input type="password" id="pass" placeholder="Password" required
+                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+                <span id="eye" class="absolute right-3 top-3 cursor-pointer opacity-70">👁️</span>
+            </div>
+            <button type="submit"
+                class="w-full bg-green-500 py-3 rounded font-bold hover:bg-green-600 transition">Go</button>
+        </form>
+        <p class="mt-4 text-center cursor-pointer text-sm opacity-70" id="reset-link">Forgot Password?</p>
+        <p class="mt-2 text-center cursor-pointer text-sm opacity-70" id="toggle">Need an account? Sign Up</p>
+    </div>
+
+    <!-- WRAPPER FOR OTP/RESET MODAL -->
+    <div id="reset-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="glass p-8 rounded-3xl w-full max-w-sm text-white relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-xl">&times;</button>
+            <h2 id="reset-title" class="text-2xl font-bold mb-4">Reset Password</h2>
+
+            <!-- STEP 1: SEND EMAIL -->
+            <form id="step1-form" class="space-y-4">
+                <input type="email" id="reset-email" placeholder="Enter Email" required
+                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+                <button type="submit" class="w-full bg-blue-500 py-2 rounded">Send OTP</button>
+            </form>
+
+            <!-- STEP 2: VERIFY OTP -->
+            <form id="step2-form" class="hidden space-y-4">
+                <input type="text" id="reset-otp" placeholder="Enter OTP" required
+                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+                <input type="password" id="reset-newpass" placeholder="New Password" required
+                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+                <button type="submit" class="w-full bg-green-500 py-2 rounded">Change Password</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- THREE.JS REMOVED (Replaced by global background-3d.js) ---
+
+
+        // --- AUTH LOGIC ---
+        let isLogin = true;
+        const toggle = document.getElementById('toggle');
+        const userInp = document.getElementById('user');
+        const passInp = document.getElementById('pass');
+        const eye = document.getElementById('eye');
+
+        // Toggle Password Visibility
+        eye.onclick = () => {
+            passInp.type = passInp.type === 'password' ? 'text' : 'password';
+            eye.innerText = passInp.type === 'password' ? '👁️' : '🙈';
+        };
+
+        toggle.onclick = () => {
+            isLogin = !isLogin;
+            userInp.classList.toggle('hidden');
+            toggle.innerText = isLogin ? "Need an account? Sign Up" : "Back to Login";
+            document.getElementById('title').innerText = isLogin ? "Farmer Login" : "Farmer Sign Up";
+            document.getElementById('reset-link').classList.toggle('hidden', !isLogin);
+        };
+
+        // --- RESET PASSWORD LOGIC ---
+        const resetModal = document.getElementById('reset-modal');
+        const resetLink = document.getElementById('reset-link');
+        const closeModal = document.getElementById('close-modal');
+        const step1 = document.getElementById('step1-form');
+        const step2 = document.getElementById('step2-form');
+        let resetEmail = "";
+
+        resetLink.onclick = () => resetModal.classList.remove('hidden');
+        closeModal.onclick = () => resetModal.classList.add('hidden');
+
+        step1.onsubmit = async (e) => {
+            e.preventDefault();
+            resetEmail = document.getElementById('reset-email').value;
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: resetEmail })
+            });
+            const data = await res.json();
+            if (res.ok) { alert(data.message); step1.classList.add('hidden'); step2.classList.remove('hidden'); }
+            else { alert(data.error); }
+        };
+
+        step2.onsubmit = async (e) => {
+            e.preventDefault();
+            const otp = document.getElementById('reset-otp').value;
+            const newPassword = document.getElementById('reset-newpass').value;
+            const res = await fetch('/api/auth/reset-password', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: resetEmail, otp, newPassword })
+            });
+            const data = await res.json();
+            if (res.ok) { alert(data.message); window.location.reload(); }
+            else { alert(data.error); }
+        };
+
+        document.getElementById('authForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const body = { email: email.value, password: pass.value, username: user.value };
+            const res = await fetch(isLogin ? '/api/auth/signin' : '/api/auth/signup', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                if (isLogin) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', data.username);
+                    window.location.href = 'dashboard.html';
+                } else { alert("Registered! Now Login."); toggle.click(); }
+            } else { alert(data.error); }
+        };
+    </script>
+    <script src="js/background-3d.js"></script>
+<script src="js/global-ticker.js"></script></body>
+
+</html>

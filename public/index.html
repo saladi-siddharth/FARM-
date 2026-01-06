@@ -1,176 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Farming AI - Login</title>
+    <meta charset="UTF-8">
+    <title>Farm Central | Future of Agriculture</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            overflow: hidden;
-            background: #000;
-        }
-
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
+            background: #0f172a;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-text {
+            background: linear-gradient(to right, #4ade80, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .fade-in {
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 
-<body class="flex items-center justify-center min-h-screen">
-    <div id="canvas-container"></div>
-    <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-md text-white">
-        <h1 id="title" class="text-3xl font-bold text-center mb-6">Farmer Login</h1>
-        <form id="authForm" class="space-y-4">
-            <input type="text" id="user" placeholder="Name"
-                class="hidden w-full p-3 rounded bg-white/10 outline-none border border-white/20">
-            <input type="email" id="email" placeholder="Email" required
-                class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
-            <div class="relative">
-                <input type="password" id="pass" placeholder="Password" required
-                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
-                <span id="eye" class="absolute right-3 top-3 cursor-pointer opacity-70">👁️</span>
+<body>
+    <div id="canvas-bg" class="fixed inset-0 z-[-1]"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-black tracking-tighter text-white flex items-center gap-2">
+                <span class="text-3xl">🌱</span> FARM CENTRAL
             </div>
-            <button type="submit"
-                class="w-full bg-green-500 py-3 rounded font-bold hover:bg-green-600 transition">Go</button>
-        </form>
-        <p class="mt-4 text-center cursor-pointer text-sm opacity-70" id="reset-link">Forgot Password?</p>
-        <p class="mt-2 text-center cursor-pointer text-sm opacity-70" id="toggle">Need an account? Sign Up</p>
-    </div>
-
-    <!-- WRAPPER FOR OTP/RESET MODAL -->
-    <div id="reset-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="glass p-8 rounded-3xl w-full max-w-sm text-white relative">
-            <button id="close-modal" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h2 id="reset-title" class="text-2xl font-bold mb-4">Reset Password</h2>
-
-            <!-- STEP 1: SEND EMAIL -->
-            <form id="step1-form" class="space-y-4">
-                <input type="email" id="reset-email" placeholder="Enter Email" required
-                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
-                <button type="submit" class="w-full bg-blue-500 py-2 rounded">Send OTP</button>
-            </form>
-
-            <!-- STEP 2: VERIFY OTP -->
-            <form id="step2-form" class="hidden space-y-4">
-                <input type="text" id="reset-otp" placeholder="Enter OTP" required
-                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
-                <input type="password" id="reset-newpass" placeholder="New Password" required
-                    class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
-                <button type="submit" class="w-full bg-green-500 py-2 rounded">Change Password</button>
-            </form>
+            <div class="flex gap-4">
+                <button onclick="enterDashboard()"
+                    class="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full font-bold transition">Dashboard</button>
+                <button onclick="location.href='login.html'"
+                    class="px-6 py-2 bg-green-500 hover:bg-green-600 rounded-full font-bold transition shadow-lg shadow-green-500/20">Login</button>
+            </div>
         </div>
-    </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="min-h-screen flex items-center justify-center pt-20 relative">
+        <div class="text-center px-4 max-w-4xl fade-in z-10">
+            <span class="text-green-400 font-bold tracking-widest uppercase text-sm mb-4 block">Next-Gen Agriculture
+                Management</span>
+            <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight">
+                Farming, <br> <span class="hero-text">Reimagined.</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">
+                The all-in-one ecosystem for modern farmers. Manage inventory, track finances, consult AI doctors, and
+                trade in real-time.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-6">
+                <button onclick="enterDashboard()"
+                    class="px-10 py-5 bg-blue-600 hover:bg-blue-500 text-lg font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:scale-105 flex items-center justify-center gap-3">
+                    <span>🚀</span> Enter Dashboard
+                </button>
+                <button onclick="document.getElementById('features').scrollIntoView()"
+                    class="px-10 py-5 glass text-lg font-bold rounded-2xl hover:bg-white/5 transition flex items-center justify-center gap-3">
+                    <span>✨</span> Explore Features
+                </button>
+            </div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0f172a] to-transparent z-0"></div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section id="features" class="py-32 relative bg-[#0f172a]">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-5xl font-black mb-6">Why Farm Central?</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">We combine advanced technology with simple interfaces to
+                    make farming smarter, more profitable, and effortless.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-emerald-500">
+                    <div class="text-5xl mb-6">🔬</div>
+                    <h3 class="text-2xl font-bold mb-4">AI Crop Doctor</h3>
+                    <p class="text-slate-400 leading-relaxed">Instantly diagnose plant diseases by uploading a photo.
+                        Get treatment plans and confidence scores powered by advanced computer vision.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-purple-500">
+                    <div class="text-5xl mb-6">📈</div>
+                    <h3 class="text-2xl font-bold mb-4">Live Market</h3>
+                    <p class="text-slate-400 leading-relaxed">Real-time simulated market prices for crops like Wheat,
+                        Rice, and Cotton. Track trends and engage in peer-to-peer trading.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-blue-500">
+                    <div class="text-5xl mb-6">🧮</div>
+                    <h3 class="text-2xl font-bold mb-4">ROI Estimator</h3>
+                    <p class="text-slate-400 leading-relaxed">Calculate projected profits and losses before you even
+                        plant. Input land size and yield to get instant financial forecasts.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-cyan-500">
+                    <div class="text-5xl mb-6">🎙️</div>
+                    <h3 class="text-2xl font-bold mb-4">Voice AI Assistant</h3>
+                    <p class="text-slate-400 leading-relaxed">Hands-free control. Just say "Hello Farm Central" to check
+                        inventory, get weather updates, or navigate the app.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-pink-500">
+                    <div class="text-5xl mb-6">💬</div>
+                    <h3 class="text-2xl font-bold mb-4">Community</h3>
+                    <p class="text-slate-400 leading-relaxed">Connect with thousands of other farmers. Share tips, ask
+                        questions, and form a strong support network.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-yellow-500">
+                    <div class="text-5xl mb-6">📊</div>
+                    <h3 class="text-2xl font-bold mb-4">Pro Reports</h3>
+                    <p class="text-slate-400 leading-relaxed">Generate professional PDF financial statements instantly
+                        for bank loans, audits, or personal record keeping.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="py-20 text-center relative overflow-hidden">
+        <div class="glass max-w-5xl mx-auto p-12 md:p-20 rounded-[3rem] border border-white/10 relative z-10 mx-6">
+            <h2 class="text-4xl md:text-6xl font-black mb-8">Ready to Modernize?</h2>
+            <button onclick="enterDashboard()"
+                class="px-12 py-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl text-xl font-bold hover:shadow-2xl hover:shadow-green-500/30 transition transform hover:scale-105">
+                Start Your Journey
+            </button>
+        </div>
+        <!-- BG Glow -->
+        <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/20 blur-[120px] rounded-full z-0">
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-12 text-center text-slate-500 text-sm border-t border-white/5 mt-20">
+        <p>&copy; 2026 Farm Central. Built with ❤️ for Farmers.</p>
+    </footer>
 
     <script>
-        // --- THREE.JS 3D SCENE ---
+        // --- 3D Background ---
+        // --- 3D Background (Futuristic Agriculture) ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        document.getElementById('canvas-bg').appendChild(renderer.domElement);
 
-        const stars = new THREE.BufferGeometry();
-        const starCount = 5000;
-        const posArray = new Float32Array(starCount * 3);
-        for (let i = 0; i < starCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 100;
-        stars.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const material = new THREE.PointsMaterial({ size: 0.05, color: 0x4ade80 });
-        const starMesh = new THREE.Points(stars, material);
-        scene.add(starMesh);
-        camera.position.z = 2;
+        // 1. Digital Terrain Grid
+        const gridHelper = new THREE.GridHelper(200, 50, 0x4ade80, 0x3b82f6);
+        gridHelper.position.y = -5;
+        scene.add(gridHelper);
+
+        // 2. Floating Data Cubes (Representing IoT)
+        const cubes = [];
+        const cubeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const cubeMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, wireframe: true });
+        for (let i = 0; i < 50; i++) {
+            const cube = new THREE.Mesh(cubeGeo, cubeMat);
+            cube.position.set((Math.random() - 0.5) * 50, (Math.random() * 10) - 5, (Math.random() - 0.5) * 50);
+            scene.add(cube);
+            cubes.push(cube);
+        }
+
+        // 3. Central "Core" (Representing AI)
+        const coreGeo = new THREE.IcosahedronGeometry(2, 0);
+        const coreMat = new THREE.MeshNormalMaterial({ wireframe: true });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        scene.add(core);
+
+        // 4. Orbiting Rings
+        const ringGeo = new THREE.TorusGeometry(4, 0.05, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = Math.PI / 2;
+        scene.add(ring);
+
+        camera.position.z = 15;
+        camera.position.y = 2;
 
         function animate() {
             requestAnimationFrame(animate);
-            starMesh.rotation.y += 0.002;
+
+            // Core Rotation
+            core.rotation.x += 0.005;
+            core.rotation.y += 0.005;
+
+            // Ring Wobble
+            ring.rotation.x += 0.002;
+            ring.rotation.y += 0.002;
+
+            // Animate Cubes
+            cubes.forEach(c => {
+                c.rotation.x += 0.02;
+                c.position.y += Math.sin(Date.now() * 0.001 + c.position.x) * 0.01;
+            });
+
+            // Camera drift
+            camera.position.x = Math.sin(Date.now() * 0.0002) * 2;
+            camera.lookAt(0, 0, 0);
+
             renderer.render(scene, camera);
         }
         animate();
 
-        // --- AUTH LOGIC ---
-        let isLogin = true;
-        const toggle = document.getElementById('toggle');
-        const userInp = document.getElementById('user');
-        const passInp = document.getElementById('pass');
-        const eye = document.getElementById('eye');
-
-        // Toggle Password Visibility
-        eye.onclick = () => {
-            passInp.type = passInp.type === 'password' ? 'text' : 'password';
-            eye.innerText = passInp.type === 'password' ? '👁️' : '🙈';
-        };
-
-        toggle.onclick = () => {
-            isLogin = !isLogin;
-            userInp.classList.toggle('hidden');
-            toggle.innerText = isLogin ? "Need an account? Sign Up" : "Back to Login";
-            document.getElementById('title').innerText = isLogin ? "Farmer Login" : "Farmer Sign Up";
-            document.getElementById('reset-link').classList.toggle('hidden', !isLogin);
-        };
-
-        // --- RESET PASSWORD LOGIC ---
-        const resetModal = document.getElementById('reset-modal');
-        const resetLink = document.getElementById('reset-link');
-        const closeModal = document.getElementById('close-modal');
-        const step1 = document.getElementById('step1-form');
-        const step2 = document.getElementById('step2-form');
-        let resetEmail = "";
-
-        resetLink.onclick = () => resetModal.classList.remove('hidden');
-        closeModal.onclick = () => resetModal.classList.add('hidden');
-
-        step1.onsubmit = async (e) => {
-            e.preventDefault();
-            resetEmail = document.getElementById('reset-email').value;
-            const res = await fetch('/api/auth/forgot-password', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: resetEmail })
-            });
-            const data = await res.json();
-            if (res.ok) { alert(data.message); step1.classList.add('hidden'); step2.classList.remove('hidden'); }
-            else { alert(data.error); }
-        };
-
-        step2.onsubmit = async (e) => {
-            e.preventDefault();
-            const otp = document.getElementById('reset-otp').value;
-            const newPassword = document.getElementById('reset-newpass').value;
-            const res = await fetch('/api/auth/reset-password', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: resetEmail, otp, newPassword })
-            });
-            const data = await res.json();
-            if (res.ok) { alert(data.message); window.location.reload(); }
-            else { alert(data.error); }
-        };
-
-        document.getElementById('authForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const body = { email: email.value, password: pass.value, username: user.value };
-            const res = await fetch(isLogin ? '/api/auth/signin' : '/api/auth/signup', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            const data = await res.json();
-            if (res.ok) {
-                if (isLogin) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', data.username);
-                    window.location.href = 'dashboard.html';
-                } else { alert("Registered! Now Login."); toggle.click(); }
-            } else { alert(data.error); }
-        };
+        // --- DASHBOARD ACCESS LOGIC ---
+        function enterDashboard() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Logged in -> Go to Dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                // Not Logged in -> Go to Login
+                window.location.href = 'login.html';
+            }
+        }
     </script>
-</body>
+<script src="js/background-3d.js"></script><script src="js/global-ticker.js"></script></body>
 
 </html>

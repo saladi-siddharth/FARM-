@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const auth = require('../middleware/auth');
-const sendAlert = require('../utils/mailer');
+const { sendAlert } = require('../utils/mailer');
 
 // GET: Fetch inventory for the logged-in user
 router.get('/', auth, async (req, res) => {

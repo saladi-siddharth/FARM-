@@ -1,6 +1,6 @@
 const cron = require('node-cron'); // Use node-cron if available, else setInterval
 const db = require('./config/db');
-const sendAlert = require('./utils/mailer');
+const { sendAlert } = require('./utils/mailer');
 
 // Schedule: Check every minute
 const startScheduler = () => {

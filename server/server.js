@@ -25,30 +25,59 @@ app.use('/api/calendar', require('./routes/calendar'));
 app.use('/api/forum', require('./routes/forum'));
 app.use('/api/trading', require('./routes/trading'));
 app.use('/api/chat', require('./routes/chat'));
+app.use('/api/market', require('./routes/market'));
+app.use('/api/doctor', require('./routes/doctor'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/trade', require('./routes/trade')); // NEW TRADE ROUTE
 
 // --- SOCKET.IO SIGNALLING (For Calls) ---
+// --- SOCKET.IO SIGNALLING (Real-Time Presence & Calls) ---
+const onlineUsers = new Map(); // Store { socketId: username }
+
 io.on('connection', (socket) => {
+
+    // 1. Handle User Presence
+    socket.on('user-online', (username) => {
+        socket.username = username;
+        onlineUsers.set(socket.id, username);
+
+        // Broadcast to others that this user is online
+        socket.broadcast.emit('user-status', { username, status: 'online' });
+
+        // Send list of currently online users to THIS new user
+        const activeUsers = Array.from(new Set(onlineUsers.values())); // Unique usernames
+        socket.emit('active-users-list', activeUsers);
+    });
+
+    // 2. Handle Disconnect
+    socket.on('disconnect', () => {
+        const username = onlineUsers.get(socket.id);
+        if (username) {
+            onlineUsers.delete(socket.id);
+            // Only broadcast offline if no other sockets exist for this user (simple check)
+            // For now, we just broadcast. The client can handle debounce or check.
+            io.emit('user-status', { username, status: 'offline' });
+        }
+    });
+
+    // 3. WebRTC Signaling (Calls)
     socket.on('join-room', (roomId, userId) => {
         socket.join(roomId);
         socket.to(roomId).emit('user-connected', userId);
-
-        socket.on('disconnect', () => {
-            socket.to(roomId).emit('user-disconnected', userId);
-        });
     });
 
-    // WebRTC Signaling
-    socket.on('offer', (data) => {
-        socket.to(data.roomId).emit('offer', data);
-    });
+    socket.on('offer', (data) => socket.to(data.roomId).emit('offer', data));
+    socket.on('answer', (data) => socket.to(data.roomId).emit('answer', data));
+    socket.on('ice-candidate', (data) => socket.to(data.roomId).emit('ice-candidate', data));
 
-    socket.on('answer', (data) => {
-        socket.to(data.roomId).emit('answer', data);
-    });
+    // 4. Call Signaling (Ringing)
+    socket.on('call-request', (data) => socket.broadcast.emit('incoming-call', data));
+    socket.on('call-accepted', (data) => socket.broadcast.emit('call-started', data));
+    socket.on('call-rejected', (data) => socket.broadcast.emit('call-ended', data));
 
-    socket.on('ice-candidate', (data) => {
-        socket.to(data.roomId).emit('ice-candidate', data);
-    });
+    // 5. Chat Typing
+    socket.on('typing', (data) => socket.broadcast.emit('typing', data));
+    socket.on('stop-typing', (data) => socket.broadcast.emit('stop-typing', data));
 });
 
 // Default route to serve Dashboard
@@ -70,7 +99,10 @@ app.get('/api/debug-env', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 const startScheduler = require('./scheduler');
+const { verifyConnection } = require('./utils/mailer'); // Import Verify
+
 startScheduler();
+verifyConnection(); // Verify SMTP on Start
 
 server.listen(PORT, () => {
     console.log(`

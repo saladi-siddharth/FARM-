@@ -1,0 +1,131 @@
+const express = require('express');
+const router = express.Router();
+const upload = require('../middleware/upload');
+const db = require('../config/db');
+const auth = require('../middleware/auth');
+
+// MOCK AI DIAGNOSIS DB
+const diagnoses = [
+    { name: "Early Blight", confidence: "94%", treatment: "Apply fungicides containing mancozeb or chlorothalonil. Remove infected leaves." },
+    { name: "Powdery Mildew", confidence: "98%", treatment: "Use sulfur-based fungicides. Improve air circulation around the crop." },
+    { name: "Leaf Minor", confidence: "89%", treatment: "Introduce natural predators like parasitic wasps. Use neem oil sprays." },
+    { name: "Nitrogen Deficiency", confidence: "92%", treatment: "Apply nitrogen-rich fertilizer (Urea or Compost). Ensure soil pH is balanced." },
+    { name: "Healthy Crop", confidence: "99%", treatment: "No action needed. Keep monitoring water and nutrient levels." }
+];
+
+router.post('/analyze', upload.single('image'), (req, res) => {
+    // 1. In a real professional app, we would send 'req.file.path' to a Python ML Service or Google Vision API
+    // 2. Here, we simulate a professional analysis delay and result.
+
+    setTimeout(() => {
+        const randomResult = diagnoses[Math.floor(Math.random() * diagnoses.length)];
+
+        res.json({
+            success: true,
+            diagnosis: randomResult.name,
+            confidence: randomResult.confidence,
+            treatment: randomResult.treatment,
+            scan_id: "SCN-" + Date.now(),
+            image_url: req.file ? `/uploads/${req.file.filename}` : null
+        });
+    }, 2500); // 2.5s simulated analysis time
+});
+
+router.post('/save-report', auth, async (req, res) => {
+    try {
+        const { scan_id, diagnosis, confidence, treatment, image_url } = req.body;
+        const userId = req.user.id;
+
+        await db.execute(`
+            INSERT INTO medical_reports (user_id, scan_id, diagnosis, confidence, treatment, image_url)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `, [userId, scan_id, diagnosis, confidence, treatment, image_url || null]);
+
+        res.json({ message: "Saved" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to save report" });
+    }
+});
+
+// GET: My Past Reports
+router.get('/history', auth, async (req, res) => {
+    try {
+        const [rows] = await db.execute('SELECT * FROM medical_reports WHERE user_id = ? ORDER BY created_at DESC', [req.user.id]);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to load history" });
+    }
+});
+
+// GET: Generate PDF for a specific report
+router.get('/report/:id', auth, async (req, res) => {
+    const PDFDocument = require('pdfkit');
+    const fs = require('fs');
+    const path = require('path');
+
+    try {
+        const reportId = req.params.id;
+        const [rows] = await db.execute('SELECT * FROM medical_reports WHERE id = ? AND user_id = ?', [reportId, req.user.id]);
+
+        if (rows.length === 0) return res.status(404).send("Report not found");
+        const report = rows[0];
+
+        const doc = new PDFDocument();
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Crop_Doctor_Report_${report.scan_id}.pdf`);
+        doc.pipe(res);
+
+        // Header
+        doc.fontSize(24).fillColor('#10b981').text('FARM CENTRAL', { align: 'center' });
+        doc.fontSize(16).fillColor('black').text('AI CROP DOCTOR DIAGNOSIS', { align: 'center' });
+        doc.moveDown();
+
+        // Info
+        doc.fontSize(12).text(`Scan ID: ${report.scan_id}`);
+        doc.text(`Date: ${new Date(report.created_at).toLocaleString()}`);
+        doc.moveDown();
+
+        // Image
+        if (report.image_url) {
+            // Convert Web URL to System Path
+            // report.image_url comes as "/uploads/filename.jpg"
+            const imagePath = path.join(__dirname, '../../public', report.image_url);
+            if (fs.existsSync(imagePath)) {
+                try {
+                    doc.image(imagePath, { fit: [500, 300], align: 'center' });
+                    doc.moveDown();
+                } catch (e) {
+                    doc.text("[Image corrupted or unsupported format]");
+                }
+            } else {
+                doc.text("[Image file not found on server]");
+            }
+        }
+        doc.moveDown();
+
+        // Diagnosis
+        doc.fontSize(14).fillColor(report.diagnosis === 'Healthy Crop' ? 'green' : 'red')
+            .text(`Diagnosis: ${report.diagnosis}`, { underline: true });
+
+        doc.fillColor('black').fontSize(12).text(`Confidence Score: ${report.confidence}`);
+        doc.moveDown();
+
+        // Treatment
+        doc.fontSize(14).text("Recommended Treatment:");
+        doc.fontSize(12).text(report.treatment);
+
+        // Footer
+        doc.moveDown(2);
+        doc.fontSize(10).fillColor('grey').text('Generated by Farm Central AI System. Consult a real agronomist for critical issues.', { align: 'center' });
+
+        doc.end();
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("PDF Generation Failed");
+    }
+});
+
+module.exports = router;

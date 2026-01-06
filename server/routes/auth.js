@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-const sendAlert = require('../utils/mailer');
+const { sendAlert } = require('../utils/mailer');
 
 // SIGN UP (New Farmer Registration)
 router.post('/signup', async (req, res) => {
@@ -103,6 +103,20 @@ router.post('/reset-password', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server Error" });
+    }
+});
+
+// TEST EMAIL ROUTE (For Debugging)
+router.post('/test-email', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: "Email required" });
+
+        await sendAlert(email, "Test Email System", "If you are reading this, the SMTP configuration on Render is working correctly! 🚀");
+
+        res.json({ message: "Test email command sent. Check server logs for success/failure." });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to send test email" });
     }
 });
 

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const auth = require('../middleware/auth');
-const sendAlert = require('../utils/mailer');
+const { sendAlert } = require('../utils/mailer');
 
 // GET: All Expenses for current farmer
 router.get('/', auth, async (req, res) => {

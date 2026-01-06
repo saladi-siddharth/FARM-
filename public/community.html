@@ -51,17 +51,31 @@
         <div class="glass p-6 rounded-2xl mb-8 shrink-0">
             <form id="postForm" class="flex flex-col gap-4">
                 <textarea id="postContent" placeholder="Ask a question or share a tip..."
-                    class="w-full bg-black/40 p-4 rounded-xl border border-white/20 outline-none focus:border-blue-500 h-24 resize-none transition"></textarea>
-                <div class="flex justify-end">
+                    class="w-full bg-black/40 p-4 rounded-xl border border-white/20 outline-none focus:border-blue-500 h-24 resize-none transition text-white placeholder-gray-500"></textarea>
+
+                <!-- Media Preview -->
+                <div id="mediaPreview"
+                    class="hidden relative w-32 h-32 rounded-lg overflow-hidden border border-white/20">
+                    <img id="previewImg" class="w-full h-full object-cover">
+                    <button type="button" onclick="clearMedia()"
+                        class="absolute top-1 right-1 bg-black/50 rounded-full p-1 hover:bg-red-500 transition">✕</button>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <label class="cursor-pointer text-blue-400 hover:text-blue-300 flex items-center gap-2 transition">
+                        <span class="text-xl">📷</span>
+                        <span class="text-sm font-bold">Add Photo/Video</span>
+                        <input type="file" id="mediaInput" class="hidden" accept="image/*,video/*"
+                            onchange="handleFileSelect(this)">
+                    </label>
                     <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-500 px-8 py-2 rounded-full font-bold transition">Post</button>
+                        class="bg-blue-600 hover:bg-blue-500 px-8 py-2 rounded-full font-bold transition shadow-lg shadow-blue-600/20">Post</button>
                 </div>
             </form>
         </div>
 
         <!-- Feed -->
         <div id="feed" class="flex-1 overflow-y-auto space-y-6 pr-2">
-            <!-- Posts Inject Here -->
             <div class="text-center text-gray-500 mt-10">Loading community discussions...</div>
         </div>
     </div>
@@ -107,32 +121,79 @@
                 }
 
                 feed.innerHTML = data.map(p => `
-                    <div class="glass p-6 rounded-2xl border-l-4 border-blue-500 animate-fade-in-up relative group">
-                        <button onclick="deletePost(${p.id})" class="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition hover:bg-red-500/20 p-2 rounded-lg">🗑️</button>
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="font-bold text-blue-300">@${p.username}</span>
-                            <span class="text-xs text-gray-500">${new Date(p.created_at).toLocaleDateString()}</span>
+                    <div class="glass p-6 rounded-2xl border-l-4 border-blue-500 relative group animate-fade-in-up">
+                        ${p.username === localStorage.getItem('username') ?
+                        `<button onclick="deletePost(${p.id})" class="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition hover:bg-red-500/20 p-2 rounded-lg">🗑️</button>` : ''}
+                        
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center font-bold text-blue-300">
+                                ${p.username[0].toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="font-bold text-white">@${p.username}</div>
+                                <div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div>
+                            </div>
                         </div>
-                        <p class="text-gray-200 leading-relaxed">${p.content}</p>
+                        
+                        <p class="text-gray-200 leading-relaxed mb-4">${p.content}</p>
+                        
+                        ${p.media_url ? renderMedia(p.media_url, p.media_type) : ''}
                     </div>
                 `).join('');
             } catch (e) { console.error(e); }
         }
 
+        function renderMedia(url, type) {
+            if (type === 'image') {
+                return `<img src="${url}" class="w-full max-h-96 object-cover rounded-xl border border-white/10">`;
+            } else if (type === 'video') {
+                return `<video src="${url}" controls class="w-full max-h-96 rounded-xl border border-white/10"></video>`;
+            }
+            return '';
+        }
+
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('mediaPreview').classList.remove('hidden');
+                    document.getElementById('previewImg').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearMedia() {
+            document.getElementById('mediaInput').value = '';
+            document.getElementById('mediaPreview').classList.add('hidden');
+        }
+
         document.getElementById('postForm').onsubmit = async (e) => {
             e.preventDefault();
             const content = document.getElementById('postContent').value;
-            if (!content.trim()) return;
+            const fileInput = document.getElementById('mediaInput');
+
+            if (!content.trim() && !fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append('content', content);
+            if (fileInput.files.length) {
+                formData.append('media', fileInput.files[0]);
+            }
 
             const res = await fetch('/api/forum', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                body: JSON.stringify({ content })
+                headers: { 'Authorization': token }, // Do NOT set Content-Type for FormData
+                body: formData
             });
 
             if (res.ok) {
                 document.getElementById('postContent').value = '';
+                clearMedia();
                 loadPosts();
+            } else {
+                alert("Failed to post");
             }
         };
 
@@ -147,6 +208,7 @@
 
         loadPosts();
     </script>
-</body>
+    <script src="js/ai-core.js"></script>
+<script src="js/background-3d.js"></script><script src="js/global-ticker.js"></script></body>
 
 </html>

@@ -25,11 +25,13 @@ const createTransporter = () => {
 
 const sendAlert = async (toEmail, subject, text) => {
     try {
-        // Re-check env vars every time (helpful for some cloud envs)
+        console.log(`📧 Attempting to send email to: ${toEmail}`);
+
+        // Re-check env vars every time
         const currentTransporter = createTransporter();
 
         if (!currentTransporter) {
-            console.log('⚠️ Email alerts disabled (EMAIL_USER/PASS not set in .env)');
+            console.error('❌ Email config missing. Please check EMAIL_USER and EMAIL_PASS variables.');
             return;
         }
 
@@ -38,19 +40,36 @@ const sendAlert = async (toEmail, subject, text) => {
             to: toEmail,
             subject: subject,
             text: text,
-            html: `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #4ade80; border-radius: 10px;">
-                    <h2 style="color: #166534;">🌾 Farm System Alert</h2>
-                    <p>${text}</p>
-                    <hr>
-                    <small>This is an automated security notification for your Smart Farm account.</small>
+            html: `<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px; border: 1px solid #4ade80; border-radius: 12px; background-color: #f0fdf4; color: #1e293b;">
+                    <h2 style="color: #15803d; margin-top: 0;">🌾 Farm System Alert</h2>
+                    <p style="font-size: 16px; line-height: 1.5;">${text}</p>
+                    <hr style="border: 0; border-top: 1px solid #bbf7d0; margin: 20px 0;">
+                    <small style="color: #64748b;">This is an automated security notification for your Smart Farm account.</small>
                    </div>`
         };
 
-        await currentTransporter.sendMail(mailOptions);
-        console.log(`✅ Alert sent to ${toEmail}`);
+        const info = await currentTransporter.sendMail(mailOptions);
+        console.log(`✅ Alert sent successfully to ${toEmail}. MessageID: ${info.messageId}`);
     } catch (err) {
-        console.error("❌ Email failed to send:", err);
+        console.error("❌ CRITICAL EMAIL ERROR:", err);
+        if (err.code === 'EAUTH') {
+            console.error("👉 Auth failed. Check EMAIL_USER/PASS. If using Gmail, use an App Password.");
+        }
     }
 };
 
-module.exports = sendAlert;
+const verifyConnection = async () => {
+    const transporter = createTransporter();
+    if (!transporter) {
+        console.warn('⚠️  Email Transporter not initialized. Missing EMAIL_USER or EMAIL_PASS.');
+        return;
+    }
+    try {
+        await transporter.verify();
+        console.log('✅ SMTP Server Connection Established (Ready to send emails)');
+    } catch (error) {
+        console.error('❌ SMTP Connection Failed:', error.message);
+    }
+};
+
+module.exports = { sendAlert, verifyConnection };

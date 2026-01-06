@@ -4,279 +4,362 @@
 <head>
     <meta charset="UTF-8">
     <title>Trade Hub | Farm Central</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body {
-            margin: 0;
-            background: #020617;
+            background: #0f172a;
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             overflow-x: hidden;
         }
 
-        #canvas-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
+        .glass {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+        .input-field {
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            width: 100%;
+            color: white;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
+        }
+
+        .tab-btn.active {
+            background: rgba(249, 115, 22, 0.2);
+            border-color: #f97316;
+            color: #f97316;
         }
     </style>
 </head>
 
-<body class="p-4 md:p-8">
-    <div id="canvas-bg"></div>
+<body class="pb-24">
+    <div id="canvas-bg" class="fixed inset-0 z-[-1] opacity-60"></div>
 
-    <div class="max-w-6xl mx-auto min-h-screen">
-        <header class="flex justify-between items-center mb-8">
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-black text-orange-400">TRADE HUB</h1>
-                <p class="text-gray-400">Buy & Sell Crops Directly (Peer-to-Peer)</p>
+                <h1
+                    class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-500 tracking-tighter">
+                    TRADE HUB</h1>
+                <p class="text-slate-400 font-medium">Direct Farmer-to-Buyer Marketplace</p>
             </div>
-            <button onclick="location.href='dashboard.html'"
-                class="glass px-6 py-2 rounded-full hover:bg-orange-500/20 transition font-bold">Back to Hub</button>
+            <div class="flex gap-3">
+                <button onclick="changeTab('market')" id="tab-market"
+                    class="tab-btn active px-6 py-2 rounded-full glass font-bold transition border border-transparent">🛒
+                    Market</button>
+                <button onclick="changeTab('my')" id="tab-my"
+                    class="tab-btn px-6 py-2 rounded-full glass font-bold transition border border-transparent">📂 My
+                    Listings</button>
+                <button onclick="location.href='dashboard.html'"
+                    class="px-6 py-2 rounded-full glass hover:bg-white/10 font-bold transition">← Hub</button>
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Sell Form -->
-            <div class="glass p-6 rounded-3xl h-fit border-t-4 border-orange-500">
-                <h2 class="text-xl font-bold mb-4">📢 Sell Your Crop</h2>
-                <form id="sellForm" class="flex flex-col gap-4">
-                    <input type="text" id="sCrop" placeholder="Crop Name (e.g. Rice)" required
-                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
-                    <input type="number" id="sQty" placeholder="Quantity (kg)" required
-                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
-                    <input type="number" id="sPrice" placeholder="Price per kg (₹)" required
-                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
-                    <input type="text" id="sLoc" placeholder="Location" required
-                        class="bg-black/40 p-3 rounded-xl border border-white/20 outline-none">
-                    <button type="submit"
-                        class="bg-orange-600 hover:bg-orange-500 py-3 rounded-xl font-bold transition">List for
-                        Sale</button>
-                </form>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- LEFT: CREATE LISTING (Visible on both tabs, but sticky) -->
+            <div class="lg:col-span-1">
+                <div class="glass p-6 rounded-3xl border-t-4 border-orange-500 sticky top-4">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="bg-orange-500/20 text-orange-400 p-2 rounded-lg">📢</span> Sell Your Harvest
+                    </h3>
+                    <form id="sellForm" class="space-y-4">
+                        <div>
+                            <label class="text-xs text-slate-400 font-bold uppercase ml-1">Crop Type</label>
+                            <select id="s-name" class="input-field cursor-pointer">
+                                <option value="Wheat">Wheat</option>
+                                <option value="Rice">Rice (Basmati)</option>
+                                <option value="Cotton">Cotton</option>
+                                <option value="Potato">Potato</option>
+                                <option value="Tomato">Tomato</option>
+                                <option value="Onion">Onion</option>
+                                <option value="Maize">Maize</option>
+                                <option value="Sugarcane">Sugarcane</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-slate-400 font-bold uppercase ml-1">Quantity (Qt)</label>
+                                <input type="number" id="s-qty" class="input-field" placeholder="e.g. 50">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 font-bold uppercase ml-1">Price/Qt (₹)</label>
+                                <input type="number" id="s-price" class="input-field" placeholder="e.g. 2400">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 font-bold uppercase ml-1">Description</label>
+                            <textarea id="s-desc" rows="3" class="input-field"
+                                placeholder="Quality details, harvest date, location..."></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-orange-500 to-amber-600 py-3 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:scale-[1.02] transition text-white">
+                            🚀 Post Listing
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <!-- Listings Feed -->
-            <div class="md:col-span-2">
-                <h2 class="text-xl font-bold mb-4">🛒 Available Listings</h2>
-                <div id="listings" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Cards Injected Here -->
+            <!-- RIGHT: MAIN CONTENT AREA -->
+            <div class="lg:col-span-2 space-y-4">
+
+                <!-- FILTER BAR (Market Only) -->
+                <div id="market-filters" class="glass p-4 rounded-xl flex justify-between items-center">
+                    <h3 class="font-bold text-white flex items-center gap-2">
+                        <span>🌾</span> Live Market
+                    </h3>
+                    <button onclick="loadMarket()"
+                        class="text-xs text-orange-400 hover:text-white transition font-mono">REFRESH ⟳</button>
                 </div>
+
+                <!-- LISTINGS GRID -->
+                <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic -->
+                    <div class="col-span-full text-center py-20 text-slate-500 animate-pulse">Loading Trade Hub...</div>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Payment Gateway Modal -->
-    <dialog id="payModal"
-        class="glass rounded-2xl p-0 backdrop:backdrop-blur-xl text-white w-full max-w-md shadow-2xl overflow-hidden">
-        <div class="bg-gradient-to-r from-orange-600 to-red-600 p-6">
-            <h3 class="text-2xl font-black flex items-center gap-2">💳 Secure Checkout</h3>
-            <p class="text-white/80 text-sm">Powered by FarmPay Shield</p>
-        </div>
-        <form class="p-8 space-y-6" onsubmit="processPayment(event)">
-            <!-- Bill Details -->
-            <div class="bg-white/5 p-4 rounded-xl space-y-2 border border-white/10">
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">Item Cost</span>
-                    <span id="payItemCost">₹0</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-orange-400">Platform Fee (5%)</span>
-                    <span id="payComm">₹0</span>
-                </div>
-                <div class="h-px bg-white/20 my-2"></div>
-                <div class="flex justify-between font-bold text-lg">
-                    <span>Total To Pay</span>
-                    <span id="payTotal" class="text-green-400">₹0</span>
-                </div>
-                <input type="hidden" id="payListingId">
-                <input type="hidden" id="payAmountRaw">
-            </div>
-
-            <!-- Card Details -->
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs text-gray-400 uppercase font-bold ml-1">Card Number</label>
-                    <div class="relative">
-                        <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" required
-                            class="w-full bg-black/40 p-3 pl-10 rounded-lg border border-white/20 outline-none focus:border-orange-500 font-mono tracking-widest">
-                        <span class="absolute left-3 top-3.5 text-gray-500">💳</span>
-                    </div>
-                </div>
-                <div class="flex gap-4">
-                    <div class="flex-1">
-                        <label class="text-xs text-gray-400 uppercase font-bold ml-1">Expiry</label>
-                        <input type="text" placeholder="MM/YY" maxlength="5" required
-                            class="w-full bg-black/40 p-3 rounded-lg border border-white/20 outline-none focus:border-orange-500 font-mono text-center">
-                    </div>
-                    <div class="flex-1">
-                        <label class="text-xs text-gray-400 uppercase font-bold ml-1">CVV</label>
-                        <input type="password" placeholder="123" maxlength="3" required
-                            class="w-full bg-black/40 p-3 rounded-lg border border-white/20 outline-none focus:border-orange-500 font-mono text-center">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <button type="submit" id="payBtn"
-                class="w-full bg-green-600 hover:bg-green-500 py-4 rounded-xl font-bold text-lg shadow-lg hover:scale-[1.02] transition flex justify-center items-center gap-2">
-                <span>🔒 Pay Securely</span>
-            </button>
-            <button type="button" onclick="payModal.close()"
-                class="w-full text-center text-gray-400 text-sm hover:text-white">Cancel Transaction</button>
-        </form>
-    </dialog>
+    <!-- VOICE FAB -->
+    <div class="fixed bottom-8 right-8 z-50">
+        <button onclick="farmAI.activateAI()" id="voice-fab"
+            class="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition border-4 border-white/20 animate-bounce">
+            🎙️
+        </button>
+    </div>
 
     <script>
-        // --- 3D BG (Golden Ring) ---
+        const token = localStorage.getItem('token');
+        const myUsername = localStorage.getItem('username'); // Assuming this is stored
+        if (!token) location.href = 'login.html';
+
+        let currentTab = 'market';
+
+        // --- 3D BG ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-bg').appendChild(renderer.domElement);
-        const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-        const material = new THREE.MeshBasicMaterial({ color: 0xf97316, wireframe: true, transparent: true, opacity: 0.1 });
-        const torus = new THREE.Mesh(geometry, material);
-        scene.add(torus);
-        camera.position.z = 30;
-        function animate() { requestAnimationFrame(animate); torus.rotation.x += 0.01; torus.rotation.y += 0.01; renderer.render(scene, camera); }
+
+        // Particles (Gold/Orange theme)
+        const geometry = new THREE.BufferGeometry();
+        const count = 1500;
+        const positions = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+        for (let i = 0; i < count * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 80;
+            positions[i + 1] = (Math.random() - 0.5) * 80;
+            positions[i + 2] = (Math.random() - 0.5) * 50;
+            colors[i] = 1; colors[i + 1] = 0.7; colors[i + 2] = 0; // Gold
+        }
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const material = new THREE.PointsMaterial({ size: 0.15, vertexColors: true, transparent: true, opacity: 0.8 });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+        camera.position.z = 25;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            points.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
         animate();
 
-        // --- TRADING LOGIC ---
-        const token = localStorage.getItem('token');
-        if (!token) location.href = 'dashboard.html';
-        const commissionRate = 0.05; // 5%
+        // --- TAB LOGIC ---
+        function changeTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-market').className = `tab-btn px-6 py-2 rounded-full glass font-bold transition border border-transparent ${tab === 'market' ? 'active' : ''}`;
+            document.getElementById('tab-my').className = `tab-btn px-6 py-2 rounded-full glass font-bold transition border border-transparent ${tab === 'my' ? 'active' : ''}`;
 
-        async function loadListings() {
+            document.getElementById('market-filters').style.display = tab === 'market' ? 'flex' : 'none';
+
+            if (tab === 'market') loadMarket();
+            else loadMyListings();
+        }
+
+        // --- LOAD MARKET ---
+        async function loadMarket() {
+            const grid = document.getElementById('listings-grid');
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">Fetching Listings...</div>';
+
             try {
-                const res = await fetch('/api/trading', { headers: { 'Authorization': token } });
+                const res = await fetch('/api/trade/listings', { headers: { 'Authorization': token } });
                 const data = await res.json();
 
-                const container = document.getElementById('listings');
-                if (!data.length) {
-                    container.innerHTML = '<div class="col-span-full text-center text-gray-500 p-10 glass rounded-xl">No active listings available.</div>';
+                if (data.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-10 flex flex-col items-center gap-2"><span class="text-4xl">📭</span><span>No active listings. Be the first to sell!</span></div>`;
                     return;
                 }
 
-                container.innerHTML = data.map(l => `
-                    <div class="glass p-6 rounded-2xl relative group hover:bg-white/5 transition border border-white/5">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold text-orange-300">${l.crop_name}</h3>
-                            <span class="bg-white/10 text-xs px-2 py-1 rounded">@${l.username}</span>
-                        </div>
-                        <div class="flex justify-between text-sm text-gray-300 mb-4">
-                            <span>📍 ${l.location}</span>
-                            <span>${l.quantity} kg</span>
-                        </div>
-                        <div class="flex justify-between items-end border-t border-white/10 pt-4">
-                            <div>
-                                <p class="text-xs text-gray-500">Price/Unit</p>
-                                <p class="text-lg font-bold">₹${l.price_per_unit}</p>
+                grid.innerHTML = data.map(item => `
+                    <div class="glass p-6 rounded-2xl border border-white/5 hover:bg-white/5 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-xl font-bold text-white">${item.crop_name}</h4>
+                                <span class="text-sm bg-green-500/20 text-green-400 px-3 py-1 rounded-full font-bold">₹${item.price_per_unit}/Qt</span>
                             </div>
-                            <button onclick="openPaymentModal(${l.id}, ${l.price_per_unit * l.quantity})" 
-                                class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg font-bold text-sm transition shadow-lg hover:shadow-green-500/20">Buy Now</button>
+                            <p class="text-sm text-slate-400 mb-4 h-12 overflow-hidden leading-relaxed">${item.description || 'No description provided.'}</p>
+                            
+                            <div class="bg-white/5 p-3 rounded-xl mb-4 flex justify-between items-center">
+                                <div class="text-xs text-slate-400">
+                                    <div class="font-bold text-white mb-1">Seller</div>
+                                    ${item.seller_name}
+                                </div>
+                                <div class="text-xs text-slate-400 text-right">
+                                    <div class="font-bold text-white mb-1">Quantity</div>
+                                    ${item.quantity} Qt
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            ${item.seller_name === myUsername
+                        ? `<button class="col-span-2 w-full py-2 rounded-lg bg-gray-600/50 text-gray-300 font-bold cursor-not-allowed">Your Listing</button>`
+                        : `
+                                    <button onclick="startChat('${item.seller_name}')" class="py-2 rounded-lg bg-blue-500/20 text-blue-400 font-bold hover:bg-blue-500 hover:text-white transition flex items-center justify-center gap-2">
+                                        💬 Chat
+                                    </button>
+                                    <button onclick="buyItem(${item.id}, '${item.crop_name}', ${item.price_per_unit * item.quantity})" 
+                                        class="py-2 rounded-lg bg-green-500/20 text-green-400 font-bold hover:bg-green-500 hover:text-white transition flex items-center justify-center gap-2">
+                                        🛒 Buy
+                                    </button>
+                                `
+                    }
                         </div>
                     </div>
                 `).join('');
-            } catch (e) { console.error(e); }
+
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = `<div class="text-red-400 col-span-full text-center">Failed to load market. Check connection.</div>`;
+            }
         }
 
-        function openPaymentModal(id, cost) {
-            const commission = cost * commissionRate;
-            const total = cost + commission;
-
-            document.getElementById('payListingId').value = id;
-            document.getElementById('payAmountRaw').value = cost;
-            document.getElementById('payItemCost').innerText = `₹${cost.toLocaleString()}`;
-            document.getElementById('payComm').innerText = `₹${commission.toLocaleString()}`;
-            document.getElementById('payTotal').innerText = `₹${total.toLocaleString()}`;
-
-            document.getElementById('payModal').showModal();
-        }
-
-        async function processPayment(e) {
-            e.preventDefault();
-            const btn = document.getElementById('payBtn');
-            const originalText = btn.innerHTML;
-
-            // 1. Loading State
-            btn.innerHTML = `<span class="animate-spin text-xl">↻</span> Processing...`;
-            btn.disabled = true;
-
-            const id = document.getElementById('payListingId').value;
-            const cost = parseFloat(document.getElementById('payAmountRaw').value);
-            const commission = cost * commissionRate;
-
-            // 2. Mock Delay for realism
-            await new Promise(r => setTimeout(r, 2000));
+        // --- LOAD MY LISTINGS ---
+        async function loadMyListings() {
+            const grid = document.getElementById('listings-grid');
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">Fetching Your History...</div>';
 
             try {
-                // 3. Backend Call
-                const res = await fetch(`/api/trading/buy/${id}`, {
+                const res = await fetch('/api/trade/listings/my', { headers: { 'Authorization': token } });
+                const data = await res.json();
+
+                if (data.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-10 flex flex-col items-center gap-2"><span class="text-4xl">📂</span><span>You haven't listed anything yet.</span></div>`;
+                    return;
+                }
+
+                grid.innerHTML = data.map(item => `
+                    <div class="glass p-6 rounded-2xl border border-white/5 flex flex-col justify-between">
+                         <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-xl font-bold text-white">${item.crop_name}</h4>
+                            <span class="text-xs px-2 py-1 rounded font-bold uppercase ${item.status === 'active' ? 'bg-green-500/20 text-green-400' : item.status === 'sold' ? 'bg-blue-500/20 text-blue-400' : 'bg-red-500/20 text-red-400'}">${item.status}</span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-4">${item.description}</p>
+                        <div class="flex justify-between text-xs text-slate-500 font-mono border-t border-white/10 pt-4">
+                            <span>Listed: ${new Date(item.created_at).toLocaleDateString()}</span>
+                            <span>₹${item.price_per_unit}/Qt</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                grid.innerHTML = `<div class="text-red-400 col-span-full text-center">Failed to load history.</div>`;
+            }
+        }
+
+        // --- ACTIONS ---
+        document.getElementById('sellForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Posting...';
+            btn.disabled = true;
+
+            const body = {
+                crop_name: document.getElementById('s-name').value,
+                quantity: document.getElementById('s-qty').value,
+                price: document.getElementById('s-price').value,
+                description: document.getElementById('s-desc').value
+            };
+
+            try {
+                const res = await fetch('/api/trade/listings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                    body: JSON.stringify({ amount: cost, commission: commission, paymentMethod: 'card' })
+                    body: JSON.stringify(body)
                 });
 
+                const data = await res.json();
+
                 if (res.ok) {
-                    btn.innerHTML = `✅ Payment Successful!`;
-                    btn.classList.replace('bg-green-600', 'bg-blue-600');
-                    setTimeout(() => {
-                        document.getElementById('payModal').close();
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                        btn.classList.replace('bg-blue-600', 'bg-green-600');
-                        loadListings();
-                        alert(`🎉 Order Confirmed!\n\nCommission of ₹${commission.toLocaleString()} collected for Admin.`);
-                    }, 1000);
+                    alert("Listing Posted Successfully!");
+                    document.getElementById('sellForm').reset();
+                    if (currentTab === 'market') loadMarket(); // Refresh
+                    else loadMyListings();
                 } else {
-                    const d = await res.json();
-                    alert("Payment Failed: " + d.error);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    alert("Error: " + (data.error || "Failed"));
                 }
             } catch (err) {
-                console.error(err);
                 alert("Network Error");
+            } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
-        }
-
-        document.getElementById('sellForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const payload = {
-                crop: document.getElementById('sCrop').value,
-                qty: document.getElementById('sQty').value,
-                price: document.getElementById('sPrice').value,
-                location: document.getElementById('sLoc').value
-            };
-
-            const res = await fetch('/api/trading', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                alert("Listing Posted Successfully!");
-                document.getElementById('sellForm').reset();
-                loadListings();
-            } else {
-                alert("Failed to post listing");
-            }
         };
 
-        // Auto-refresh every 10 seconds to show new items from other users
-        setInterval(loadListings, 10000);
-        loadListings();
+        async function buyItem(id, name, cost) {
+            if (!confirm(`Confirm purchase of ${name} for ₹${cost.toLocaleString()}?`)) return;
+
+            try {
+                const res = await fetch(`/api/trade/buy/${id}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': token }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert("Purchase Successful! Item moved to 'Sold'.");
+                    loadMarket();
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { alert("Transaction Failed"); }
+        }
+
+        function startChat(username) {
+            window.location.href = `chat.html?chat_with=${username}`;
+        }
+
+        // Init
+        loadMarket();
+
+        // Auto-refresh market every 5 seconds
+        setInterval(() => {
+            if (currentTab === 'market') loadMarket();
+        }, 5000);
     </script>
-</body>
+    <script src="js/ai-core.js"></script>
+<script src="js/background-3d.js"></script><script src="js/global-ticker.js"></script></body>
 
 </html>

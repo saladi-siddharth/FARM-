@@ -13,16 +13,27 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// POST Post
-router.post('/', auth, async (req, res) => {
+const upload = require('../middleware/upload');
+
+// POST Post (Text + Media)
+router.post('/', auth, upload.single('media'), async (req, res) => {
     try {
         const { content } = req.body;
-        // Get username from users table to store in post for simpler display
+
+        let mediaUrl = null;
+        let mediaType = 'text';
+
+        if (req.file) {
+            mediaUrl = '/uploads/' + req.file.filename;
+            mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'video';
+        }
+
+        // Get username
         const [user] = await db.execute('SELECT username FROM users WHERE id = ?', [req.user.id]);
 
         await db.execute(
-            'INSERT INTO forum_posts (user_id, username, content) VALUES (?, ?, ?)',
-            [req.user.id, user[0].username, content]
+            'INSERT INTO forum_posts (user_id, username, content, media_url, media_type) VALUES (?, ?, ?, ?, ?)',
+            [req.user.id, user[0].username, content, mediaUrl, mediaType]
         );
         res.status(201).json({ message: "Post Shared" });
     } catch (err) {

@@ -2,7 +2,7 @@ const express = require('express'); // 1. Import Express
 const router = express.Router();    // 2. Define the router
 const db = require('../config/db');
 const auth = require('../middleware/auth');
-const sendAlert = require('../utils/mailer');
+const { sendAlert } = require('../utils/mailer');
 
 // GET Tasks
 router.get('/', auth, async (req, res) => {
