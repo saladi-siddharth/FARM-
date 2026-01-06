@@ -97,6 +97,17 @@ app.get('/api/debug-env', (req, res) => {
     });
 });
 
+// Health Check (Public)
+app.get('/health', async (req, res) => {
+    try {
+        const db = require('./config/db');
+        await db.query('SELECT 1');
+        res.json({ status: 'ok', database: 'connected', timestamp: new Date() });
+    } catch (err) {
+        res.status(500).json({ status: 'error', database: 'disconnected', error: err.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 const startScheduler = require('./scheduler');
 const { verifyConnection } = require('./utils/mailer'); // Import Verify
