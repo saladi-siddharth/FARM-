@@ -2,23 +2,23 @@ const nodemailer = require('nodemailer');
 
 // 1. Configure the transporter (Using Gmail as an example)
 const createTransporter = () => {
+    // Debug Logging (Secure)
+    if (process.env.EMAIL_USER) {
+        const maskedUser = process.env.EMAIL_USER.substring(0, 3) + '***';
+        console.log(`🔧 Configuring Transporter for: ${maskedUser}`);
+    }
+
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
         return null;
     }
     return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // Use SSL
+        service: 'gmail', // Use built-in service for better auto-config
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
-        family: 4, // <--- FORCE IPv4 (Fixes Render/Gmail timeouts)
         tls: {
-            rejectUnauthorized: false
+            rejectUnauthorized: false // Fixes 'self-signed certificate' errors
         }
     });
 };
