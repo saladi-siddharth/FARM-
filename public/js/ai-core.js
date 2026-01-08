@@ -261,61 +261,49 @@ class FarmVoiceAI {
         div.id = 'ai-overlay';
         div.className = 'fixed inset-0 z-[100] hidden bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center transition-all duration-500';
         div.innerHTML = `
-            <!-- Header -->
-            <div class="absolute top-10 w-full flex justify-between px-10 items-center">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">🌱</span>
-                    <h1 class="text-white font-bold tracking-widest text-lg">KISAN CENTRAL <span class="text-cyan-400 text-xs px-2 py-1 bg-cyan-900/30 rounded border border-cyan-500/30">V2.0</span></h1>
-                </div>
-                <div class="relative group">
-                    <button class="flex items-center gap-2 text-slate-300 hover:text-white transition bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                        <span>🌐</span> <span id="current-lang-label">English</span>
-                    </button>
-                    <!-- Language Dropdown -->
-                    <div class="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden hidden group-hover:block z-50">
-                        <div class="max-h-64 overflow-y-auto">
-                            <button onclick="farmAI.setLang('en-IN', 'English')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇺🇸 English</button>
-                            <button onclick="farmAI.setLang('hi-IN', 'Hindi')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Hindi</button>
-                            <button onclick="farmAI.setLang('pa-IN', 'Punjabi')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Punjabi</button>
-                            <button onclick="farmAI.setLang('mr-IN', 'Marathi')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Marathi</button>
-                            <button onclick="farmAI.setLang('gu-IN', 'Gujarati')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Gujarati</button>
-                            <button onclick="farmAI.setLang('ta-IN', 'Tamil')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Tamil</button>
-                            <button onclick="farmAI.setLang('te-IN', 'Telugu')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Telugu</button>
-                            <button onclick="farmAI.setLang('kn-IN', 'Kannada')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Kannada</button>
-                            <button onclick="farmAI.setLang('ml-IN', 'Malayalam')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Malayalam</button>
-                            <button onclick="farmAI.setLang('bn-IN', 'Bengali')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white transition">🇮🇳 Bengali</button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Simplified Header (Mobile Friendly) -->
+            <div class="absolute top-6 left-6 flex items-center gap-2 z-50">
+                <span class="text-2xl">🌱</span>
+                <h1 class="text-white font-bold tracking-widest text-sm opacity-80">KISAN FRIEND</h1>
             </div>
 
-            <!-- Central Visualizer -->
-            <div class="relative mb-12 transform scale-125">
-                <canvas id="voice-waves" width="400" height="400" class="rounded-full opacity-80 mix-blend-screen"></canvas>
-                
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div id="ai-core" class="w-40 h-40 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 opacity-20 blur-xl animate-pulse"></div>
-                    <div id="mic-pulse" class="absolute w-32 h-32 rounded-full border-2 border-cyan-400/50 flex items-center justify-center shadow-[0_0_100px_rgba(34,211,238,0.5)] bg-black/40 backdrop-blur-sm transition-all duration-300">
-                        <span class="text-5xl drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">🎙️</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Status & Transcript -->
-            <div class="text-center space-y-4 max-w-2xl px-6 relative z-10">
-                <h2 id="ai-status" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-cyan-300 tracking-[0.2em] animate-pulse drop-shadow-lg">ONLINE</h2>
-                
-                <div class="bg-gradient-to-b from-white/10 to-transparent p-px rounded-2xl">
-                    <div class="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 min-h-[120px] flex items-center justify-center">
-                        <p id="ai-transcript" class="text-emerald-300 text-2xl font-medium font-sans leading-relaxed transition-all">"Say 'Go to Market' or 'Price of Wheat'..."</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Close -->
-            <button onclick="farmAI.goToSleep()" class="mt-16 group flex flex-col items-center gap-2 text-slate-500 hover:text-white transition">
-                <span class="text-sm tracking-widest uppercase opacity-70">Tap to Sleep</span>
+            <!-- Single Close Button (Top Right) -->
+            <button onclick="farmAI.goToSleep()" class="absolute top-6 right-6 z-50 p-3 rounded-full bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400 transition backdrop-blur-md">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
+
+            <!-- Central Visualizer & Interaction Button -->
+            <div class="relative flex flex-col items-center justify-center w-full h-full">
+                
+                <!-- Dynamic Status Text -->
+                <h2 id="ai-status" class="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-cyan-300 tracking-[0.2em] animate-pulse drop-shadow-lg mb-8 text-center px-4">LISTENING...</h2>
+
+                <!-- Main "Single Button" Interaction -->
+                <button onclick="farmAI.toggleListening()" class="relative group transition-all duration-300 transform active:scale-95">
+                    <canvas id="voice-waves" width="300" height="300" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 mix-blend-screen pointer-events-none md:w-[400px] md:h-[400px]"></canvas>
+                    
+                    <div id="ai-core" class="w-48 h-48 md:w-64 md:h-64 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 opacity-20 blur-2xl animate-pulse absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                    
+                    <div id="mic-pulse" class="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-cyan-400/50 flex items-center justify-center shadow-[0_0_50px_rgba(34,211,238,0.3)] bg-black/40 backdrop-blur-md transition-all duration-300 relative z-10 group-hover:border-cyan-400 group-hover:shadow-[0_0_80px_rgba(34,211,238,0.6)]">
+                        <span class="text-4xl md:text-5xl drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">🎙️</span>
+                    </div>
+                </button>
+
+                <!-- Transcript / Output -->
+                <div class="mt-12 w-full max-w-lg px-6">
+                     <div class="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 min-h-[100px] flex items-center justify-center text-center">
+                        <p id="ai-transcript" class="text-emerald-300 text-lg md:text-xl font-medium font-sans leading-relaxed transition-all">"Say 'Hello' or 'Analysis Report'"</p>
+                    </div>
+                </div>
+
+                <!-- Language Toggler (Minimal Bottom Centered) -->
+                <div class="absolute bottom-8 flex gap-2 overflow-x-auto max-w-full px-4 no-scrollbar">
+                    <button onclick="farmAI.setLang('en-IN', 'ENG')" class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300 hover:bg-cyan-500 hover:text-white transition">ENG</button>
+                    <button onclick="farmAI.setLang('hi-IN', 'HIN')" class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300 hover:bg-cyan-500 hover:text-white transition">HIN</button>
+                    <button onclick="farmAI.setLang('pa-IN', 'PUN')" class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300 hover:bg-cyan-500 hover:text-white transition">PUN</button>
+                    <!-- Expandable 'More' if needed, mostly top 3 are fine for MinimalView -->
+                </div>
+            </div>
         `;
         document.body.appendChild(div);
 
