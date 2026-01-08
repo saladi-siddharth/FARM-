@@ -113,15 +113,21 @@ const PORT = process.env.PORT || 3000;
 const startScheduler = require('./scheduler');
 const { verifyConnection } = require('./utils/mailer'); // Import Verify
 
-startScheduler();
-verifyConnection(); // Verify SMTP on Start
+// Conditional Listen for Local Development
+if (require.main === module) {
+    startScheduler();
+    verifyConnection(); // Verify SMTP on Start
 
-server.listen(PORT, () => {
-    console.log(`
-    --- 🌾 FARM SYSTEM ONLINE ---
-    🚀 Port: ${PORT}
-    ✅ Routes Linked: Auth, Inv, Tasks, Exp, Dash, Chat
-    ⚡ Socket.io: Active (Calling System Ready)
-    -----------------------------
-    `);
-});
+    server.listen(PORT, () => {
+        console.log(`
+        --- 🌾 FARM SYSTEM ONLINE ---
+        🚀 Port: ${PORT}
+        ✅ Routes Linked: Auth, Inv, Tasks, Exp, Dash, Chat
+        ⚡ Socket.io: Active (Calling System Ready)
+        -----------------------------
+        `);
+    });
+}
+
+// Export for Vercel (Serverless)
+module.exports = app;
