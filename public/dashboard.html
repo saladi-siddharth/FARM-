@@ -46,6 +46,16 @@
             box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.4);
             border-color: rgba(255, 255, 255, 0.2);
         }
+
+        /* Global Interactive Hover Effects */
+        button:hover,
+        input:hover,
+        .glass:hover,
+        a:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s ease-in-out;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -69,6 +79,10 @@
                 <button onclick="window.location.href='index.html'"
                     class="glass px-6 py-2 rounded-full hover:bg-white/10 transition font-bold text-slate-300 text-sm">
                     🏠 Home
+                </button>
+                <button onclick="window.location.href='profile.html'"
+                    class="glass px-6 py-2 rounded-full hover:bg-white/10 transition font-bold text-emerald-400 text-sm border border-emerald-500/30">
+                    👤 Profile
                 </button>
                 <button onclick="logout()"
                     class="glass px-6 py-2 rounded-full border border-red-500/30 text-red-400 font-bold hover:bg-red-500/20 transition flex items-center gap-2 text-sm">
@@ -96,22 +110,151 @@
             </div>
         </div>
 
+        <!-- QUICK ACTIONS (Moved to Top) -->
+        <div class="mb-12">
+            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2" data-i18n="quick_actions_header">
+                <span>🚀</span> Quick Actions
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Inventory -->
+                <button onclick="location.href='inventory.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-blue-500/20">
+                    <div
+                        class="bg-blue-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        📦</div>
+                    <div>
+                        <h3 class="font-bold text-base text-blue-200" data-i18n="inventory">Inventory</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="manage_stocks">Manage
+                            Stocks</p>
+                    </div>
+                </button>
+                <!-- Tasks -->
+                <button onclick="location.href='tasks.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-yellow-500/20">
+                    <div
+                        class="bg-yellow-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        📝</div>
+                    <div>
+                        <h3 class="font-bold text-base text-yellow-200" data-i18n="tasks">Tasks</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="jobs_title">To-Do List
+                        </p>
+                    </div>
+                </button>
+                <!-- Crop Doctor -->
+                <button onclick="location.href='doctor.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-emerald-500/30">
+                    <div
+                        class="bg-emerald-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        🔬</div>
+                    <div>
+                        <h3 class="font-bold text-base text-emerald-400" data-i18n="ai_doctor">AI Doctor</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="disease_scan">Disease
+                            Scan</p>
+                    </div>
+                </button>
+                <!-- Market -->
+                <button onclick="location.href='market.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-purple-500/20">
+                    <div
+                        class="bg-purple-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        📈</div>
+                    <div>
+                        <h3 class="font-bold text-base text-purple-200" data-i18n="market">Market</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="live_prices">Live
+                            Prices</p>
+                    </div>
+                </button>
+                <!-- Calculator -->
+                <button onclick="location.href='calculator.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-cyan-500/30">
+                    <div
+                        class="bg-cyan-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        🧮</div>
+                    <div>
+                        <h3 class="font-bold text-base text-cyan-400" data-i18n="calculator">ROI Calc</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="profit_estimator">
+                            Profit Estimator</p>
+                    </div>
+                </button>
+                <!-- Community -->
+                <button onclick="location.href='community.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-indigo-500/20">
+                    <div
+                        class="bg-indigo-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        👥</div>
+                    <div>
+                        <h3 class="font-bold text-base text-indigo-200" data-i18n="community">Community</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="public_forum">Public
+                            Forum</p>
+                    </div>
+                </button>
+                <!-- Chats -->
+                <button onclick="location.href='chat.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-pink-500/20">
+                    <div
+                        class="bg-pink-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        💬</div>
+                    <div>
+                        <h3 class="font-bold text-base text-pink-200" data-i18n="my_chats">My Chats</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="direct_messages">
+                            Direct Messages</p>
+                    </div>
+                </button>
+                <!-- Expenses -->
+                <button onclick="location.href='expenses.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-rose-500/20">
+                    <div
+                        class="bg-rose-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        💰</div>
+                    <div>
+                        <h3 class="font-bold text-base text-rose-400" data-i18n="expenses">Expenses</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="manager">Manager</p>
+                    </div>
+                </button>
+                <!-- Trade Hub -->
+                <button onclick="location.href='trading.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] col-span-1 md:col-span-2 lg:col-span-2">
+                    <div
+                        class="bg-orange-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        🤝</div>
+                    <div>
+                        <h3 class="font-bold text-base text-orange-400" data-i18n="trade_hub">Trade Hub</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="buy_sell">Buy & Sell
+                            Crops</p>
+                    </div>
+                </button>
+                <!-- Profile -->
+                <button onclick="location.href='profile.html'"
+                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-teal-500/20 col-span-1 md:col-span-2 lg:col-span-2">
+                    <div
+                        class="bg-teal-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        ⚙️</div>
+                    <div>
+                        <h3 class="font-bold text-base text-teal-200" data-i18n="settings">Settings</h3>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="profile_pref">Profile
+                            & Preferences</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
         <!-- DESKTOP GRID (Hidden on Mobile) -->
         <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <!-- Assets -->
-            <div class="glass p-6 rounded-2xl hover-lift border-l-4 border-emerald-500">
+            <!-- Flash cards go here (Expenses, Tasks etc, but Total Assets removed) -->
+            <!-- Expenses -->
+            <div class="glass p-6 rounded-2xl hover-lift border-l-4 border-rose-500">
                 <div class="flex justify-between items-start mb-4">
                     <div>
-                        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider">Total Assets</p>
-                        <h3 class="text-3xl font-black mt-1">₹<span id="total-assets">0</span></h3>
+                        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider" data-i18n="outflow_title">
+                            Total Outflow</p>
+                        <h3 class="text-3xl font-black mt-1">₹<span id="total-expenses-desk">0</span></h3>
                     </div>
-                    <div class="p-3 bg-emerald-500/20 rounded-xl text-emerald-400">💰</div>
+                    <div class="p-3 bg-rose-500/20 rounded-xl text-rose-400">💸</div>
                 </div>
                 <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                    <div class="bg-emerald-500 h-full w-[70%]"></div>
+                    <div class="bg-rose-500 h-full w-[45%]"></div>
                 </div>
             </div>
-            <!-- More Desktop Cards... (Simplified for brevity, existing structure remains) -->
         </div>
 
         <!-- MOBILE "SUPER INTELLIGENCE" FEED (Visible Only on Mobile) -->
@@ -194,14 +337,7 @@
             <p class="text-[10px] text-emerald-400 mt-2 font-bold uppercase tracking-wider">Asset Valuation</p>
         </div>
 
-        <!-- Expenses -->
-        <div class="glass p-6 rounded-3xl border-l-4 border-rose-500 hover-lift relative overflow-hidden group">
-            <div class="absolute right-[-10px] top-[-10px] p-4 opacity-10 group-hover:opacity-20 transition text-8xl">
-                💸</div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Total Outflow</h3>
-            <p id="stat-expenses" class="text-3xl md:text-3xl font-black text-white tracking-tight">₹0</p>
-            <p class="text-[10px] text-rose-400 mt-2 font-bold uppercase tracking-wider">Current Cycle Cost</p>
-        </div>
+        <!-- Outflow Card Removed -->
 
         <!-- Tasks -->
         <div class="glass p-6 rounded-3xl border-l-4 border-blue-500 hover-lift relative overflow-hidden group">
@@ -237,143 +373,21 @@
             </div>
         </div>
 
-        <!-- RIGHT: Quick Actions Grid -->
-        <div class="lg:col-span-2 space-y-6">
-            <h3 class="text-lg font-bold text-white ml-2 flex items-center gap-2">
-                <span>🚀</span> Quick Actions
+        <!-- RIGHT: Inventory Analytics -->
+        <div class="glass p-6 rounded-3xl border border-white/5 lg:col-span-1 h-full flex flex-col">
+            <h3 class="text-lg font-bold mb-6 flex items-center text-white">
+                <span class="bg-emerald-500/20 text-emerald-500 p-2 rounded-lg mr-3 text-sm">📦</span>
+                Inventory
             </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-
-                <!-- Inventory -->
-                <button onclick="location.href='inventory.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-blue-500/20">
-                    <div
-                        class="bg-blue-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        📦</div>
-                    <div>
-                        <h3 class="font-bold text-base text-blue-200">Inventory</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Manage Stocks</p>
-                    </div>
-                </button>
-
-                <!-- Tasks -->
-                <button onclick="location.href='tasks.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-yellow-500/20">
-                    <div
-                        class="bg-yellow-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        📝</div>
-                    <div>
-                        <h3 class="font-bold text-base text-yellow-200">Tasks</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">To-Do List</p>
-                    </div>
-                </button>
-
-                <!-- Crop Doctor -->
-                <button onclick="location.href='doctor.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-emerald-500/30">
-                    <div
-                        class="bg-emerald-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        🔬</div>
-                    <div>
-                        <h3 class="font-bold text-base text-emerald-400">AI Doctor</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Disease Scan</p>
-                    </div>
-                </button>
-
-                <!-- Market -->
-                <button onclick="location.href='market.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-purple-500/20">
-                    <div
-                        class="bg-purple-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        📈</div>
-                    <div>
-                        <h3 class="font-bold text-base text-purple-200">Market</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Live Prices</p>
-                    </div>
-                </button>
-
-                <!-- Calculator -->
-                <button onclick="location.href='calculator.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-cyan-500/30">
-                    <div
-                        class="bg-cyan-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        🧮</div>
-                    <div>
-                        <h3 class="font-bold text-base text-cyan-400">ROI Calc</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Profit Estimator</p>
-                    </div>
-                </button>
-
-                <!-- Community (Forum) -->
-                <button onclick="location.href='community.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-indigo-500/20">
-                    <div
-                        class="bg-indigo-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        👥</div>
-                    <div>
-                        <h3 class="font-bold text-base text-indigo-200">Community</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Public Forum</p>
-                    </div>
-                </button>
-
-                <!-- Chats (Direct) -->
-                <button onclick="location.href='chat.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-pink-500/20">
-                    <div
-                        class="bg-pink-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        💬</div>
-                    <div>
-                        <h3 class="font-bold text-base text-pink-200">My Chats</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Direct Messages</p>
-                    </div>
-                </button>
-
-
-                <!-- Expenses Page -->
-                <button onclick="location.href='expenses.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-rose-500/20">
-                    <div
-                        class="bg-rose-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        💰</div>
-                    <div>
-                        <h3 class="font-bold text-base text-rose-400">Expenses</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Manager</p>
-                    </div>
-                </button>
-
-                <!-- Trade Hub -->
-                <button onclick="location.href='trading.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] col-span-1 md:col-span-2 lg:col-span-2">
-                    <div
-                        class="bg-orange-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        🤝</div>
-                    <div>
-                        <h3 class="font-bold text-base text-orange-400">Trade Hub</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Buy & Sell Crops</p>
-                    </div>
-                </button>
-
+            <div class="relative flex-grow min-h-[250px] w-full">
+                <canvas id="inventoryChart"></canvas>
             </div>
         </div>
+
+
     </div>
 
-    <div class="glass p-8 rounded-3xl mb-12 border-l-4 border-purple-500 bg-purple-900/10">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-                <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                    <span class="text-2xl">🧠</span> Smart Crop Advisor
-                </h3>
-                <p class="text-slate-400 text-sm">
-                    Based on your location (<span id="advisor-loc">Detecting...</span>) and current season.
-                </p>
-            </div>
-            <div class="text-center md:text-right">
-                <p class="text-xs text-slate-500 uppercase tracking-widest mb-1">Top Recommendation</p>
-                <h2 class="text-3xl font-black text-purple-400 animate-pulse" id="advisor-crop">Analyzing...</h2>
-            </div>
-        </div>
-    </div>
+
 
     <!-- REPORTS BANNER -->
     <div
@@ -385,7 +399,7 @@
         </div>
         <button onclick="downloadReport()"
             class="w-full md:w-auto bg-white text-slate-900 px-8 py-3 rounded-xl font-black hover:bg-gray-200 transition flex items-center justify-center gap-2 text-sm shadow-xl">
-            <span>⬇️</span> Download PDF
+            <span>⬇️</span> <span data-i18n="download_pdf">Download PDF</span>
         </button>
     </div>
 
@@ -421,11 +435,12 @@
                 const stats = await res.json();
 
                 document.getElementById('stat-assets').innerText = `₹${Number(stats.inventoryValue).toLocaleString()}`;
-                document.getElementById('stat-expenses').innerText = `₹${Number(stats.totalExpenses).toLocaleString()}`;
+                // document.getElementById('stat-expenses').innerText = `₹${Number(stats.totalExpenses).toLocaleString()}`; // Removed element
                 document.getElementById('stat-tasks').innerText = stats.taskCount;
                 document.getElementById('stat-msgs').innerText = stats.msgCount || 0;
 
                 renderChart(stats.expenseBreakdown);
+                renderInvChart(stats.inventoryBreakdown);
             } catch (err) { console.error("Sync Error", err); }
         }
         showStats();
@@ -477,6 +492,8 @@
 
         // --- 5. CHARTS ---
         let chartInstance = null;
+        let invChartInstance = null;
+
         function renderChart(data) {
             const ctx = document.getElementById('expenseChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
@@ -487,6 +504,33 @@
 
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: 'transparent',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10 } } }
+                }
+            });
+        }
+
+        function renderInvChart(data) {
+            const ctx = document.getElementById('inventoryChart').getContext('2d');
+            if (invChartInstance) invChartInstance.destroy();
+
+            const labels = data && data.length ? data.map(d => d.type || 'General') : ['Empty'];
+            const values = data && data.length ? data.map(d => d.value) : [1];
+            const colors = ['#06b6d4', '#8b5cf6', '#ec4899', '#f97316', '#84cc16'];
+
+            invChartInstance = new Chart(ctx, {
+                type: 'pie',
                 data: {
                     labels: labels,
                     datasets: [{
@@ -522,6 +566,7 @@
     <script src="js/background-3d.js"></script>
     <script src="js/global-ticker.js"></script>
     <script src="js/mobile-nav.js"></script>
+    <script src="js/language-manager.js"></script>
 </body>
 
 </html>

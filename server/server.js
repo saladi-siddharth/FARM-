@@ -28,7 +28,8 @@ app.use('/api/chat', require('./routes/chat'));
 app.use('/api/market', require('./routes/market'));
 app.use('/api/doctor', require('./routes/doctor'));
 app.use('/api/reports', require('./routes/reports'));
-app.use('/api/trade', require('./routes/trade')); // NEW TRADE ROUTE
+app.use('/api/trade', require('./routes/trade'));
+app.use('/api/ai', require('./routes/ai')); // NEW AI VOICE ROUTE
 
 // --- SOCKET.IO SIGNALLING (For Calls) ---
 // --- SOCKET.IO SIGNALLING (Real-Time Presence & Calls) ---

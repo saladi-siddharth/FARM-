@@ -38,13 +38,18 @@
 
 <body class="flex items-center justify-center min-h-screen">
     <div id="canvas-container"></div>
-    <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-md text-white">
+    <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-md text-white relative">
+        <button onclick="window.location.href='index.html'"
+            class="absolute top-4 left-4 text-gray-400 hover:text-white transition" title="Back to Home">
+            ←
+        </button>
         <h1 id="title" class="text-3xl font-bold text-center mb-6">Farmer Login</h1>
         <form id="authForm" class="space-y-4">
             <input type="text" id="user" placeholder="Name"
                 class="hidden w-full p-3 rounded bg-white/10 outline-none border border-white/20">
             <input type="email" id="email" placeholder="Email" required
                 class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
+            <p id="email-feedback" class="text-xs mt-1 font-bold hidden"></p>
             <div class="relative">
                 <input type="password" id="pass" placeholder="Password" required
                     class="w-full p-3 rounded bg-white/10 outline-none border border-white/20">
@@ -144,22 +149,55 @@
 
         document.getElementById('authForm').onsubmit = async (e) => {
             e.preventDefault();
+            const emailVal = email.value;
+            const feedback = document.getElementById('email-feedback');
+
+            // Format Validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailVal)) {
+                feedback.innerText = "Please enter a valid email address.";
+                feedback.className = "text-xs mt-1 font-bold text-red-500 block";
+                return;
+            } else {
+                feedback.classList.add('hidden');
+            }
+
             const body = { email: email.value, password: pass.value, username: user.value };
-            const res = await fetch(isLogin ? '/api/auth/signin' : '/api/auth/signup', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            const data = await res.json();
-            if (res.ok) {
-                if (isLogin) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', data.username);
-                    window.location.href = 'dashboard.html';
-                } else { alert("Registered! Now Login."); toggle.click(); }
-            } else { alert(data.error); }
+
+            try {
+                const res = await fetch(isLogin ? '/api/auth/signin' : '/api/auth/signup', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    if (isLogin) {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('username', data.username);
+                        localStorage.setItem('email', data.email);
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        alert("Registered! Now Login.");
+                        toggle.click();
+                    }
+                } else {
+                    // Handle specific errors
+                    if (data.error === "User not found" || data.error.includes("email")) {
+                        feedback.innerText = "❌ " + data.error;
+                        feedback.className = "text-xs mt-1 font-bold text-red-500 block";
+                    } else {
+                        alert(data.error);
+                    }
+                }
+            } catch (err) {
+                alert("Connection Error");
+            }
         };
     </script>
     <script src="js/background-3d.js"></script>
-<script src="js/global-ticker.js"></script><script src="js/mobile-nav.js"></script></body>
+    <script src="js/global-ticker.js"></script>
+    <script src="js/mobile-nav.js"></script>
+</body>
 
 </html>

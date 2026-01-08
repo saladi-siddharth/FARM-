@@ -130,6 +130,22 @@ async function setup() {
         `);
         console.log('✅ Table "messages" created/checked');
 
+        // NEW: Medical Reports (AI Doctor)
+        await connection.execute(`
+            CREATE TABLE IF NOT EXISTS medical_reports (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                scan_id VARCHAR(50) NOT NULL,
+                diagnosis VARCHAR(255) NOT NULL,
+                confidence VARCHAR(50),
+                treatment TEXT,
+                image_url VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        `);
+        console.log('✅ Table "medical_reports" created/checked');
+
         console.log('🎉 Database Updated & Ready!');
         process.exit();
     } catch (err) {

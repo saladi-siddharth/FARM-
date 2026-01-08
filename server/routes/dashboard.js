@@ -42,6 +42,12 @@ router.get('/summary', auth, async (req, res) => {
             [userId]
         );
 
+        // Fetch Inventory Breakdown (for Pie Chart)
+        const [invBreakdown] = await db.execute(
+            'SELECT type, SUM(quantity * cost) as value FROM inventory WHERE user_id = ? GROUP BY type',
+            [userId]
+        );
+
         // Send a clean object to the frontend
         res.json({
             username: req.user.username,
@@ -49,7 +55,8 @@ router.get('/summary', auth, async (req, res) => {
             totalExpenses: exp[0].totalExpenses,
             taskCount: tasks[0].taskCount,
             msgCount: msgs[0].msgCount,
-            expenseBreakdown: expenseBreakdown
+            expenseBreakdown: expenseBreakdown,
+            inventoryBreakdown: invBreakdown
         });
     } catch (err) {
         console.error("Dashboard SQL Error:", err.message);

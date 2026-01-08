@@ -36,13 +36,29 @@
         .normal-stock {
             border-left: 4px solid #22c55e;
         }
+
+        /* Global Interactive Hover Effects */
+        button:hover,
+        input:hover,
+        .glass:hover,
+        a:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s ease-in-out;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body class="p-6 md:p-12">
     <div id="canvas-bg"></div>
 
-    <div class="max-w-6xl mx-auto">
+    <!-- Back Button -->
+    <button onclick="window.history.back()"
+        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-full glass flex items-center justify-center text-white hover:bg-white/10 transition hover:scale-110 shadow-lg">
+        ←
+    </button>
+
+    <div class="max-w-6xl mx-auto pl-12">
         <header class="flex justify-between items-center mb-10">
             <div>
                 <h1 class="text-4xl font-black text-green-400 tracking-tighter">INVENTORY CONTROL</h1>
@@ -52,8 +68,9 @@
                 <button onclick="exportCSV()"
                     class="glass px-6 py-2 rounded-full border border-blue-500/30 font-bold hover:bg-blue-500/10 transition text-blue-400">Export
                     CSV</button>
-                <button onclick="location.href='dashboard.html'"
-                    class="glass px-6 py-2 rounded-full border border-green-500/30 font-bold hover:bg-green-500/10 transition">Dashboard</button>
+                <button onclick="localStorage.clear(); location.href='index.html'"
+                    class="glass px-6 py-2 rounded-full border border-red-500/30 font-bold hover:bg-red-500/10 transition text-red-400">Logout</button>
+                <!-- Dashboard button removed -->
             </div>
         </header>
 
@@ -81,22 +98,7 @@
 
     <script>
         // --- THREE.JS BACKGROUND ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-bg').appendChild(renderer.domElement);
 
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshNormalMaterial({ wireframe: true }));
-        scene.add(cube);
-        camera.position.z = 25;
-
-        function animate() {
-            requestAnimationFrame(animate);
-            cube.rotation.y += 0.005; cube.rotation.x += 0.002;
-            renderer.render(scene, camera);
-        }
-        animate();
 
         // --- DATA LOGIC ---
         const token = localStorage.getItem('token');
@@ -179,6 +181,9 @@
             } catch (e) { console.error(e); }
         }
     </script>
-<script src="js/background-3d.js"></script><script src="js/global-ticker.js"></script><script src="js/mobile-nav.js"></script></body>
+    <script src="js/background-3d.js"></script>
+    <script src="js/global-ticker.js"></script>
+    <script src="js/mobile-nav.js"></script>
+</body>
 
 </html>

@@ -1,232 +1,384 @@
 class FarmVoiceAI {
     constructor() {
         this.recognition = null;
-        this.isListening = false;
+        this.isListening = false; // "Active" state (interacting)
+        this.isStandby = false;   // "Standby" state (waiting for wake word)
         this.synth = window.speechSynthesis;
-        this.wakeWord = "farm farm";
-        this.lastTranscript = "";
-        this.wakeWordCount = 0;
         this.ui = null;
         this.statusEl = null;
+        this.transcriptEl = null;
+        this.currentLang = 'en-IN';
+        this.isProcessing = false;
 
-        // "Super Intelligence" Knowledge Base
-        this.knowledgeBase = {
-            "best crop for winter": "For winter (Rabi season), Wheat, Mustard, and Chickpeas are excellent choices for Indian climate.",
-            "how to grow tomato": "Tomatoes need plenty of sun and well-drained soil. Water regularly but avoid wetting leaves to prevent fungus.",
-            "pesticide for cotton": "For cotton bollworm, use Neem oil or Bacillus thuringiensis (Bt) sprays as eco-friendly options.",
-            "market price of onion": "Onion prices fluctuate. Please check the Market Intelligence section for live rates.",
-            "government schemes": "PM Kisan Samman Nidhi and KCC are key schemes. Visit the government portal for details.",
-            "weather forecast": "I can check the live weather for you. Just say 'Check Weather'."
+        // Website Navigation Map
+        this.navMap = {
+            'dashboard': 'dashboard.html',
+            'home': 'dashboard.html',
+            'doctor': 'doctor.html',
+            'crop doctor': 'doctor.html',
+            'market': 'market.html',
+            'news': 'market.html',
+            'inventory': 'inventory.html',
+            'stock': 'inventory.html',
+            'tasks': 'tasks.html',
+            'todo': 'tasks.html',
+            'planner': 'calendar.html',
+            'calendar': 'calendar.html',
+            'chat': 'chat.html',
+            'community': 'chat.html',
+            'profile': 'profile.html',
+            'settings': 'profile.html',
+            'login': 'login.html',
+            'logout': 'LOGOUT_ACTION',
+            'trade': 'trading.html'
         };
     }
 
     init() {
-        if (!('webkitSpeechRecognition' in window)) return;
+        if (!('webkitSpeechRecognition' in window)) {
+            console.error("Web Speech API not supported.");
+            return;
+        }
         this.createUI();
+        this.createStandbyUI();
 
         this.recognition = new webkitSpeechRecognition();
-        this.recognition.continuous = true;
+        this.recognition.continuous = true; // Use continuous to catch wake word without stopping
         this.recognition.interimResults = true;
-        this.recognition.lang = 'en-IN';
+        this.recognition.lang = this.currentLang;
 
-        this.recognition.onstart = () => console.log("FarmAI: Listening...");
+        this.recognition.onstart = () => {
+            console.log("FarmAI: Listening Loop Started");
+        };
 
         this.recognition.onresult = (event) => {
-            const result = event.results[event.results.length - 1];
-            const transcript = result[0].transcript.toLowerCase().trim();
-            const isFinal = result.isFinal;
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join('').toLowerCase();
 
-            if (isFinal) {
-                // Wake Word Logic: "Farm Farm"
-                if (!this.isListening) {
-                    // Check strict "farm farm" or repetition
-                    if (transcript.includes("farm farm") || (transcript.includes("farm") && this.lastTranscript.includes("farm"))) {
-                        this.activateAI();
-                        this.wakeWordCount = 0;
-                    }
-                    this.lastTranscript = transcript;
+            // Update UI if active
+            if (this.isListening && this.transcriptEl) {
+                // Get only the latest result for display to avoid clutter
+                const latest = event.results[event.results.length - 1][0].transcript;
+                this.transcriptEl.innerText = `"${latest}"`;
+            }
+
+            // Final Result Logic
+            const lastResult = event.results[event.results.length - 1];
+            if (lastResult.isFinal) {
+                const command = lastResult[0].transcript.trim();
+                console.log("Heard:", command);
+
+                if (this.isListening) {
+                    // Already active? Process command
+                    this.processCommand(command);
                 } else {
-                    this.processCommand(transcript);
+                    // In standby? Check for Wake Word
+                    if (command.toLowerCase().includes('hello farm central') || command.toLowerCase().includes('hello farm') || command.toLowerCase().includes('farm central')) {
+                        this.wakeUp();
+                    }
                 }
             }
         };
 
         this.recognition.onend = () => {
-            // Auto-restart
-            if (!this.isListening || location.pathname.includes('dashboard')) {
-                try { this.recognition.start(); } catch (e) { }
+            // Auto-restart for "Always On" capability
+            if (this.isStandby || this.isListening) {
+                setTimeout(() => {
+                    try { this.recognition.start(); } catch (e) { }
+                }, 500);
             }
         };
 
-        try { this.recognition.start(); } catch (e) {
-            // Might block auto-play, usually needs 1 interaction
-            document.body.addEventListener('click', () => {
-                try { this.recognition.start(); } catch (e) { }
-            }, { once: true });
+        this.recognition.onerror = (event) => {
+            console.warn("Speech Error:", event.error);
+            if (event.error === 'not-allowed') {
+                this.isStandby = false;
+                this.updateStandbyVisuals();
+            }
+        };
+
+        // Attempt to start in Standby Mode on load (might fail due to autoplay policy, user needs to click once)
+        // We rely on the global mic button to "Enable" the AI for the session.
+    }
+
+    // --- STATES ---
+
+    enableStandby() {
+        this.isStandby = true;
+        this.updateStandbyVisuals();
+        try { this.recognition.start(); } catch (e) { }
+        this.speak("Voice Assistant Activating. Say 'Hello Farm Central' to wake me up.");
+    }
+
+    wakeUp() {
+        if (this.isListening) return;
+        this.isListening = true;
+        this.ui.classList.remove('hidden');
+        document.getElementById('mic-pulse').classList.add('animate-ping');
+        this.speak("I am listening. How can I help?", this.currentLang);
+        this.updateStandbyVisuals();
+    }
+
+    goToSleep() {
+        this.isListening = false;
+        this.ui.classList.add('hidden');
+        document.getElementById('mic-pulse').classList.remove('animate-ping');
+        this.updateStandbyVisuals();
+        // Stays in standby (loop continues)
+    }
+
+    // --- LOGIC ---
+
+    async processCommand(cmd) {
+        if (this.isProcessing) return;
+        this.isProcessing = true;
+        const lowerCmd = cmd.toLowerCase();
+
+        // 1. Local Actions & Navigation
+        if (lowerCmd.includes('exit') || lowerCmd.includes('close') || lowerCmd.includes('sleep') || lowerCmd.includes('stop')) {
+            this.speak("Going to sleep.");
+            this.goToSleep();
+            this.isProcessing = false;
+            return;
+        }
+
+        // Navigation
+        if (lowerCmd.includes('go to') || lowerCmd.includes('open') || lowerCmd.includes('show')) {
+            for (const [key, url] of Object.entries(this.navMap)) {
+                if (lowerCmd.includes(key)) {
+                    if (url === 'LOGOUT_ACTION') {
+                        this.speak("Logging you out.");
+                        localStorage.clear();
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    this.speak(`Opening ${key}.`);
+                    setTimeout(() => window.location.href = url, 1000);
+                    this.isProcessing = false;
+                    return;
+                }
+            }
+        }
+
+        // Actions
+        if (lowerCmd.includes('scroll down')) {
+            window.scrollBy({ top: 500, behavior: 'smooth' });
+            this.isProcessing = false;
+            return;
+        }
+        if (lowerCmd.includes('scroll up')) {
+            window.scrollBy({ top: -500, behavior: 'smooth' });
+            this.isProcessing = false;
+            return;
+        }
+        if (lowerCmd.includes('click')) {
+            // Fuzzy clicker
+            const words = lowerCmd.split(' ');
+            const targetWord = words[words.indexOf('click') + 1];
+            if (targetWord) {
+                // Try to find a button or link with this text
+                const elements = [...document.querySelectorAll('button, a')];
+                const match = elements.find(el => el.innerText.toLowerCase().includes(targetWord));
+                if (match) {
+                    this.speak(`Clicking ${targetWord}.`);
+                    match.click();
+                    this.isProcessing = false;
+                    return;
+                }
+            }
+        }
+
+        // 2. AI Knowledge Base (Backend)
+        try {
+            this.statusEl.innerText = "THINKING...";
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/ai/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify({ query: cmd, language: this.currentLang })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                this.transcriptEl.innerText = data.answer;
+                await this.speak(data.answer, data.language_detected);
+            } else {
+                await this.speak("I didn't catch that. Could you repeat?");
+            }
+
+        } catch (e) {
+            console.error(e);
+            await this.speak("I am having trouble connecting to the cloud.");
+        }
+
+        this.isProcessing = false;
+        this.statusEl.innerText = "LISTENING...";
+    }
+
+    // --- UI ---
+
+    createStandbyUI() {
+        if (document.getElementById('ai-standby-btn')) return;
+        const btn = document.createElement('button');
+        btn.id = 'ai-standby-btn';
+        btn.className = 'fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-slate-900 border border-cyan-500/50 shadow-lg shadow-cyan-500/20 flex items-center justify-center transition-all hover:scale-110 group';
+        btn.onclick = () => {
+            if (this.isStandby) {
+                this.wakeUp(); // Manual wake
+            } else {
+                this.enableStandby(); // First time activation
+            }
+        };
+        btn.innerHTML = `
+            <div id="standby-pulse" class="absolute inset-0 rounded-full border border-cyan-400 opacity-0 transition-opacity duration-500"></div>
+            <span class="text-3xl filter drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">🎙️</span>
+        `;
+        document.body.appendChild(btn);
+    }
+
+    updateStandbyVisuals() {
+        const pulse = document.getElementById('standby-pulse');
+        const btn = document.getElementById('ai-standby-btn');
+        if (!pulse) return;
+
+        if (this.isStandby && !this.isListening) {
+            pulse.className = 'absolute inset-0 rounded-full border-2 border-cyan-400 animate-ping opacity-75';
+            btn.classList.add('shadow-[0_0_20px_rgba(34,211,238,0.4)]');
+        } else if (this.isListening) {
+            pulse.className = 'absolute inset-0 rounded-full bg-cyan-500 opacity-20'; // Solid when active overlay is up
+        } else {
+            pulse.className = 'hidden';
+            btn.classList.remove('shadow-[0_0_20px_rgba(34,211,238,0.4)]');
         }
     }
 
     createUI() {
-        // Create the Overlay UI
+        if (document.getElementById('ai-overlay')) return;
+
         const div = document.createElement('div');
         div.id = 'ai-overlay';
-        div.className = 'fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-md flex flex-col items-center justify-center transition-opacity duration-500';
+        div.className = 'fixed inset-0 z-[100] hidden bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center transition-all duration-500';
         div.innerHTML = `
-            <div class="relative">
-                <canvas id="voice-waves" width="300" height="300" class="rounded-full"></canvas>
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div class="w-32 h-32 rounded-full bg-cyan-500/20 animate-pulse flex items-center justify-center border border-cyan-400/30 shadow-[0_0_50px_rgba(34,211,238,0.4)]">
-                        <span class="text-4xl">🤖</span>
+            <!-- Header -->
+            <div class="absolute top-10 w-full flex justify-between px-10 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🌱</span>
+                    <h1 class="text-white font-bold tracking-widest text-lg">KISAN CENTRAL <span class="text-cyan-400 text-xs px-2 py-1 bg-cyan-900/30 rounded border border-cyan-500/30">V2.0</span></h1>
+                </div>
+                <div class="relative group">
+                    <button class="flex items-center gap-2 text-slate-300 hover:text-white transition bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                        <span>🌐</span> <span id="current-lang-label">English</span>
+                    </button>
+                    <!-- Language Dropdown -->
+                    <div class="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden hidden group-hover:block z-50">
+                        <div class="max-h-64 overflow-y-auto">
+                            <button onclick="farmAI.setLang('en-IN', 'English')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇺🇸 English</button>
+                            <button onclick="farmAI.setLang('hi-IN', 'Hindi')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Hindi</button>
+                            <button onclick="farmAI.setLang('pa-IN', 'Punjabi')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Punjabi</button>
+                            <button onclick="farmAI.setLang('mr-IN', 'Marathi')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Marathi</button>
+                            <button onclick="farmAI.setLang('gu-IN', 'Gujarati')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Gujarati</button>
+                            <button onclick="farmAI.setLang('ta-IN', 'Tamil')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Tamil</button>
+                            <button onclick="farmAI.setLang('te-IN', 'Telugu')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Telugu</button>
+                            <button onclick="farmAI.setLang('kn-IN', 'Kannada')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Kannada</button>
+                            <button onclick="farmAI.setLang('ml-IN', 'Malayalam')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white border-b border-white/5 transition">🇮🇳 Malayalam</button>
+                            <button onclick="farmAI.setLang('bn-IN', 'Bengali')" class="block w-full text-left px-4 py-3 text-slate-300 hover:bg-emerald-600 hover:text-white transition">🇮🇳 Bengali</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <h2 id="ai-status" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mt-8 tracking-widest">LISTENING...</h2>
-            <p id="ai-transcript" class="text-slate-400 mt-4 text-lg font-mono italic h-8">...</p>
+
+            <!-- Central Visualizer -->
+            <div class="relative mb-12 transform scale-125">
+                <canvas id="voice-waves" width="400" height="400" class="rounded-full opacity-80 mix-blend-screen"></canvas>
+                
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div id="ai-core" class="w-40 h-40 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 opacity-20 blur-xl animate-pulse"></div>
+                    <div id="mic-pulse" class="absolute w-32 h-32 rounded-full border-2 border-cyan-400/50 flex items-center justify-center shadow-[0_0_100px_rgba(34,211,238,0.5)] bg-black/40 backdrop-blur-sm transition-all duration-300">
+                        <span class="text-5xl drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">🎙️</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status & Transcript -->
+            <div class="text-center space-y-4 max-w-2xl px-6 relative z-10">
+                <h2 id="ai-status" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-cyan-300 tracking-[0.2em] animate-pulse drop-shadow-lg">ONLINE</h2>
+                
+                <div class="bg-gradient-to-b from-white/10 to-transparent p-px rounded-2xl">
+                    <div class="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-white/10 min-h-[120px] flex items-center justify-center">
+                        <p id="ai-transcript" class="text-emerald-300 text-2xl font-medium font-sans leading-relaxed transition-all">"Say 'Go to Market' or 'Price of Wheat'..."</p>
+                    </div>
+                </div>
+            </div>
             
-            <button onclick="farmAI.deactivateAI()" class="mt-12 text-slate-500 hover:text-white transition uppercase text-xs tracking-widest border border-white/10 px-6 py-2 rounded-full">Close AI</button>
+            <!-- Close -->
+            <button onclick="farmAI.goToSleep()" class="mt-16 group flex flex-col items-center gap-2 text-slate-500 hover:text-white transition">
+                <span class="text-sm tracking-widest uppercase opacity-70">Tap to Sleep</span>
+            </button>
         `;
         document.body.appendChild(div);
 
         this.ui = div;
         this.statusEl = div.querySelector('#ai-status');
         this.transcriptEl = div.querySelector('#ai-transcript');
-    }
-
-    activateAI() {
-        this.isListening = true;
-        this.ui.classList.remove('hidden');
-        this.speak("Hello Farmer. Systems Online.");
         this.startVisualizer();
     }
 
-    deactivateAI() {
-        this.isListening = false;
-        this.ui.classList.add('hidden');
-        this.speak("Standing by.");
-    }
-
-    // --- PROCESS COMMAND (SUPER INTELLIGENCE) ---
-    async processCommand(cmd) {
-        this.transcriptEl.innerText = `"${cmd}"`;
-
-        // 1. Check Keywords (Navigation)
-        if (this.checkNavigation(cmd)) return;
-
-        // 2. Language Switching
-        if (this.checkLanguageSwitch(cmd)) return;
-
-        // 3. Super Fast LLM Simulation
-        const response = await this.mockLLMResponse(cmd);
-        this.speak(response);
-    }
-
-    checkNavigation(cmd) {
-        if (cmd.includes('market') || cmd.includes('price')) { location.href = 'market.html'; return true; }
-        if (cmd.includes('inventory') || cmd.includes('stock')) { location.href = 'inventory.html'; return true; }
-        if (cmd.includes('weather')) { this.speak("Checking live weather..."); return true; }
-        if (cmd.includes('doctor')) { location.href = 'doctor.html'; return true; }
-        if (cmd.includes('close') || cmd.includes('exit')) { this.deactivateAI(); return true; }
-        return false;
-    }
-
-    checkLanguageSwitch(cmd) {
-        const langs = {
-            'hindi': 'hi-IN', 'telugu': 'te-IN', 'tamil': 'ta-IN', 'kannada': 'kn-IN',
-            'malayalam': 'ml-IN', 'marathi': 'mr-IN', 'punjabi': 'pa-IN', 'english': 'en-IN'
-        };
-        for (let [name, code] of Object.entries(langs)) {
-            if (cmd.includes(name)) {
-                this.speak(`Switching to ${name} mode.`);
-                this.setLang(code);
-                return true;
-            }
+    setLang(lang, label) {
+        this.currentLang = lang;
+        this.recognition.lang = lang;
+        if (this.isStandby) {
+            this.recognition.stop(); // Triggers onend -> restart with new lang
         }
-        return false;
+        document.getElementById('current-lang-label').innerText = label;
+        this.speak(`Language switched to ${label}.`, lang);
     }
 
-    // SIMULATED LLM BACKEND (Local "Knowledge Graph")
-    async mockLLMResponse(query) {
-        // Delay for realism (super fast 300ms)
-        await new Promise(r => setTimeout(r, 300));
-
-        query = query.toLowerCase();
-
-        // Extended Knowledge Base
-        if (query.includes('winter') || query.includes('rabi')) return "For winter season, Wheat (HD-2967) and Mustard are highly profitable. Sowing time is Oct-Nov.";
-        if (query.includes('summer') || query.includes('zaid')) return "Watermelon, Cucumber, and Moong Dal are best for summer (Zaid) season.";
-        if (query.includes('tomato')) return "To grow tomatoes: Use well-drained loamy soil. Stake plants for support. Apply 19:19:19 fertilizer every 15 days.";
-        if (query.includes('pesticide') || query.includes('insect')) return "For general pests, Neem Oil (1000ppm) is safe. For bollworms, use Emamectin Benzoate.";
-        if (query.includes('subsidy') || query.includes('govt')) return "You can apply for PM-Kisan (₹6000/yr) and Sub-Mission on Agricultural Mechanization for tractor subsidies.";
-        if (query.includes('fertilizer')) return "DAP and Urea are common, but organic Vermicompost yields better long-term soil health.";
-
-        return "I am searching the global agricultural database for " + query + ". Please wait...";
-    }
-
-    // --- HOLOGRAPHIC VISUALIZER (Back Hologram) ---
-    startVisualizer() {
-        const container = document.getElementById('voice-waves')?.parentElement;
-        if (!container || this.renderer) return;
-
-        const scene = new THREE.Scene();
-        // Transparent background
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(400, 400);
-        container.innerHTML = '';
-        container.appendChild(renderer.domElement);
-        this.renderer = renderer;
-
-        // HOLOGRAPHIC SPHERE (Points)
-        const geometry = new THREE.SphereGeometry(1.5, 64, 64);
-        const material = new THREE.PointsMaterial({
-            color: 0x00ffff, // Cyan Hologram
-            size: 0.05,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
+    speak(text, lang) {
+        return new Promise((resolve) => {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang || this.currentLang;
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            utterance.onend = () => resolve();
+            window.speechSynthesis.speak(utterance);
         });
+    }
 
-        const hologram = new THREE.Points(geometry, material);
-        scene.add(hologram);
-
-        // Inner Core
-        const coreGeo = new THREE.IcosahedronGeometry(0.8, 2);
-        const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.3 });
-        const core = new THREE.Mesh(coreGeo, coreMat);
-        scene.add(core);
-
-        camera.position.z = 4.0;
-
+    startVisualizer() {
+        const canvas = document.getElementById('voice-waves');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
         let time = 0;
+
         const animate = () => {
-            if (!this.isListening) {
-                renderer.dispose();
-                this.renderer = null;
-                container.innerHTML = '<canvas id="voice-waves" width="300" height="300" class="rounded-full"></canvas>';
-                return;
+            if (this.ui.classList.contains('hidden')) {
+                // Keep animation loop alive but lightweight if hidden or just pause?
+                // Better to request frame only if visible to save battery
             }
             requestAnimationFrame(animate);
+            if (this.ui.classList.contains('hidden')) return;
 
-            time += 0.02;
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.beginPath();
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = 2;
 
-            // Hologram Rotation
-            hologram.rotation.y += 0.005;
-            core.rotation.x -= 0.01;
-            core.rotation.y -= 0.01;
-
-            // interference effect (Hologram jitter)
-            if (Math.random() > 0.9) hologram.position.x = (Math.random() - 0.5) * 0.05;
-            else hologram.position.x = 0;
-
-            renderer.render(scene, camera);
+            for (let i = 0; i < 400; i++) {
+                const amp = this.isProcessing ? 40 : (this.isListening ? 20 : 2);
+                const y = 200 + Math.sin(i * 0.02 + time) * amp * Math.sin(i * 0.01 + time);
+                if (i === 0) ctx.moveTo(i, y);
+                else ctx.lineTo(i, y);
+            }
+            ctx.stroke();
+            time += 0.1;
         };
         animate();
     }
 }
 
-// Global Instance
 const farmAI = new FarmVoiceAI();
-// Wait for voices to load
 window.speechSynthesis.onvoiceschanged = () => { };
-// Auto-init on page load
 window.addEventListener('DOMContentLoaded', () => farmAI.init());

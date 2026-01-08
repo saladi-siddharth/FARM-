@@ -54,7 +54,7 @@ router.post('/signin', async (req, res) => {
             `Hello ${user.username}, a successful login was recorded on ${new Date().toLocaleString()}.`
         ).catch(e => console.log("Email error:", e.message));
 
-        res.json({ token, username: user.username });
+        res.json({ token, username: user.username, email: user.email });
     } catch (err) {
         console.error("Login Error:", err.message);
         res.status(500).json({ error: "Server error during signin" });

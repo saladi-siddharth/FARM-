@@ -97,58 +97,93 @@
     <section id="features" class="py-32 relative bg-[#0f172a]">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20">
-                <h2 class="text-4xl md:text-5xl font-black mb-6">Why Farm Central?</h2>
-                <p class="text-slate-400 max-w-2xl mx-auto">We combine advanced technology with simple interfaces to
-                    make farming smarter, more profitable, and effortless.</p>
+                <h2 class="text-4xl md:text-5xl font-black mb-6">Explore the Ecosystem</h2>
+                <p class="text-slate-200 max-w-2xl mx-auto font-medium">All the tools you need in one place. Click any
+                    feature to start.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-emerald-500">
-                    <div class="text-5xl mb-6">🔬</div>
-                    <h3 class="text-2xl font-bold mb-4">AI Crop Doctor</h3>
-                    <p class="text-slate-400 leading-relaxed">Instantly diagnose plant diseases by uploading a photo.
-                        Get treatment plans and confidence scores powered by advanced computer vision.</p>
+                <!-- clickable cards -->
+
+                <!-- Feature 1: Inventory (Core) -->
+                <div onclick="navigateTo('inventory.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-emerald-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📦</div>
+                    <h3 class="text-2xl font-bold mb-4">Smart Inventory</h3>
+                    <p class="text-slate-300 leading-relaxed">Track seeds, fertilizers, and harvest stocks in real-time.
+                        Get low-stock alerts and export data instantly.</p>
                 </div>
 
-                <!-- Feature 2 -->
-                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-purple-500">
-                    <div class="text-5xl mb-6">📈</div>
+                <!-- Feature 2: Market -->
+                <div onclick="navigateTo('market.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-purple-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📈</div>
                     <h3 class="text-2xl font-bold mb-4">Live Market</h3>
-                    <p class="text-slate-400 leading-relaxed">Real-time simulated market prices for crops like Wheat,
-                        Rice, and Cotton. Track trends and engage in peer-to-peer trading.</p>
+                    <p class="text-slate-300 leading-relaxed">Check live commodity prices, view historical trends, and
+                        stay updated with agricultural news.</p>
                 </div>
 
-                <!-- Feature 3 -->
-                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-blue-500">
-                    <div class="text-5xl mb-6">🧮</div>
-                    <h3 class="text-2xl font-bold mb-4">ROI Estimator</h3>
-                    <p class="text-slate-400 leading-relaxed">Calculate projected profits and losses before you even
-                        plant. Input land size and yield to get instant financial forecasts.</p>
+                <!-- Feature 3: Calculator -->
+                <div onclick="navigateTo('calculator.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-blue-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">🧮</div>
+                    <h3 class="text-2xl font-bold mb-4">ROI Calculator</h3>
+                    <p class="text-slate-300 leading-relaxed">Plan your season. Estimate costs, profits, and yield
+                        projections before sowing a single seed.</p>
                 </div>
 
-                <!-- Feature 4 -->
-                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-cyan-500">
-                    <div class="text-5xl mb-6">🎙️</div>
-                    <h3 class="text-2xl font-bold mb-4">Voice AI Assistant</h3>
-                    <p class="text-slate-400 leading-relaxed">Hands-free control. Just say "Hello Farm Central" to check
-                        inventory, get weather updates, or navigate the app.</p>
+                <!-- Feature 4: Chat/Community -->
+                <div onclick="navigateTo('chat.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-pink-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">💬</div>
+                    <h3 class="text-2xl font-bold mb-4">Farmer Connect</h3>
+                    <p class="text-slate-300 leading-relaxed">Chat with peers, make video calls, and share advice in a
+                        thriving community of modern farmers.</p>
                 </div>
 
-                <!-- Feature 5 -->
-                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-pink-500">
-                    <div class="text-5xl mb-6">💬</div>
-                    <h3 class="text-2xl font-bold mb-4">Community</h3>
-                    <p class="text-slate-400 leading-relaxed">Connect with thousands of other farmers. Share tips, ask
-                        questions, and form a strong support network.</p>
+                <!-- Feature 5: AI Doctor (Placeholder link to dashboard/tasks for now or future page) -->
+                <div onclick="navigateTo('dashboard.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-cyan-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">🔬</div>
+                    <h3 class="text-2xl font-bold mb-4">AI Assistant</h3>
+                    <p class="text-slate-300 leading-relaxed">Get automated insights and manage your daily tasks
+                        efficiently with our smart helper.</p>
                 </div>
 
-                <!-- Feature 6 -->
-                <div class="glass p-10 rounded-3xl hover:bg-white/5 transition border-t-4 border-yellow-500">
-                    <div class="text-5xl mb-6">📊</div>
+                <!-- Feature 6: Weather -->
+                <div onclick="navigateTo('dashboard.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-yellow-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">⛅</div>
+                    <h3 class="text-2xl font-bold mb-4">Weather & Field</h3>
+                    <p class="text-slate-300 leading-relaxed">Monitor field conditions (simulated) and view real-time
+                        weather updates for your location.</p>
+                </div>
+
+                <!-- Feature 7: Expense Manager -->
+                <div onclick="navigateTo('dashboard.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-rose-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">💰</div>
+                    <h3 class="text-2xl font-bold mb-4">Expense Manager</h3>
+                    <p class="text-slate-300 leading-relaxed">Log every purchase, from seeds to machinery. Visualize
+                        your cash flow with intuitive charts.</p>
+                </div>
+
+                <!-- Feature 8: Tasks -->
+                <div onclick="navigateTo('dashboard.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-teal-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📝</div>
+                    <h3 class="text-2xl font-bold mb-4">Task Scheduler</h3>
+                    <p class="text-slate-300 leading-relaxed">Organize daily farm activities. Assign jobs, set
+                        deadlines, and never miss a harvest window.</p>
+                </div>
+
+                <!-- Feature 9: Reports -->
+                <div onclick="navigateTo('dashboard.html')"
+                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-orange-500 cursor-pointer group hover:scale-105">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📊</div>
                     <h3 class="text-2xl font-bold mb-4">Pro Reports</h3>
-                    <p class="text-slate-400 leading-relaxed">Generate professional PDF financial statements instantly
-                        for bank loans, audits, or personal record keeping.</p>
+                    <p class="text-slate-300 leading-relaxed">Generate instant PDF financial and yield reports for
+                        banks, audits, or personal records.</p>
                 </div>
             </div>
         </div>
@@ -176,69 +211,8 @@
 
     <script>
         // --- 3D Background ---
-        // --- 3D Background (Futuristic Agriculture) ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-bg').appendChild(renderer.domElement);
+        // Handled by js/background-3d.js
 
-        // 1. Digital Terrain Grid
-        const gridHelper = new THREE.GridHelper(200, 50, 0x4ade80, 0x3b82f6);
-        gridHelper.position.y = -5;
-        scene.add(gridHelper);
-
-        // 2. Floating Data Cubes (Representing IoT)
-        const cubes = [];
-        const cubeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-        const cubeMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, wireframe: true });
-        for (let i = 0; i < 50; i++) {
-            const cube = new THREE.Mesh(cubeGeo, cubeMat);
-            cube.position.set((Math.random() - 0.5) * 50, (Math.random() * 10) - 5, (Math.random() - 0.5) * 50);
-            scene.add(cube);
-            cubes.push(cube);
-        }
-
-        // 3. Central "Core" (Representing AI)
-        const coreGeo = new THREE.IcosahedronGeometry(2, 0);
-        const coreMat = new THREE.MeshNormalMaterial({ wireframe: true });
-        const core = new THREE.Mesh(coreGeo, coreMat);
-        scene.add(core);
-
-        // 4. Orbiting Rings
-        const ringGeo = new THREE.TorusGeometry(4, 0.05, 16, 100);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
-        const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.rotation.x = Math.PI / 2;
-        scene.add(ring);
-
-        camera.position.z = 15;
-        camera.position.y = 2;
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Core Rotation
-            core.rotation.x += 0.005;
-            core.rotation.y += 0.005;
-
-            // Ring Wobble
-            ring.rotation.x += 0.002;
-            ring.rotation.y += 0.002;
-
-            // Animate Cubes
-            cubes.forEach(c => {
-                c.rotation.x += 0.02;
-                c.position.y += Math.sin(Date.now() * 0.001 + c.position.x) * 0.01;
-            });
-
-            // Camera drift
-            camera.position.x = Math.sin(Date.now() * 0.0002) * 2;
-            camera.lookAt(0, 0, 0);
-
-            renderer.render(scene, camera);
-        }
-        animate();
 
         // --- DASHBOARD ACCESS LOGIC ---
         function enterDashboard() {
@@ -251,7 +225,22 @@
                 window.location.href = 'login.html';
             }
         }
+
+        // --- DIRECT NAVIGATION ---
+        function navigateTo(page) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = page;
+            } else {
+                // Save intended destination? For now just redirect to login
+                alert("Please login to access this feature.");
+                window.location.href = 'login.html';
+            }
+        }
     </script>
-<script src="js/background-3d.js"></script><script src="js/global-ticker.js"></script><script src="js/mobile-nav.js"></script></body>
+    <script src="js/background-3d.js"></script>
+    <script src="js/global-ticker.js"></script>
+    <script src="js/mobile-nav.js"></script>
+</body>
 
 </html>
