@@ -9,7 +9,7 @@
         body {
             margin: 0;
             background: #0f172a;
-            color: #f8fafc;
+            color: #0e0101;
             font-family: 'Outfit', 'Inter', sans-serif;
             overflow: hidden;
         }
@@ -58,6 +58,19 @@
             <button type="submit"
                 class="w-full bg-green-500 py-3 rounded font-bold hover:bg-green-600 transition">Go</button>
         </form>
+
+        <div class="mt-6 flex flex-col gap-2">
+            <div class="relative flex py-2 items-center">
+                <div class="flex-grow border-t border-white/20"></div>
+                <span class="flex-shrink-0 mx-4 text-gray-400 text-xs">OR</span>
+                <div class="flex-grow border-t border-white/20"></div>
+            </div>
+            <a href="/api/auth/google"
+                class="w-full bg-white text-gray-900 py-3 rounded-lg font-bold hover:bg-gray-200 transition flex items-center justify-center gap-2">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="G">
+                Sign in with Google
+            </a>
+        </div>
         <p class="mt-4 text-center cursor-pointer text-sm opacity-70" id="reset-link">Forgot Password?</p>
         <p class="mt-2 text-center cursor-pointer text-sm opacity-70" id="toggle">Need an account? Sign Up</p>
     </div>

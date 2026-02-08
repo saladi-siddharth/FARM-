@@ -2,7 +2,12 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255), -- Nullable for OAuth users
+    google_id VARCHAR(255) UNIQUE, -- For Google OAuth
+    reset_token VARCHAR(6), -- For password reset OTP
+    reset_expires BIGINT, -- Timestamp for OTP expiry
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS inventory (

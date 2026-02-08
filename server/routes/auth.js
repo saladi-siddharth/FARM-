@@ -4,15 +4,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const { sendAlert } = require('../utils/mailer');
+const passport = require('passport');
+const { validate, schemas } = require('../middleware/validator');
+const { authLimiter } = require('../middleware/security');
+
 
 // SIGN UP (New Farmer Registration)
-router.post('/signup', async (req, res) => {
+router.post('/signup', authLimiter, validate(schemas.signup), async (req, res) => {
     try {
         const { username, email, password } = req.body;
-
-        if (!username || !email || !password) {
-            return res.status(400).json({ error: "Missing required fields" });
-        }
 
         const hashedPass = await bcrypt.hash(password, 10);
 
@@ -29,7 +29,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // SIGN IN (Login + Email Alert)
-router.post('/signin', async (req, res) => {
+router.post('/signin', authLimiter, validate(schemas.signin), async (req, res) => {
     try {
         const { email, password } = req.body;
         const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
@@ -62,7 +62,7 @@ router.post('/signin', async (req, res) => {
 });
 
 // FORGOT PASSWORD (Generate OTP)
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', authLimiter, validate(schemas.forgotPassword), async (req, res) => {
     try {
         const { email } = req.body;
         const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
@@ -84,7 +84,7 @@ router.post('/forgot-password', async (req, res) => {
 });
 
 // RESET PASSWORD (Verify OTP & Change)
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', authLimiter, validate(schemas.resetPassword), async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
         const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
@@ -107,7 +107,7 @@ router.post('/reset-password', async (req, res) => {
 });
 
 // TEST EMAIL ROUTE (For Debugging)
-router.post('/test-email', async (req, res) => {
+router.post('/test-email', validate(schemas.email), async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) return res.status(400).json({ error: "Email required" });
@@ -119,5 +119,31 @@ router.post('/test-email', async (req, res) => {
         res.status(500).json({ error: "Failed to send test email" });
     }
 });
+
+// --- GOOGLE AUTH ROUTES ---
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/google/callback',
+    passport.authenticate('google', { session: false, failureRedirect: '/login.html?error=GoogleAuthFailed' }),
+    (req, res) => {
+        // Successful authentication
+        const user = req.user;
+        const token = jwt.sign(
+            { id: user.id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        // Send Login Alert (Async)
+        sendAlert(
+            user.email,
+            "Login Alert: Smart Farm (Google)",
+            `Hello ${user.username}, you signed in via Google on ${new Date().toLocaleString()}.`
+        ).catch(e => console.log("Email error:", e.message));
+
+        // Redirect to Dashboard with Token
+        res.redirect(`/dashboard.html?token=${token}&username=${encodeURIComponent(user.username)}&email=${encodeURIComponent(user.email)}`);
+    }
+);
 
 module.exports = router;

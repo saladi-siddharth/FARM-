@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
 
 // Load .env
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -10,9 +11,25 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { cors: { origin: "*" } });
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
+// Security Middlewares
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable for now to allow inline scripts
+    crossOriginEmbedderPolicy: false
+}));
+
+// CORS Configuration
+app.use(cors({
+    origin: process.env.APP_URL || '*',
+    credentials: true
+}));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Initialize Passport for Google Auth
+const passport = require('./config/passport');
+app.use(passport.initialize());
+
 app.use(express.static(path.join(__dirname, '../public')));
 
 // --- REGISTER ALL API ROUTES ---
@@ -81,8 +98,19 @@ io.on('connection', (socket) => {
     socket.on('stop-typing', (data) => socket.broadcast.emit('stop-typing', data));
 });
 
+// Import error handlers
+const { errorHandler, notFoundHandler } = require('./middleware/security');
+
 // Default route to serve Dashboard
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+app.get('*', (req, res, next) => {
+    // Check if it's an API route
+    if (req.path.startsWith('/api/')) {
+        return next();
+    }
     res.sendFile(path.join(__dirname, '../public/dashboard.html'));
 });
 
@@ -108,6 +136,12 @@ app.get('/health', async (req, res) => {
         res.status(500).json({ status: 'error', database: 'disconnected', error: err.message });
     }
 });
+
+// 404 Handler for undefined routes (must be after all routes)
+app.use(notFoundHandler);
+
+// Global Error Handler (must be last)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 const startScheduler = require('./scheduler');

@@ -416,6 +416,17 @@
     <!-- SCRIPTS -->
     <script>
         // --- 1. AUTH GATEKEEPER ---
+        // Check for Google Auth Token in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlToken = urlParams.get('token');
+        if (urlToken) {
+            localStorage.setItem('token', urlToken);
+            localStorage.setItem('username', urlParams.get('username'));
+            localStorage.setItem('email', urlParams.get('email'));
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         const token = localStorage.getItem('token');
         if (!token) {
             window.location.href = 'login.html'; // FORCE LOGIN PAGE
