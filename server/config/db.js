@@ -8,8 +8,10 @@ const dbConfig = {
     database: process.env.DB_NAME || 'farming',
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    connectionLimit: 100, // Increased from 10 to 100 for scalability
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0
 };
 
 // 🌩️ Cloud Database Support (TiDB, PlanetScale, AWS)

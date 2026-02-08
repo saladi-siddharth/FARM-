@@ -3,6 +3,7 @@ const path = require('path');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
+const compression = require('compression');
 
 // Load .env
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -15,6 +16,17 @@ const io = require('socket.io')(server, { cors: { origin: "*" } });
 app.use(helmet({
     contentSecurityPolicy: false, // Disable for now to allow inline scripts
     crossOriginEmbedderPolicy: false
+}));
+
+// Compression Middleware (reduces response size by ~70%)
+app.use(compression({
+    filter: (req, res) => {
+        if (req.headers['x-no-compression']) {
+            return false;
+        }
+        return compression.filter(req, res);
+    },
+    level: 6 // Compression level (0-9, 6 is balanced)
 }));
 
 // CORS Configuration
