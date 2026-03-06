@@ -3,42 +3,85 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farm Central | Future of Agriculture</title>
+    <meta name="description" content="Farm Central — AI-powered smart farming platform for modern Indian farmers">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090e17">
+    <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
-            background: #0f172a;
-            color: white;
-            font-family: 'Outfit', sans-serif;
+            background: #090e17;
+            /* Deeper modern dark */
+            color: #f8fafc;
+            font-family: 'Outfit', 'Inter', sans-serif;
             overflow-x: hidden;
-            scroll-behavior: smooth;
         }
 
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Abstract glowing orbs for background */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 10s ease-in-out infinite alternate;
         }
 
-        .hero-text {
-            background: linear-gradient(to right, #4ade80, #3b82f6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: #06b6d4;
+            top: -100px;
+            left: -100px;
+            opacity: 0.15;
         }
 
-        .fade-in {
-            animation: fadeIn 1.5s ease-out;
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: #3b82f6;
+            bottom: -200px;
+            right: -100px;
+            opacity: 0.15;
+            animation-delay: -5s;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: #10b981;
+            top: 40%;
+            left: 30%;
+            opacity: 0.1;
+            animation-duration: 15s;
+        }
 
+        .fade-in-up {
+            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+
+        @keyframes fadeInUp {
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -47,181 +90,214 @@
     </style>
 </head>
 
-<body>
-    <div id="canvas-bg" class="fixed inset-0 z-[-1]"></div>
+<body class="selection:bg-emerald-500/30 selection:text-emerald-200 relative overflow-x-hidden">
+    <div id="canvas-bg" class="fixed inset-0 z-[-2]"></div>
+
+    <!-- Background Orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
 
     <!-- NAVIGATION -->
-    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+    <nav class="fixed top-0 w-full z-50 glass-premium border-b-0 backdrop-blur-3xl">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-black tracking-tighter text-white flex items-center gap-2">
-                <span class="text-3xl">🌱</span> FARM CENTRAL
+            <div onclick="location.href='index.html'"
+                class="text-2xl font-black tracking-tighter text-white flex items-center gap-3 hover:scale-105 transition duration-300 cursor-pointer">
+                <img src="logo.png" alt="Farm Central Logo" class="w-10 h-10 object-contain">
+                <span>FARM CENTRAL</span>
             </div>
-            <div class="flex gap-4">
-                <button onclick="enterDashboard()"
-                    class="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full font-bold transition">Dashboard</button>
-                <button onclick="location.href='login.html'"
-                    class="px-6 py-2 bg-green-500 hover:bg-green-600 rounded-full font-bold transition shadow-lg shadow-green-500/20">Login</button>
+            <div class="flex gap-4 items-center">
+                <!-- Language Switcher -->
+                <select onchange="changeAppLanguage(this.value)"
+                    class="bg-white/5 border border-white/10 text-white text-sm rounded-xl px-2 py-1 outline-none hidden md:block">
+                    <option value="en" class="text-black">English</option>
+                    <option value="hi" class="text-black">हिन्दी (Hindi)</option>
+                    <option value="pa" class="text-black">ਪੰਜਾਬੀ (Punjabi)</option>
+                    <option value="te" class="text-black">తెలుగు (Telugu)</option>
+                </select>
+
+
+
+                <button onclick="location.href='satellite.html'"
+                    class="hidden md:block px-6 py-2.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-full text-sm font-bold transition hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                    🛰️ Satellite Scan
+                </button>
+                <button onclick="enterDashboard()" data-i18n="enter_dashboard"
+                    class="hidden md:block px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-semibold transition hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                    Dashboard
+                </button>
+                <button onclick="location.href='login.html'" data-i18n="login"
+                    class="btn-premium px-8 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 rounded-full text-sm font-bold shadow-lg shadow-emerald-500/20 text-white border border-emerald-400/50">
+                    Login
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- HERO SECTION -->
-    <section class="min-h-screen flex items-center justify-center pt-20 relative">
-        <div class="text-center px-4 max-w-4xl fade-in z-10">
-            <span class="text-green-400 font-bold tracking-widest uppercase text-sm mb-4 block">Next-Gen Agriculture
-                Management</span>
-            <h1 class="text-6xl md:text-8xl font-black mb-6 leading-tight">
-                Farming, <br> <span class="hero-text">Reimagined.</span>
+    <section class="min-h-screen flex items-center justify-center pt-24 pb-12 relative overflow-hidden">
+        <div class="text-center px-4 max-w-5xl z-10">
+            <div
+                class="inline-block mb-6 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-bold tracking-widest uppercase fade-in-up">
+                ✨ Next-Gen Agriculture Ecosystem
+            </div>
+            <h1 class="text-5xl md:text-8xl font-black mb-6 leading-[1.1] tracking-tight fade-in-up delay-100">
+                Farming, <br> <span class="gradient-text pb-2">Reimagined.</span>
             </h1>
-            <p class="text-xl md:text-2xl text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">
-                The all-in-one ecosystem for modern farmers. Manage inventory, track finances, consult AI doctors, and
-                trade in real-time.
+            <p
+                class="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-3xl mx-auto font-light fade-in-up delay-200">
+                The all-in-one platform for modern farmers. Manage inventory, track finances, consult AI, and trade
+                globally in real-time.
             </p>
-            <div class="flex flex-col md:flex-row justify-center gap-6">
+            <div class="flex flex-col sm:flex-row justify-center gap-6 fade-in-up delay-300">
                 <button onclick="enterDashboard()"
-                    class="px-10 py-5 bg-blue-600 hover:bg-blue-500 text-lg font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:scale-105 flex items-center justify-center gap-3">
-                    <span>🚀</span> Enter Dashboard
+                    class="btn-premium px-10 py-5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-lg font-bold rounded-2xl shadow-xl shadow-blue-500/20 flex items-center justify-center gap-3 border border-blue-400/30">
+                    <span>🚀</span> <span data-i18n="enter_dashboard">Enter Dashboard</span>
                 </button>
                 <button onclick="document.getElementById('features').scrollIntoView()"
-                    class="px-10 py-5 glass text-lg font-bold rounded-2xl hover:bg-white/5 transition flex items-center justify-center gap-3">
-                    <span>✨</span> Explore Features
+                    class="btn-premium px-10 py-5 glass-premium text-lg font-bold rounded-2xl hover:bg-white/10 flex items-center justify-center gap-3 border border-white/10">
+                    <span>✨</span> <span data-i18n="features">Explore Features</span>
                 </button>
+
             </div>
         </div>
 
-        <!-- Decorative Elements -->
-        <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0f172a] to-transparent z-0"></div>
+        <!-- Bottom Fade -->
+        <div
+            class="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-[#090e17] to-transparent z-0 pointer-events-none">
+        </div>
     </section>
 
     <!-- FEATURES SECTION -->
-    <section id="features" class="py-32 relative bg-[#0f172a]">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-20">
-                <h2 class="text-4xl md:text-5xl font-black mb-6">Explore the Ecosystem</h2>
-                <p class="text-slate-200 max-w-2xl mx-auto font-medium">All the tools you need in one place. Click any
-                    feature to start.</p>
+    <section id="features" class="py-32 relative bg-[#090e17]">
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-20 fade-in-up">
+                <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tight"><span data-i18n="features">Explore
+                        Features</span></h2>
+                <p class="text-slate-300 max-w-2xl mx-auto font-medium text-lg" data-i18n="why_us">Why Farm Central?</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- clickable cards -->
-
-                <!-- Feature 1: Inventory (Core) -->
+                <!-- Feature 1: Inventory -->
                 <div onclick="navigateTo('inventory.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-emerald-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📦</div>
-                    <h3 class="text-2xl font-bold mb-4">Smart Inventory</h3>
-                    <p class="text-slate-300 leading-relaxed">Track seeds, fertilizers, and harvest stocks in real-time.
-                        Get low-stock alerts and export data instantly.</p>
+                    class="glass-premium p-8 rounded-[2rem] border-neon-green cursor-pointer group">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-emerald-500/20">
+                        📦</div>
+                    <h3 class="text-2xl font-bold mb-3 text-white" data-i18n="inventory">Smart Inventory</h3>
+                    <p class="text-slate-400 leading-relaxed font-light" data-i18n="manage_stocks">Manage Stocks</p>
                 </div>
 
                 <!-- Feature 2: Market -->
                 <div onclick="navigateTo('market.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-purple-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📈</div>
-                    <h3 class="text-2xl font-bold mb-4">Live Market</h3>
-                    <p class="text-slate-300 leading-relaxed">Check live commodity prices, view historical trends, and
-                        stay updated with agricultural news.</p>
+                    class="glass-premium p-8 rounded-[2rem] border-neon-blue cursor-pointer group">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-blue-500/20">
+                        📈</div>
+                    <h3 class="text-2xl font-bold mb-3 text-white" data-i18n="market">Live Market</h3>
+                    <p class="text-slate-400 leading-relaxed font-light" data-i18n="live_prices">Live Prices</p>
                 </div>
 
                 <!-- Feature 3: Calculator -->
                 <div onclick="navigateTo('calculator.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-blue-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">🧮</div>
-                    <h3 class="text-2xl font-bold mb-4">ROI Calculator</h3>
-                    <p class="text-slate-300 leading-relaxed">Plan your season. Estimate costs, profits, and yield
-                        projections before sowing a single seed.</p>
+                    class="glass-premium p-8 rounded-[2rem] border-neon-purple cursor-pointer group">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-purple-500/20">
+                        🧮</div>
+                    <h3 class="text-2xl font-bold mb-3 text-white" data-i18n="calculator">ROI Calc</h3>
+                    <p class="text-slate-400 leading-relaxed font-light" data-i18n="profit_estimator">Profit Estimator
+                    </p>
                 </div>
 
-                <!-- Feature 4: Chat/Community -->
-                <div onclick="navigateTo('chat.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-pink-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">💬</div>
-                    <h3 class="text-2xl font-bold mb-4">Farmer Connect</h3>
-                    <p class="text-slate-300 leading-relaxed">Chat with peers, make video calls, and share advice in a
-                        thriving community of modern farmers.</p>
+                <!-- Feature 4: Community -->
+                <div onclick="navigateTo('community.html')"
+                    class="glass-premium p-8 rounded-[2rem] border border-pink-500/30 hover:border-pink-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(236,72,153,0.2)]">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-pink-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-pink-500/20">
+                        💬</div>
+                    <h3 class="text-2xl font-bold mb-3 text-white" data-i18n="community">Community</h3>
+                    <p class="text-slate-400 leading-relaxed font-light" data-i18n="public_forum">Public Forum</p>
                 </div>
 
-                <!-- Feature 5: AI Doctor (Placeholder link to dashboard/tasks for now or future page) -->
-                <div onclick="navigateTo('dashboard.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-cyan-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">🔬</div>
-                    <h3 class="text-2xl font-bold mb-4">AI Assistant</h3>
-                    <p class="text-slate-300 leading-relaxed">Get automated insights and manage your daily tasks
-                        efficiently with our smart helper.</p>
+                <!-- Feature 5: AI Doctor -->
+                <div onclick="navigateTo('doctor.html')"
+                    class="glass-premium p-8 rounded-[2rem] border border-cyan-500/30 hover:border-cyan-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-cyan-500/20">
+                        🔬</div>
+                    <h3 class="text-2xl font-bold mb-3 text-white" data-i18n="ai_doctor">AI Doctor</h3>
+                    <p class="text-slate-400 leading-relaxed font-light" data-i18n="disease_scan">Disease Scan</p>
                 </div>
 
-                <!-- Feature 6: Weather -->
-                <div onclick="navigateTo('dashboard.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-yellow-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">⛅</div>
-                    <h3 class="text-2xl font-bold mb-4">Weather & Field</h3>
-                    <p class="text-slate-300 leading-relaxed">Monitor field conditions (simulated) and view real-time
-                        weather updates for your location.</p>
+                <!-- Feature 6: Expense Manager -->
+                <div onclick="navigateTo('expenses.html')"
+                    class="glass-premium p-8 rounded-[2rem] border border-yellow-500/30 hover:border-yellow-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-yellow-500/20">
+                        💰</div>
+                    <h3 class="text-2xl font-bold mb-3 text-white" data-i18n="expenses">Expenses</h3>
+                    <p class="text-slate-400 leading-relaxed font-light" data-i18n="reports_title">Professional Reports
+                    </p>
                 </div>
 
-                <!-- Feature 7: Expense Manager -->
-                <div onclick="navigateTo('dashboard.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-rose-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">💰</div>
-                    <h3 class="text-2xl font-bold mb-4">Expense Manager</h3>
-                    <p class="text-slate-300 leading-relaxed">Log every purchase, from seeds to machinery. Visualize
-                        your cash flow with intuitive charts.</p>
-                </div>
-
-                <!-- Feature 8: Tasks -->
-                <div onclick="navigateTo('dashboard.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-teal-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📝</div>
-                    <h3 class="text-2xl font-bold mb-4">Task Scheduler</h3>
-                    <p class="text-slate-300 leading-relaxed">Organize daily farm activities. Assign jobs, set
-                        deadlines, and never miss a harvest window.</p>
-                </div>
-
-                <!-- Feature 9: Reports -->
-                <div onclick="navigateTo('dashboard.html')"
-                    class="glass p-10 rounded-3xl hover:bg-white/20 transition border-t-4 border-orange-500 cursor-pointer group hover:scale-105">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition">📊</div>
-                    <h3 class="text-2xl font-bold mb-4">Pro Reports</h3>
-                    <p class="text-slate-300 leading-relaxed">Generate instant PDF financial and yield reports for
-                        banks, audits, or personal records.</p>
+                <!-- Feature 7: Satellite Scanner -->
+                <div onclick="navigateTo('satellite.html')"
+                    class="glass-premium p-8 rounded-[2rem] border border-blue-500/50 hover:border-blue-400 cursor-pointer group hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] min-h-[220px]">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.3)] flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition">
+                        🛰️</div>
+                    <h3
+                        class="text-2xl font-bold mb-3 text-white text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                        Space Scanner</h3>
+                    <p class="text-slate-400 leading-relaxed font-light">Real-time NASA & Sentinel farm health data</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- CALL TO ACTION -->
-    <section class="py-20 text-center relative overflow-hidden">
-        <div class="glass max-w-5xl mx-auto p-12 md:p-20 rounded-[3rem] border border-white/10 relative z-10 mx-6">
-            <h2 class="text-4xl md:text-6xl font-black mb-8">Ready to Modernize?</h2>
+    <section class="py-32 text-center relative overflow-hidden">
+        <div
+            class="glass-premium max-w-5xl mx-auto p-12 md:p-24 rounded-[3rem] border border-emerald-500/20 relative z-10 mx-6 shadow-[0_0_50px_rgba(16,185,129,0.1)] fade-in-up">
+            <h2 class="text-4xl md:text-6xl font-black mb-8 tracking-tight">Ready to Modernize?</h2>
+            <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-light">Join thousands of farmers tracking
+                metrics, predicting yields, and increasing profits with Farm Central.</p>
             <button onclick="enterDashboard()"
-                class="px-12 py-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl text-xl font-bold hover:shadow-2xl hover:shadow-green-500/30 transition transform hover:scale-105">
-                Start Your Journey
+                class="btn-premium px-12 py-6 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-xl font-bold shadow-2xl shadow-emerald-500/30 text-white border border-emerald-400/50">
+                Start Your Journey Today
             </button>
         </div>
         <!-- BG Glow -->
         <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/20 blur-[120px] rounded-full z-0">
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/10 blur-[120px] rounded-full z-0 pointer-events-none">
         </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="py-12 text-center text-slate-500 text-sm border-t border-white/5 mt-20">
-        <p>&copy; 2026 Farm Central. Built with ❤️ for Farmers.</p>
+    <footer class="py-12 border-t border-white/5 bg-[#05080f] relative z-10 block">
+        <div
+            class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+            <div
+                class="text-2xl font-black tracking-tighter text-white flex items-center justify-center md:justify-start gap-3 w-full md:w-auto">
+                <img src="logo.png" alt="Farm Central Logo" class="w-10 h-10 object-contain">
+                <span>FARM CENTRAL</span>
+            </div>
+            <p class="text-slate-500 text-sm font-medium w-full md:w-auto">&copy; 2026 Farm Central. Built with ❤️ for
+                Farmers.</p>
+            <div class="flex gap-4 text-slate-500 justify-center md:justify-end w-full md:w-auto">
+                <a href="#" class="hover:text-white transition">Privacy</a>
+                <a href="#" class="hover:text-white transition">Terms</a>
+            </div>
+        </div>
     </footer>
 
     <script>
-        // --- 3D Background ---
-        // Handled by js/background-3d.js
-
-
         // --- DASHBOARD ACCESS LOGIC ---
         function enterDashboard() {
             const token = localStorage.getItem('token');
             if (token) {
-                // Logged in -> Go to Dashboard
                 window.location.href = 'dashboard.html';
             } else {
-                // Not Logged in -> Go to Login
                 window.location.href = 'login.html';
             }
         }
@@ -232,15 +308,49 @@
             if (token) {
                 window.location.href = page;
             } else {
-                // Save intended destination? For now just redirect to login
-                alert("Please login to access this feature.");
-                window.location.href = 'login.html';
+                if (typeof toast !== 'undefined' && toast.info) {
+                    toast.info('Please login to access this feature.');
+                } else {
+                    alert('Please login to access this feature.');
+                }
+                setTimeout(() => { window.location.href = 'login.html'; }, 1200);
             }
         }
+
+        // Simple Intersection Observer for scroll animations (fade-in)
+        document.addEventListener("DOMContentLoaded", function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in-up');
+                        entry.target.style.opacity = "1";
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.glass-premium').forEach((el) => {
+                if (!el.classList.contains('backdrop-blur-3xl')) {
+                    el.style.opacity = "0";
+                    observer.observe(el);
+                }
+            });
+        });
     </script>
+    <script src="js/language-manager.js"></script>
+
+    <script src="js/toast.js"></script>
     <script src="js/background-3d.js"></script>
     <script src="js/global-ticker.js"></script>
-    <script src="js/mobile-nav.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.error('Service Worker registration failed', err));
+            });
+        }
+    </script>
 </body>
 
 </html>

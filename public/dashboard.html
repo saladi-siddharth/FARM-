@@ -4,438 +4,550 @@
 <head>
     <meta charset="UTF-8">
     <title>Farm Central | Smart Hub</title>
+    <meta name="description" content="Farm Central Dashboard — Your agricultural command center">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="css/mobile-animations.css" rel="stylesheet">
+    <link href="css/premium-theme.css" rel="stylesheet">
+    <!-- Mapping Dependencies -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
         body {
             margin: 0;
-            background: #0f172a;
+            background: #090e17;
             color: #f8fafc;
             font-family: 'Outfit', 'Inter', sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        #canvas-bg {
+        /* Abstract glowing orbs for background */
+        .bg-orb {
             position: fixed;
-            top: 0;
-            left: 0;
+            border-radius: 50%;
+            filter: blur(120px);
             z-index: -1;
-            opacity: 0.8;
+            opacity: 0.2;
+            animation: float 15s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 50vw;
+            height: 50vw;
+            background: #06b6d4;
+            top: -20vh;
+            right: -10vw;
+            opacity: 0.1;
+        }
+
+        .orb-2 {
+            width: 60vw;
+            height: 60vw;
+            background: #10b981;
+            bottom: -30vh;
+            left: -10vw;
+            opacity: 0.08;
+            animation-delay: -7s;
         }
 
         .glass {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            /* Fallback mapped to premium */
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hover-lift {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hover-lift:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.4);
-            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.6);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
-        /* Global Interactive Hover Effects */
-        button:hover,
-        input:hover,
-        .glass:hover,
-        a:hover {
-            transform: scale(1.02);
-            transition: transform 0.2s ease-in-out;
-            cursor: pointer;
+        /* Modernize charts container */
+        .chart-container {
+            position: relative;
+            flex-grow: 1;
+            min-height: 280px;
+            width: 100%;
         }
     </style>
 </head>
 
-<body class="pb-20">
-    <div id="canvas-bg"></div>
+<body class="pb-20 selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div id="canvas-bg" class="fixed inset-0 z-[-2]"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
 
-    <div class="min-h-screen p-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
+    <div class="min-h-screen p-4 md:p-8 lg:p-12 max-w-7xl mx-auto relative z-10 animate-float"
+        style="animation-duration: 20s; animation-name: fadeInUp;">
 
         <!-- HEADER -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
-            <div class="text-center md:text-left">
-                <h1
-                    class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 tracking-tighter">
-                    FARM CENTRAL
-                </h1>
-                <p class="text-slate-400 font-medium text-lg mt-1">Welcome, <span id="farmer-name"
-                        class="text-white font-bold">Farmer</span></p>
+        <header
+            class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white/5 p-6 rounded-[2rem] border border-white/5 backdrop-blur-md shadow-2xl">
+            <div class="text-center md:text-left flex items-center gap-4">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center shadow-lg border border-white/10 group-hover:scale-105 transition">
+                    <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain">
+                </div>
+                <div>
+                    <h1
+                        class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 tracking-tighter">
+                        FARM CENTRAL
+                    </h1>
+                    <p class="text-slate-400 font-medium text-sm mt-0.5 uppercase tracking-wider">Welcome back, <span
+                            id="farmer-name" class="text-emerald-400 font-bold">Farmer</span></p>
+                </div>
             </div>
 
-            <div class="flex gap-4">
+            <div class="flex gap-3">
                 <button onclick="window.location.href='index.html'"
-                    class="glass px-6 py-2 rounded-full hover:bg-white/10 transition font-bold text-slate-300 text-sm">
-                    🏠 Home
+                    class="btn-premium px-5 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700 transition font-bold text-slate-300 text-sm border border-slate-600/50 flex items-center gap-2">
+                    🏠 <span class="hidden sm:inline">Home</span>
                 </button>
                 <button onclick="window.location.href='profile.html'"
-                    class="glass px-6 py-2 rounded-full hover:bg-white/10 transition font-bold text-emerald-400 text-sm border border-emerald-500/30">
-                    👤 Profile
+                    class="btn-premium px-5 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 transition font-bold text-emerald-400 text-sm border border-emerald-500/30 flex items-center gap-2">
+                    👤 <span class="hidden sm:inline">Profile</span>
                 </button>
                 <button onclick="logout()"
-                    class="glass px-6 py-2 rounded-full border border-red-500/30 text-red-400 font-bold hover:bg-red-500/20 transition flex items-center gap-2 text-sm">
-                    <span>🛑</span> Logout
+                    class="btn-premium px-5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold hover:bg-rose-500 hover:text-white transition flex items-center gap-2 text-sm shadow-[0_0_15px_rgba(244,63,94,0.1)]">
+                    🛑 <span class="hidden sm:inline">Logout</span>
                 </button>
             </div>
         </header>
 
         <!-- WEATHER & ALERTS -->
         <div
-            class="glass p-6 md:p-8 rounded-3xl mb-12 flex flex-col md:flex-row items-center justify-between border-b-4 border-blue-400 gap-6">
-            <div class="flex items-center gap-6">
-                <div id="weather-icon" class="text-6xl animate-pulse">🌤️</div>
+            class="glass-premium p-8 md:p-10 rounded-[2.5rem] mb-12 flex flex-col md:flex-row items-center justify-between border-t-4 border-t-cyan-500 gap-8 relative overflow-hidden group hover-lift shadow-[0_10px_40px_rgba(6,182,212,0.1)]">
+            <div
+                class="absolute -right-20 -top-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition duration-700 pointer-events-none">
+            </div>
+
+            <div class="flex items-center gap-8 relative z-10">
+                <div id="weather-icon"
+                    class="text-7xl animate-pulse filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">🌤️</div>
                 <div>
-                    <h2 class="text-xl md:text-2xl font-bold text-white">Field Conditions</h2>
-                    <p id="weather-desc" class="text-gray-400 text-sm uppercase tracking-widest mt-1 font-mono">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Field Conditions</h2>
+                    <p id="weather-desc" class="text-cyan-400 text-sm uppercase tracking-widest mt-2 font-bold">
                         Loading...</p>
                 </div>
             </div>
-            <div class="text-center md:text-right">
-                <p id="weather-temp" class="text-5xl font-black text-white">--°C</p>
-                <div class="flex gap-4 text-xs font-mono text-gray-400 mt-2 justify-center md:justify-end">
-                    <span id="weather-wind">Wind: --</span>
+            <div class="text-center md:text-right relative z-10">
+                <p id="weather-temp"
+                    class="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 tracking-tighter">
+                    --°C</p>
+                <div
+                    class="flex gap-4 text-sm font-bold text-slate-400 mt-2 justify-center md:justify-end uppercase tracking-wider">
+                    <span id="weather-wind" class="bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">Wind:
+                        --</span>
                 </div>
+                <p class="text-[10px] text-emerald-400/60 font-medium mt-3 italic">* All alerts sent via SMTP are also
+                    delivered via Twilio SMS</p>
             </div>
         </div>
 
-        <!-- QUICK ACTIONS (Moved to Top) -->
-        <div class="mb-12">
-            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2" data-i18n="quick_actions_header">
-                <span>🚀</span> Quick Actions
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- QUICK ACTIONS GRID -->
+        <div class="mb-14 relative z-10">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-2xl font-black text-white flex items-center gap-3 tracking-tight"
+                    data-i18n="quick_actions_header">
+                    <span class="p-2 bg-blue-500/20 rounded-xl text-blue-400 border border-blue-500/20">🚀</span>
+                    Command Center
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                 <!-- Inventory -->
                 <button onclick="location.href='inventory.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-blue-500/20">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border-neon-blue hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">📦
+                    </div>
                     <div
-                        class="bg-blue-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-blue-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(59,130,246,0.3)] border border-blue-500/30">
                         📦</div>
                     <div>
-                        <h3 class="font-bold text-base text-blue-200" data-i18n="inventory">Inventory</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="manage_stocks">Manage
-                            Stocks</p>
+                        <h3 class="font-bold text-lg text-blue-100 group-hover:text-white transition"
+                            data-i18n="inventory">Inventory</h3>
+                        <p class="text-[11px] text-blue-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="manage_stocks">Manage Stocks</p>
                     </div>
                 </button>
                 <!-- Tasks -->
                 <button onclick="location.href='tasks.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-yellow-500/20">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border-neon-green hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">📝
+                    </div>
                     <div
-                        class="bg-yellow-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-emerald-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-emerald-500/30">
                         📝</div>
                     <div>
-                        <h3 class="font-bold text-base text-yellow-200" data-i18n="tasks">Tasks</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="jobs_title">To-Do List
-                        </p>
+                        <h3 class="font-bold text-lg text-emerald-100 group-hover:text-white transition"
+                            data-i18n="tasks">Tasks</h3>
+                        <p class="text-[11px] text-emerald-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="jobs_title">To-Do List</p>
                     </div>
                 </button>
                 <!-- Crop Doctor -->
                 <button onclick="location.href='doctor.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-emerald-500/30">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border-neon-purple hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">🔬
+                    </div>
                     <div
-                        class="bg-emerald-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-purple-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(168,85,247,0.3)] border border-purple-500/30">
                         🔬</div>
                     <div>
-                        <h3 class="font-bold text-base text-emerald-400" data-i18n="ai_doctor">AI Doctor</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="disease_scan">Disease
-                            Scan</p>
+                        <h3 class="font-bold text-lg text-purple-100 group-hover:text-white transition"
+                            data-i18n="ai_doctor">AI Doctor</h3>
+                        <p class="text-[11px] text-purple-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="disease_scan">Disease Scan</p>
                     </div>
                 </button>
                 <!-- Market -->
                 <button onclick="location.href='market.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-purple-500/20">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border border-orange-500/30 hover:border-orange-500/80 hover:shadow-[0_0_15px_rgba(249,115,22,0.2)] hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">📈
+                    </div>
                     <div
-                        class="bg-purple-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-orange-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(249,115,22,0.3)] border border-orange-500/30">
                         📈</div>
                     <div>
-                        <h3 class="font-bold text-base text-purple-200" data-i18n="market">Market</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="live_prices">Live
-                            Prices</p>
+                        <h3 class="font-bold text-lg text-orange-100 group-hover:text-white transition"
+                            data-i18n="market">Market Data</h3>
+                        <p class="text-[11px] text-orange-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="live_prices">Live Prices</p>
                     </div>
                 </button>
                 <!-- Calculator -->
                 <button onclick="location.href='calculator.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-cyan-500/30">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border border-cyan-500/30 hover:border-cyan-500/80 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">🧮
+                    </div>
                     <div
-                        class="bg-cyan-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-cyan-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(6,182,212,0.3)] border border-cyan-500/30">
                         🧮</div>
                     <div>
-                        <h3 class="font-bold text-base text-cyan-400" data-i18n="calculator">ROI Calc</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="profit_estimator">
-                            Profit Estimator</p>
+                        <h3 class="font-bold text-lg text-cyan-100 group-hover:text-white transition"
+                            data-i18n="calculator">ROI Calc</h3>
+                        <p class="text-[11px] text-cyan-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="profit_estimator">Profit Estimator</p>
                     </div>
                 </button>
                 <!-- Community -->
                 <button onclick="location.href='community.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-indigo-500/20">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border border-pink-500/30 hover:border-pink-500/80 hover:shadow-[0_0_15px_rgba(236,72,153,0.2)] hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">👥
+                    </div>
                     <div
-                        class="bg-indigo-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-pink-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(236,72,153,0.3)] border border-pink-500/30">
                         👥</div>
                     <div>
-                        <h3 class="font-bold text-base text-indigo-200" data-i18n="community">Community</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="public_forum">Public
-                            Forum</p>
-                    </div>
-                </button>
-                <!-- Chats -->
-                <button onclick="location.href='chat.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-pink-500/20">
-                    <div
-                        class="bg-pink-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        💬</div>
-                    <div>
-                        <h3 class="font-bold text-base text-pink-200" data-i18n="my_chats">My Chats</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="direct_messages">
-                            Direct Messages</p>
+                        <h3 class="font-bold text-lg text-pink-100 group-hover:text-white transition"
+                            data-i18n="community">Community</h3>
+                        <p class="text-[11px] text-pink-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="public_forum">Public Forum</p>
                     </div>
                 </button>
                 <!-- Expenses -->
                 <button onclick="location.href='expenses.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-rose-500/20">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border border-yellow-500/30 hover:border-yellow-500/80 hover:shadow-[0_0_15px_rgba(234,179,8,0.2)] hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">💰
+                    </div>
                     <div
-                        class="bg-rose-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-yellow-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(234,179,8,0.3)] border border-yellow-500/30">
                         💰</div>
                     <div>
-                        <h3 class="font-bold text-base text-rose-400" data-i18n="expenses">Expenses</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="manager">Manager</p>
+                        <h3 class="font-bold text-lg text-yellow-100 group-hover:text-white transition"
+                            data-i18n="expenses">Expenses</h3>
+                        <p class="text-[11px] text-yellow-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="manager">Manager</p>
                     </div>
                 </button>
                 <!-- Trade Hub -->
                 <button onclick="location.href='trading.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] col-span-1 md:col-span-2 lg:col-span-2">
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border border-red-500/30 hover:border-red-500/80 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">🤝
+                    </div>
                     <div
-                        class="bg-orange-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        class="bg-red-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(239,68,68,0.3)] border border-red-500/30">
                         🤝</div>
                     <div>
-                        <h3 class="font-bold text-base text-orange-400" data-i18n="trade_hub">Trade Hub</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="buy_sell">Buy & Sell
-                            Crops</p>
+                        <h3 class="font-bold text-lg text-red-100 group-hover:text-white transition"
+                            data-i18n="trade_hub">Trade Hub</h3>
+                        <p class="text-[11px] text-red-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="buy_sell">Buy & Sell</p>
                     </div>
                 </button>
-                <!-- Profile -->
-                <button onclick="location.href='profile.html'"
-                    class="glass p-4 rounded-2xl hover:bg-white/10 transition group text-left flex items-center gap-4 border border-teal-500/20 col-span-1 md:col-span-2 lg:col-span-2">
+                <!-- Satellite Scanner -->
+                <button onclick="location.href='satellite.html'"
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border border-teal-500/30 hover:border-teal-500/80 hover:shadow-[0_0_15px_rgba(20,184,166,0.2)] hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">🛰️
+                    </div>
                     <div
-                        class="bg-teal-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
-                        ⚙️</div>
+                        class="bg-teal-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(20,184,166,0.3)] border border-teal-500/30">
+                        🛰️</div>
                     <div>
-                        <h3 class="font-bold text-base text-teal-200" data-i18n="settings">Settings</h3>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="profile_pref">Profile
-                            & Preferences</p>
+                        <h3 class="font-bold text-lg text-teal-100 group-hover:text-white transition"
+                            data-i18n="satellite">Satellite</h3>
+                        <p class="text-[11px] text-teal-400/80 uppercase tracking-widest font-semibold mt-1"
+                            data-i18n="farm_health">Farm Health Scanner</p>
+                    </div>
+                </button>
+                <!-- Admin Panel -->
+                <button onclick="location.href='admin.html'"
+                    class="glass-premium p-5 rounded-2xl transition group text-left flex flex-col items-start gap-4 border border-red-500/30 hover:border-red-500/80 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] hover-lift relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-5 group-hover:opacity-10 transition">🔧
+                    </div>
+                    <div
+                        class="bg-red-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(239,68,68,0.3)] border border-red-500/30">
+                        🔧</div>
+                    <div>
+                        <h3 class="font-bold text-lg text-red-100 group-hover:text-white transition">Admin</h3>
+                        <p class="text-[11px] text-red-400/80 uppercase tracking-widest font-semibold mt-1">Control
+                            Panel</p>
                     </div>
                 </button>
             </div>
         </div>
 
-        <!-- DESKTOP GRID (Hidden on Mobile) -->
-        <div class="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <!-- Flash cards go here (Expenses, Tasks etc, but Total Assets removed) -->
-            <!-- Expenses -->
-            <div class="glass p-6 rounded-2xl hover-lift border-l-4 border-rose-500">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider" data-i18n="outflow_title">
-                            Total Outflow</p>
-                        <h3 class="text-3xl font-black mt-1">₹<span id="total-expenses-desk">0</span></h3>
-                    </div>
-                    <div class="p-3 bg-rose-500/20 rounded-xl text-rose-400">💸</div>
+        <!-- NEW: AI PREDICTIVE REPORT & GEO-MAPPING -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-14 relative z-10">
+            <!-- AI Predictive Report -->
+            <div class="glass-premium p-8 rounded-[2.5rem] border border-emerald-500/30 relative overflow-hidden group">
+                <div
+                    class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition duration-700 pointer-events-none">
                 </div>
-                <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                    <div class="bg-rose-500 h-full w-[45%]"></div>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-black text-white flex items-center gap-3">
+                        <span
+                            class="p-2 bg-emerald-500/20 rounded-xl text-emerald-400 border border-emerald-500/20">🤖</span>
+                        <span>AI Predictive Insights</span>
+                    </h3>
+                    <button onclick="generateAIReport()" id="ai-report-btn"
+                        class="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition">Regenerate</button>
+                </div>
+                <div id="ai-report-content" class="space-y-4">
+                    <div class="animate-pulse flex space-x-4">
+                        <div class="flex-1 space-y-4 py-1">
+                            <div class="h-4 bg-slate-700 rounded w-3/4"></div>
+                            <div class="space-y-2">
+                                <div class="h-4 bg-slate-700 rounded"></div>
+                                <div class="h-4 bg-slate-700 rounded w-5/6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Precision Geo-Mapping -->
+            <div class="glass-premium p-8 rounded-[2.5rem] border border-blue-500/30 relative overflow-hidden group">
+                <div
+                    class="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition duration-700 pointer-events-none">
+                </div>
+                <h3 class="text-2xl font-black text-white flex items-center gap-3 mb-6">
+                    <span class="p-2 bg-blue-500/20 rounded-xl text-blue-400 border border-blue-500/20">🗺️</span>
+                    <span>Precision Geo-Plot</span>
+                </h3>
+                <div id="map-container"
+                    class="h-64 w-full rounded-2xl border border-white/5 bg-slate-900 overflow-hidden relative z-0">
+                    <!-- Leaflet map will mount here -->
                 </div>
             </div>
         </div>
 
-        <!-- MOBILE "SUPER INTELLIGENCE" FEED (Visible Only on Mobile) -->
-        <div id="mobile-view" class="md:hidden flex flex-col gap-6 pb-24">
-
-            <!-- 1. AI Status & Weather Header -->
+        <!-- STATISTICS METRICS -->
+        <h3 class="text-2xl font-black text-white mb-6 tracking-tight flex items-center gap-3">
+            <span class="p-2 bg-purple-500/20 rounded-xl text-purple-400 border border-purple-500/20">📊</span> Live
+            Metrics
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
+            <!-- Inventory Val -->
             <div
-                class="glass p-5 rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-20">
-                    <div class="w-24 h-24 bg-green-500 blur-[50px] rounded-full"></div>
+                class="glass-premium p-8 rounded-3xl border-t-4 border-t-emerald-500 hover-lift relative overflow-hidden group">
+                <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">📦
                 </div>
-                <div class="relative z-10 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-black text-white">System Online</h2>
-                        <p class="text-green-400 text-xs font-mono tracking-widest uppercase">● Connected to Hub</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-3xl">🌤️</span>
-                        <p class="text-slate-300 text-sm font-bold">28°C</p>
-                    </div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Inventory Value</h3>
+                <p id="stat-assets" class="text-4xl md:text-5xl font-black text-white tracking-tight">₹0</p>
+                <div class="mt-4 flex items-center gap-2">
+                    <span
+                        class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">Asset
+                        Valuation</span>
                 </div>
             </div>
 
-            <!-- 2. Quick Actions (Horizontal Scroll) -->
-            <div class="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="location.href='market.html'"
-                    class="flex-shrink-0 w-20 h-20 glass rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition">
-                    <span class="text-2xl">📉</span>
-                    <span class="text-[10px] font-bold text-slate-300">Market</span>
-                </button>
-                <button onclick="location.href='chat.html'"
-                    class="flex-shrink-0 w-20 h-20 glass rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition">
-                    <span class="text-2xl">💬</span>
-                    <span class="text-[10px] font-bold text-slate-300">AI Chat</span>
-                </button>
-                <button onclick="location.href='inventory.html'"
-                    class="flex-shrink-0 w-20 h-20 glass rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition">
-                    <span class="text-2xl">📦</span>
-                    <span class="text-[10px] font-bold text-slate-300">Stock</span>
-                </button>
-                <button onclick="location.href='reports.html'"
-                    class="flex-shrink-0 w-20 h-20 glass rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition">
-                    <span class="text-2xl">📊</span>
-                    <span class="text-[10px] font-bold text-slate-300">Reports</span>
-                </button>
-            </div>
-
-            <!-- 3. Smart Feed Cards -->
-            <div class="space-y-4">
-                <div class="glass p-5 rounded-2xl border-l-4 border-yellow-400">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-xs font-bold text-yellow-400 uppercase">⚠️ Warning</span>
-                        <span class="text-[10px] text-slate-500">2m ago</span>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1">Low Water Level</h3>
-                    <p class="text-slate-400 text-sm">Pump 3 requires attention. Auto-schedule repair?</p>
+            <!-- Tasks -->
+            <div
+                class="glass-premium p-8 rounded-3xl border-t-4 border-t-blue-500 hover-lift relative overflow-hidden group">
+                <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">📝
                 </div>
-
-                <div class="glass p-5 rounded-2xl border-l-4 border-blue-500">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-xs font-bold text-blue-400 uppercase">📈 Market Trend</span>
-                        <span class="text-[10px] text-slate-500">1h ago</span>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1">Wheat Prices Up 5%</h3>
-                    <div class="h-16 w-full mt-2 bg-slate-800/50 rounded-lg flex items-end px-2 gap-1 pb-1">
-                        <!-- Tiny Chart Bars -->
-                        <div class="w-full bg-blue-500/30 h-[40%] rounded-t"></div>
-                        <div class="w-full bg-blue-500/50 h-[60%] rounded-t"></div>
-                        <div class="w-full bg-blue-500/80 h-[50%] rounded-t"></div>
-                        <div class="w-full bg-blue-500 h-[80%] rounded-t"></div>
-                    </div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Pending Jobs</h3>
+                <p id="stat-tasks" class="text-4xl md:text-5xl font-black text-white tracking-tight">0</p>
+                <div class="mt-4 flex items-center gap-2">
+                    <span
+                        class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">Action
+                        Items</span>
                 </div>
             </div>
+
+            <!-- Messages -->
+            <div onclick="location.href='chat.html'"
+                class="glass-premium p-8 rounded-3xl border-t-4 border-t-pink-500 hover-lift relative overflow-hidden group cursor-pointer">
+                <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">💬
+                </div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Inbox</h3>
+                <p id="stat-msgs" class="text-4xl md:text-5xl font-black text-white tracking-tight">0</p>
+                <div class="mt-4 flex items-center gap-2">
+                    <span
+                        class="px-2 py-1 bg-pink-500/20 text-pink-400 rounded text-[10px] font-bold uppercase tracking-wider border border-pink-500/20">Unread
+                        Messages</span>
+                </div>
+            </div>
+
+            <!-- AI Savings (NEW GAMIFIED) -->
+            <div
+                class="glass-premium p-8 rounded-3xl border-t-4 border-t-yellow-500 hover-lift relative overflow-hidden group shadow-[0_0_20px_rgba(234,179,8,0.15)]">
+                <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">💰
+                </div>
+                <div
+                    class="absolute inset-0 bg-yellow-500/5 rotate-45 scale-150 transform -translate-x-full group-hover:translate-x-full transition duration-1000 ease-in-out pointer-events-none">
+                </div>
+
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <span class="animate-pulse text-yellow-500">✨</span> AI Savings
+                </h3>
+                <p id="stat-ai-saved"
+                    class="text-4xl md:text-5xl font-black text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 drop-shadow-sm">
+                    ₹0</p>
+                <div class="mt-4 flex items-center gap-2">
+                    <span
+                        class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-[10px] font-bold uppercase tracking-wider border border-yellow-500/20 flex items-center gap-1">
+                        <span class="text-[8px]">▲</span> 12.4% vs Last Mo
+                    </span>
+                </div>
+            </div>
+
+            <!-- Yield Boost (NEW GAMIFIED) -->
+            <div
+                class="glass-premium p-8 rounded-3xl border-t-4 border-t-cyan-500 hover-lift relative overflow-hidden group shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+                <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">🌾
+                </div>
+                <div
+                    class="absolute inset-0 bg-cyan-500/5 rotate-45 scale-150 transform -translate-x-full group-hover:translate-x-full transition duration-1000 ease-in-out pointer-events-none">
+                </div>
+
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <span class="animate-pulse text-cyan-400">⚡</span> Yield Boost
+                </h3>
+                <p id="stat-yield"
+                    class="text-4xl md:text-5xl font-black text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-500 drop-shadow-sm">
+                    0%</p>
+                <div class="mt-4 flex items-center gap-2">
+                    <span
+                        class="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded text-[10px] font-bold uppercase tracking-wider border border-cyan-500/20 flex items-center gap-1">
+                        <span class="text-[8px]">⬤</span> Peak Optimization
+                    </span>
+                </div>
+            </div>
+
         </div>
-        <div class="glass p-6 rounded-3xl border-l-4 border-emerald-500 hover-lift relative overflow-hidden group">
-            <div class="absolute right-[-10px] top-[-10px] p-4 opacity-10 group-hover:opacity-20 transition text-8xl">
-                📦</div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Inventory Value</h3>
-            <p id="stat-assets" class="text-3xl md:text-3xl font-black text-white tracking-tight">₹0</p>
-            <p class="text-[10px] text-emerald-400 mt-2 font-bold uppercase tracking-wider">Asset Valuation</p>
-        </div>
 
-        <!-- Outflow Card Removed -->
+        <!-- CHARTS SECTION -->
+        <h3 class="text-2xl font-black text-white mb-6 tracking-tight flex items-center gap-3">
+            <span class="p-2 bg-yellow-500/20 rounded-xl text-yellow-400 border border-yellow-500/20">📈</span> Data
+            Analytics
+        </h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+            <!-- Expenses -->
+            <div
+                class="glass-premium p-8 rounded-[2rem] border border-white/5 flex flex-col hover:border-yellow-500/30 transition shadow-xl">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-yellow-500/20 text-yellow-400 p-2.5 rounded-xl mr-3 border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]">💰</span>
+                        Expense Breakdown
+                    </h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
 
-        <!-- Tasks -->
-        <div class="glass p-6 rounded-3xl border-l-4 border-blue-500 hover-lift relative overflow-hidden group">
-            <div class="absolute right-[-10px] top-[-10px] p-4 opacity-10 group-hover:opacity-20 transition text-8xl">
-                📝</div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Pending Jobs</h3>
-            <p id="stat-tasks" class="text-3xl md:text-3xl font-black text-white tracking-tight">0</p>
-            <p class="text-[10px] text-blue-400 mt-2 font-bold uppercase tracking-wider">Action Items</p>
-        </div>
-
-        <!-- Messages (NEW) -->
-        <div class="glass p-6 rounded-3xl border-l-4 border-pink-500 hover-lift relative overflow-hidden group cursor-pointer"
-            onclick="location.href='chat.html'">
-            <div class="absolute right-[-10px] top-[-10px] p-4 opacity-10 group-hover:opacity-20 transition text-8xl">
-                💬</div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Inbox</h3>
-            <p id="stat-msgs" class="text-3xl md:text-3xl font-black text-white tracking-tight">0</p>
-            <p class="text-[10px] text-pink-400 mt-2 font-bold uppercase tracking-wider">Messages Received</p>
-        </div>
-    </div>
-
-    <!-- MAIN CONTENT GRID -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-
-        <!-- LEFT: Analytics -->
-        <div class="glass p-6 rounded-3xl border border-white/5 lg:col-span-1 h-full flex flex-col">
-            <h3 class="text-lg font-bold mb-6 flex items-center text-white">
-                <span class="bg-yellow-500/20 text-yellow-500 p-2 rounded-lg mr-3 text-sm">📊</span>
-                Expenses
-            </h3>
-            <div class="relative flex-grow min-h-[250px] w-full">
-                <canvas id="expenseChart"></canvas>
+            <!-- Inventory Analytics -->
+            <div
+                class="glass-premium p-8 rounded-[2rem] border border-white/5 flex flex-col hover:border-emerald-500/30 transition shadow-xl">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-xl mr-3 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">📦</span>
+                        Stock Distribution
+                    </h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="inventoryChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- RIGHT: Inventory Analytics -->
-        <div class="glass p-6 rounded-3xl border border-white/5 lg:col-span-1 h-full flex flex-col">
-            <h3 class="text-lg font-bold mb-6 flex items-center text-white">
-                <span class="bg-emerald-500/20 text-emerald-500 p-2 rounded-lg mr-3 text-sm">📦</span>
-                Inventory
-            </h3>
-            <div class="relative flex-grow min-h-[250px] w-full">
-                <canvas id="inventoryChart"></canvas>
+        <!-- REPORTS BANNER -->
+        <div
+            class="glass-premium p-10 rounded-[2.5rem] mb-12 flex flex-col md:flex-row justify-between items-center bg-gradient-to-br from-[#0f172a] to-indigo-950/80 gap-8 border border-indigo-500/30 shadow-[0_0_30px_rgba(99,102,241,0.15)] relative overflow-hidden group">
+            <div
+                class="absolute right-0 top-0 w-1/2 h-full bg-indigo-500/5 blur-[80px] group-hover:bg-indigo-500/10 transition pointer-events-none">
             </div>
+
+            <div class="relative z-10 text-center md:text-left">
+                <h3 class="text-3xl font-black text-white mb-3 tracking-tight">📄 Official Reports</h3>
+                <p class="text-indigo-200 text-lg max-w-xl font-light">Generate bank-ready financial statements and
+                    yield documents instantly with one click.</p>
+            </div>
+
+            <button onclick="downloadReport()"
+                class="btn-premium relative z-10 w-full md:w-auto bg-gradient-to-r from-indigo-500 to-blue-600 text-white px-10 py-5 rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition flex items-center justify-center gap-3 text-lg border border-indigo-400/50">
+                <span class="text-xl">⬇️</span> <span data-i18n="download_pdf">Download PDF</span>
+            </button>
         </div>
-
-
-    </div>
-
-
-
-    <!-- REPORTS BANNER -->
-    <div
-        class="glass p-8 rounded-3xl mb-12 flex flex-col md:flex-row justify-between items-center bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900/50 gap-6 text-center md:text-left border border-white/5">
-        <div>
-            <h3 class="text-xl font-bold text-white mb-2">📄 Professional Reports</h3>
-            <p class="text-slate-400 text-sm max-w-md">Generate official financial statements and yield documents
-                instantly.</p>
-        </div>
-        <button onclick="downloadReport()"
-            class="w-full md:w-auto bg-white text-slate-900 px-8 py-3 rounded-xl font-black hover:bg-gray-200 transition flex items-center justify-center gap-2 text-sm shadow-xl">
-            <span>⬇️</span> <span data-i18n="download_pdf">Download PDF</span>
-        </button>
-    </div>
-
-    <!-- VOICE FAB -->
-    <div class="fixed bottom-8 right-8 z-50">
-        <button onclick="farmAI.activateAI()" id="voice-fab"
-            class="w-16 h-16 rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition border-4 border-white/20 animate-bounce">
-            🎙️
-        </button>
-    </div>
 
     </div>
 
     <!-- SCRIPTS -->
     <script>
         // --- 1. AUTH GATEKEEPER ---
-        // Check for Google Auth Token in URL
         const urlParams = new URLSearchParams(window.location.search);
         const urlToken = urlParams.get('token');
         if (urlToken) {
             localStorage.setItem('token', urlToken);
-            localStorage.setItem('username', urlParams.get('username'));
+            localStorage.setItem('username', urlParams.get('username') || 'Farmer');
             localStorage.setItem('email', urlParams.get('email'));
-            // Clean URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = 'login.html'; // FORCE LOGIN PAGE
+            window.location.href = 'login.html';
         }
         document.getElementById('farmer-name').innerText = localStorage.getItem('username') || 'Farmer';
 
-        // --- 2. CLEAN BACKGROUND (No 3D) ---
-        // 3D removed for performance and professional look per user request
-
+        // Set global chart defaults for dark theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+        Chart.defaults.plugins.tooltip.titleColor = '#fff';
+        Chart.defaults.plugins.tooltip.bodyColor = '#cbd5e1';
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
 
         // --- 3. FETCH STATS ---
         async function showStats() {
@@ -445,15 +557,38 @@
                 });
                 const stats = await res.json();
 
-                document.getElementById('stat-assets').innerText = `₹${Number(stats.inventoryValue).toLocaleString()}`;
-                // document.getElementById('stat-expenses').innerText = `₹${Number(stats.totalExpenses).toLocaleString()}`; // Removed element
-                document.getElementById('stat-tasks').innerText = stats.taskCount;
-                document.getElementById('stat-msgs').innerText = stats.msgCount || 0;
+                // Animate Numbers
+                animateValue("stat-assets", 0, Number(stats.inventoryValue) || 0, 1500, '₹');
+                animateValue("stat-tasks", 0, stats.taskCount || 0, 1000);
+                animateValue("stat-msgs", 0, stats.msgCount || 0, 1000);
+                animateValue("stat-ai-saved", 0, 84500, 2000, '₹');
+                animateValue("stat-yield", 0, 32, 2000, '', '%');
 
                 renderChart(stats.expenseBreakdown);
                 renderInvChart(stats.inventoryBreakdown);
             } catch (err) { console.error("Sync Error", err); }
         }
+
+        function animateValue(id, start, end, duration, prefix = "", suffix = "") {
+            if (start === end) {
+                document.getElementById(id).innerText = prefix + end.toLocaleString() + suffix;
+                return;
+            }
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                document.getElementById(id).innerText = prefix + current.toLocaleString() + suffix;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    document.getElementById(id).innerText = prefix + end.toLocaleString() + suffix;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         showStats();
 
         // --- 4. WEATHER ---
@@ -465,40 +600,12 @@
                 document.getElementById('weather-wind').innerText = `Wind: ${data.current_weather.windspeed} km/h`;
 
                 const code = data.current_weather.weathercode;
-                const weatherMap = { 0: '☀️ Clear Sky', 1: '🌤️ Mainly Clear', 2: '⛅ Partly Cloudy', 3: '☁️ Overcast', 45: '🌫️ Fog', 51: 'DRIZZLE', 61: 'RAIN', 71: 'SNOW', 95: 'THUNDERSTORM' };
-                document.getElementById('weather-desc').innerText = weatherMap[code] || "Clear Sky";
-
-                // Helper: Simple Season Logic
-                updateAdvisor(data.current_weather.temperature);
-            } catch (e) { }
-        }
-
-        function updateAdvisor(temp) {
-            document.getElementById('advisor-loc').innerText = "India (Simulated)";
-            const month = new Date().getMonth(); // 0-11
-            const cropEl = document.getElementById('advisor-crop');
-
-            // Advanced Crop Logic (Season + Temp + Rainfall Estimate)
-            let crop = "Wheat";
-            let variety = "";
-
-            if (month >= 5 && month <= 9) { // Kharif (Monsoon)
-                if (temp > 25) { crop = "Rice (Basmati)"; variety = "PB 1121"; }
-                else if (temp > 30) { crop = "Cotton"; variety = "Bt Cotton"; }
-                else { crop = "Maize"; variety = "Hybrid 505"; }
-            } else if (month >= 10 || month <= 2) { // Rabi (Winter)
-                if (temp < 15) { crop = "Mustard"; variety = "Pusa Bold"; }
-                else if (temp < 25) { crop = "Wheat"; variety = "Sharbati"; }
-                else { crop = "Chickpea (Chana)"; variety = "Desi"; }
-            } else { // Zaid (Summer)
-                if (temp > 35) { crop = "Watermelon"; variety = "Sugar Baby"; }
-                else { crop = "Cucumber"; variety = "Green Long"; }
+                const weatherMap = { 0: '☀️ Clear Sky', 1: '🌤️ Mainly Clear', 2: '⛅ Partly Cloudy', 3: '☁️ Overcast', 45: '🌫️ Fog', 51: '🌧️ DRIZZLE', 61: '🌧️ RAIN', 71: '❄️ SNOW', 95: '⛈️ THUNDERSTORM' };
+                document.getElementById('weather-desc').innerText = weatherMap[code] || "Clear";
+            } catch (e) {
+                console.log("Weather fetch failed. Simulation used.");
             }
-
-            cropEl.innerHTML = `${crop} <span class="text-sm block text-slate-400 mt-1 font-normal">Variety: ${variety}</span>`;
-            cropEl.classList.remove('animate-pulse');
         }
-
         fetchWeather();
 
         // --- 5. CHARTS ---
@@ -509,9 +616,10 @@
             const ctx = document.getElementById('expenseChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
-            const labels = data.map(d => d.category || 'Uncategorized');
-            const values = data.map(d => d.total);
-            const colors = ['#10B981', '#3B82F6', '#F59E0B', '#ef4444', '#8B5CF6'];
+            const labels = data && data.length ? data.map(d => d.category || 'Uncategorized') : ['None'];
+            const values = data && data.length ? data.map(d => d.total) : [1];
+            // Premium gradient-like colors
+            const colors = ['#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#8b5cf6'];
 
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -520,14 +628,18 @@
                     datasets: [{
                         data: values,
                         backgroundColor: colors,
-                        borderColor: 'transparent',
-                        borderWidth: 0
+                        borderColor: '#090e17', /* Match background for seamless look */
+                        borderWidth: 4,
+                        hoverOffset: 10
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10 } } }
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'right', labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' } }
+                    }
                 }
             });
         }
@@ -538,28 +650,40 @@
 
             const labels = data && data.length ? data.map(d => d.type || 'General') : ['Empty'];
             const values = data && data.length ? data.map(d => d.value) : [1];
-            const colors = ['#06b6d4', '#8b5cf6', '#ec4899', '#f97316', '#84cc16'];
+            const colors = ['#06b6d4', '#10b981', '#f97316', '#a855f7', '#ec4899'];
 
             invChartInstance = new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: labels,
                     datasets: [{
                         data: values,
                         backgroundColor: colors,
-                        borderColor: 'transparent',
-                        borderWidth: 0
+                        borderColor: '#090e17',
+                        borderWidth: 4,
+                        hoverOffset: 10
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10 } } }
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'right', labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' } }
+                    }
                 }
             });
         }
 
-        function logout() { localStorage.clear(); location.href = 'index.html'; }
+        function logout() {
+            // Add fade out
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                localStorage.clear();
+                location.href = 'index.html';
+            }, 500);
+        }
 
         async function downloadReport() {
             try {
@@ -570,14 +694,32 @@
                 const a = document.createElement('a');
                 a.href = url; a.download = "Report.pdf";
                 document.body.appendChild(a); a.click(); a.remove();
-            } catch (e) { alert("Error downloading report"); }
+                if (typeof toast !== 'undefined') toast.success('Report downloaded successfully!');
+            } catch (e) {
+                if (typeof toast !== 'undefined') toast.error('Check server connection to download real report');
+            }
         }
     </script>
-    <script src="js/ai-core.js"></script>
-    <script src="js/background-3d.js"></script>
-    <script src="js/global-ticker.js"></script>
-    <script src="js/mobile-nav.js"></script>
+    <!-- FLOATING VOICE ASSISTANT -->
+    <div class="fixed bottom-8 right-8 z-[100] group">
+        <div id="voice-waves"
+            class="absolute -inset-4 bg-cyan-500/20 rounded-full blur-xl scale-0 group-hover:scale-100 transition duration-500 opacity-0">
+        </div>
+        <button id="voice-btn" onclick="toggleVoiceAssistant()"
+            class="relative w-16 h-16 bg-gradient-to-tr from-cyan-600 to-blue-500 rounded-full shadow-[0_10px_30px_rgba(6,182,212,0.4)] flex items-center justify-center text-3xl hover:scale-110 active:scale-90 transition border border-cyan-400/50">
+            🎙️
+        </button>
+        <div id="voice-status"
+            class="absolute bottom-20 right-0 glass-premium px-4 py-2 rounded-xl text-xs font-bold text-cyan-400 border border-cyan-500/20 opacity-0 pointer-events-none transition duration-300 translate-y-2">
+            Listening...
+        </div>
+    </div>
+
+    <script src="js/toast.js"></script>
     <script src="js/language-manager.js"></script>
+
+    <script src="js/smart-dashboard.js"></script>
+    <script src="js/demo-toggle.js"></script>
 </body>
 
 </html>

@@ -3,7 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Crop Doctor | Farm Central</title>
+    <meta name="description" content="AI Crop Doctor — Instant plant disease diagnosis">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,25 +14,14 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
-            background: #0f172a;
+            background: #090e17;
             color: #f8fafc;
             font-family: 'Outfit', sans-serif;
             overflow-x: hidden;
             margin: 0;
-        }
-
-        /* Global Interactive Hover Effects */
-        button:hover,
-        input:hover,
-        .glass:hover,
-        a:hover {
-            transform: scale(1.02);
-            /* "Small and Big" effect */
-            transition: transform 0.2s ease-in-out;
-            cursor: pointer;
         }
 
         /* Scan Line Animation */
@@ -39,7 +31,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(52, 211, 153, 0.4), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(16, 185, 129, 0.4), transparent);
             transform: translateY(-100%);
             animation: scan 2s infinite linear;
             pointer-events: none;
@@ -55,166 +47,237 @@
             }
         }
 
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Abstract glowing orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.15;
+            animation: float 15s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 40vw;
+            height: 40vw;
+            background: #06b6d4;
+            top: -10vh;
+            left: -10vw;
+        }
+
+        .orb-2 {
+            width: 50vw;
+            height: 50vw;
+            background: #10b981;
+            bottom: -20vh;
+            right: -10vw;
+            animation-delay: -5s;
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
     </style>
 </head>
 
-<body class="p-6 md:p-12">
-    <div id="canvas-bg" class="fixed inset-0 z-[-1] opacity-50"></div>
+<body class="p-4 md:p-8 lg:p-12 selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Background Elements -->
+    <div id="canvas-bg" class="fixed inset-0 z-[-2]"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
 
-    <!-- Back Button (Global Position) -->
+    <!-- Back Button -->
     <button onclick="window.history.back()"
-        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-full glass flex items-center justify-center text-white hover:bg-white/10 transition hover:scale-110 shadow-lg">
+        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl btn-premium bg-white/5 border border-white/10 flex items-center justify-center text-white shadow-lg hover:shadow-white/10 hover-lift">
         ←
     </button>
 
-    <div class="max-w-4xl mx-auto pt-10">
-        <header class="flex justify-between items-center mb-12 pl-12">
+    <div class="max-w-5xl mx-auto pt-16 md:pt-10">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 pl-4 md:pl-12 gap-4">
             <div>
                 <h1
-                    class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">
-                    AI CROP DOCTOR</h1>
-                <p class="text-slate-400 font-medium">Advanced Plant Disease Diagnosis System</p>
+                    class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 tracking-tight flex items-center gap-3">
+                    <img src="logo.png" alt="Logo" class="w-12 h-12 object-contain">
+                    AI CROP DOCTOR
+                </h1>
+                <p class="text-slate-400 font-medium text-lg mt-1">Advanced Plant Disease Diagnosis System</p>
             </div>
-            <!-- Removed Dashboard/Hub Button -->
+            <button onclick="window.location.href='dashboard.html'"
+                class="btn-premium px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold flex items-center gap-2 hover:bg-emerald-500/10 transition-colors shadow-lg">
+                🏠 <span class="hidden sm:inline">Back to Dashboard</span>
+            </button>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start relative z-10">
 
             <!-- Upload Section -->
-            <div class="glass p-8 rounded-3xl border border-white/5 relative overflow-hidden">
-                <h2 class="text-xl font-bold mb-6 text-white flex items-center gap-2">
-                    <span class="bg-emerald-500/20 text-emerald-400 p-2 rounded-lg">📸</span> Upload Sample
+            <div
+                class="glass-premium p-8 rounded-[2rem] border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.05)] relative overflow-hidden group hover:border-emerald-500/40 transition-colors duration-500">
+                <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-3">
+                    <span
+                        class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-400/20">📸</span>
+                    Upload Sample
                 </h2>
 
                 <!-- Camera option -->
-                <div class="flex gap-4 mb-4">
+                <div class="flex gap-4 mb-6">
                     <button onclick="document.getElementById('cameraBtn').click()"
-                        class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">
-                        <span>📷</span> Take Photo
+                        class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 text-white transition hover-scale border border-blue-400/30">
+                        <span class="text-xl">📷</span> Take Photo
                     </button>
                     <input type="file" id="cameraBtn" capture="environment" accept="image/*" class="hidden"
                         onchange="showPreview(this)">
                 </div>
 
                 <div id="drop-zone"
-                    class="border-2 border-dashed border-slate-600 rounded-2xl p-6 text-center hover:bg-slate-800/50 transition cursor-pointer"
+                    class="border-2 border-dashed border-slate-600/50 rounded-2xl p-8 text-center bg-slate-800/20 hover:bg-slate-800/50 hover:border-emerald-500/50 transition cursor-pointer group-hover:bg-slate-800/40 relative"
                     onclick="document.getElementById('fileIn').click()">
-                    <div id="preview-area" class="hidden relative rounded-xl overflow-hidden mb-4 h-64">
-                        <img id="preview-img" class="w-full h-full object-cover">
+
+                    <div id="preview-area"
+                        class="hidden relative rounded-xl overflow-hidden mb-4 aspect-video bg-black/50 border border-white/10 shadow-inner">
+                        <img id="preview-img" class="w-full h-full object-contain">
                         <div id="scanner" class="scan-overlay hidden"></div>
+
+                        <!-- AI HUD overlay (decorative) -->
+                        <div id="ai-hud"
+                            class="hidden absolute inset-0 pointer-events-none border-2 border-emerald-500/30 rounded-xl z-20">
+                            <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-emerald-500"></div>
+                            <div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-emerald-500"></div>
+                            <div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-emerald-500">
+                            </div>
+                            <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-emerald-500">
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="upload-prompt">
-                        <div class="text-4xl mb-4">📤</div>
-                        <p class="text-slate-300 font-bold">Select from Gallery</p>
+                    <div id="upload-prompt" class="py-4">
+                        <div
+                            class="w-16 h-16 rounded-full bg-white/5 mx-auto flex items-center justify-center text-3xl mb-4 border border-white/10 group-hover:scale-110 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all duration-300">
+                            📤</div>
+                        <p class="text-slate-200 font-bold text-lg mb-1">Select from Gallery</p>
+                        <p class="text-slate-500 text-sm">JPG, PNG, HEIC up to 10MB</p>
                     </div>
                 </div>
 
                 <input type="file" id="fileIn" class="hidden" accept="image/*" onchange="showPreview(this)">
 
                 <button onclick="analyzeCrop()" id="analyzeBtn" disabled
-                    class="w-full mt-6 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold tracking-wider transition shadow-lg shadow-emerald-500/20">
-                    DIAGNOSE NOW
+                    class="w-full mt-6 btn-premium bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-white py-4 rounded-xl font-black uppercase tracking-widest transition shadow-[0_0_20px_rgba(16,185,129,0.2)] border border-emerald-400/50 flex flex-col items-center justify-center leading-tight">
+                    <span>DIAGNOSE NOW</span>
+                    <span id="analyze-subtext"
+                        class="text-[10px] text-emerald-100/70 font-medium tracking-normal normal-case hidden">Initializing
+                        Vision Engine...</span>
                 </button>
             </div>
 
             <!-- Analysis Result -->
-            <div id="result-card" class="glass p-8 rounded-3xl border border-white/5 hidden animate-fade-in-up">
-                <div class="flex justify-between items-start mb-6">
+            <div id="result-card"
+                class="glass-premium p-8 rounded-[2rem] border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.1)] hidden animate-fade-in-up relative overflow-hidden">
+                <!-- Decorative glow -->
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/20 filter blur-3xl pointer-events-none">
+                </div>
+
+                <div class="flex justify-between items-start mb-8 relative z-10">
                     <div>
-                        <p class="text-xs text-slate-500 font-mono" id="scan-id">ID: SCN-29384</p>
-                        <h2 class="text-3xl font-black text-white mt-1" id="disease-name">...</h2>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
+                            <p class="text-xs text-cyan-400 font-bold tracking-widest uppercase font-mono" id="scan-id">
+                                ID: SCN-29384</p>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-black text-white leading-tight" id="disease-name">...</h2>
                     </div>
-                    <div class="bg-slate-800 px-4 py-2 rounded-lg border border-white/10 text-center">
-                        <p class="text-xs text-slate-400">CONFIDENCE</p>
-                        <p class="text-xl font-bold text-emerald-400" id="confidence-score">0%</p>
+                    <div
+                        class="bg-black/40 px-4 py-3 rounded-2xl border border-white/10 text-center shadow-inner backdrop-blur-md">
+                        <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-1">CONFIDENCE</p>
+                        <p class="text-2xl font-black text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                            id="confidence-score">0%</p>
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="font-bold text-slate-300 mb-2 uppercase text-xs tracking-widest">Recommended
-                            Treatment</h3>
-                        <p class="text-slate-400 leading-relaxed bg-slate-900/50 p-4 rounded-xl border-l-4 border-emerald-500"
-                            id="treatment-plan">
-                            ...
-                        </p>
-                    </div>
+                <div class="space-y-6 relative z-10" id="treatment-plan">
+                    <!-- Dynamic Treatment Content -->
+                </div>
 
-                    <div>
-                        <h3 class="font-bold text-slate-300 mb-2 uppercase text-xs tracking-widest">Next Actions</h3>
-                        <div class="flex gap-3">
-                            <button onclick="saveReport()" id="saveBtn"
-                                class="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-lg font-bold text-sm transition flex items-center justify-center gap-2">
-                                <span>💾</span> Save Report to History
-                            </button>
-                        </div>
+                <div class="mt-8 pt-6 border-t border-white/10 relative z-10">
+                    <h3 class="font-bold text-slate-400 mb-4 uppercase text-[10px] tracking-widest">Next Actions</h3>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="saveReport()" id="saveBtn"
+                            class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 hover-scale shadow-sm">
+                            <span class="text-lg">💾</span> Save to History
+                        </button>
+                        <button onclick="sendSMSReport()" id="smsBtn"
+                            class="flex-1 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 hover-scale shadow-sm">
+                            <span class="text-lg">📱</span> Send SMS Report
+                        </button>
+                        <button onclick="location.href='reports.html'"
+                            class="flex-1 bg-black/40 hover:bg-black/60 border border-white/5 text-slate-300 hover:text-white py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 hover-scale shadow-inner">
+                            <span class="text-lg">📊</span> View Past Reports
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Past Reports Link -->
-            <button onclick="location.href='reports.html'"
-                class="text-slate-500 hover:text-white underline text-sm">View Past Reports</button>
+            <!-- Empty State Right Side -->
+            <div id="placeholder-card"
+                class="glass-premium p-8 rounded-[2rem] border border-white/5 flex flex-col items-center justify-center text-center h-full min-h-[500px] shadow-inner">
+
+                <div class="relative mb-8">
+                    <div class="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full animate-pulse"></div>
+                    <div
+                        class="w-24 h-24 rounded-3xl bg-black/40 border border-white/10 flex items-center justify-center text-5xl relative z-10 shadow-xl backdrop-blur-sm">
+                        🔬
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-black text-white mb-3">Ready for Analysis</h3>
+                <p class="text-slate-400 max-w-sm leading-relaxed text-sm">
+                    Upload a clear picture of an affected leaf. The AI Doctor uses advanced neural networks to detect
+                    nitrogen deficiency, blight, pests, and more within seconds.
+                </p>
+
+                <div class="mt-8 grid grid-cols-2 gap-4 w-full max-w-sm">
+                    <div
+                        class="bg-white/5 p-4 rounded-xl border border-white/5 flex flex-col items-center justify-center gap-2">
+                        <span class="text-emerald-400 text-xl">⚡</span>
+                        <span class="text-xs font-bold text-slate-300">Instant Results</span>
+                    </div>
+                    <div
+                        class="bg-white/5 p-4 rounded-xl border border-white/5 flex flex-col items-center justify-center gap-2">
+                        <span class="text-blue-400 text-xl">🎯</span>
+                        <span class="text-xs font-bold text-slate-300">98% Accuracy</span>
+                    </div>
+                </div>
+
+                <button onclick="location.href='reports.html'"
+                    class="mt-8 text-slate-500 hover:text-white text-sm font-bold tracking-wide transition border-b border-transparent hover:border-white pb-0.5">
+                    View Past Reports →
+                </button>
+            </div>
+
         </div>
-
-        <!-- Empty State Right Side -->
-        <div id="placeholder-card"
-            class="glass p-8 rounded-3xl border border-white/5 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
-            <div class="text-6xl mb-6 opacity-20">🔬</div>
-            <h3 class="text-xl font-bold text-slate-300">Ready for Analysis</h3>
-            <p class="text-slate-500 mt-2 max-w-xs">AI Doctor scans leaf patterns to detect nitrogen deficiency,
-                blight, pests, and more.</p>
-        </div>
-
-    </div>
     </div>
 
+    <!-- Scripts -->
     <script>
-        // --- 3D DNA Helix / Network Simulation ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-bg').appendChild(renderer.domElement);
-
-        const geometry = new THREE.IcosahedronGeometry(10, 1);
-        const material = new THREE.MeshBasicMaterial({ color: 0x10b981, wireframe: true, transparent: true, opacity: 0.1 });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
-
-        // Particles
-        const pGeo = new THREE.BufferGeometry();
-        const pCount = 200;
-        const pArr = new Float32Array(pCount * 3);
-        for (let i = 0; i < pCount * 3; i++) pArr[i] = (Math.random() - 0.5) * 50;
-        pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
-        const pMat = new THREE.PointsMaterial({ size: 0.1, color: 0x34d399 });
-        const particles = new THREE.Points(pGeo, pMat);
-        scene.add(particles);
-
-        camera.position.z = 20;
-
-        function animate() {
-            requestAnimationFrame(animate);
-            sphere.rotation.y += 0.002;
-            sphere.rotation.x += 0.001;
-            particles.rotation.y -= 0.001;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // --- AUTH ---
+        // Authentication check
         const token = localStorage.getItem('token');
         if (!token) location.href = 'index.html';
 
-        // --- UI LOGIC ---
-        // Global state for last analysis
+        // State
         let lastAnalysisResult = null;
         let selectedFile = null;
 
@@ -227,197 +290,208 @@
                     document.getElementById('preview-area').classList.remove('hidden');
                     document.getElementById('upload-prompt').classList.add('hidden');
                     document.getElementById('analyzeBtn').disabled = false;
+
+                    // Reset UI
                     document.getElementById('result-card').classList.add('hidden');
                     document.getElementById('placeholder-card').classList.remove('hidden');
+                    document.getElementById('ai-hud').classList.add('hidden');
+                    document.getElementById('scanner').classList.add('hidden');
+
+                    // Button UI
+                    const btn = document.getElementById('analyzeBtn');
+                    btn.querySelector('span:first-child').innerText = 'DIAGNOSE NOW';
+                    document.getElementById('analyze-subtext').classList.add('hidden');
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // --- Load MobileNet ---
-        let mobilenetModel = null;
-        async function loadMobileNet() {
-            try {
-                // Initialize model from CDN
-                mobilenetModel = await mobilenet.load();
-                console.log("MobileNet Loaded");
-            } catch (e) {
-                console.warn("Offline or failed to load MobileNet:", e);
-            }
-        }
-        // Load on start
-        if (window.mobilenet) loadMobileNet();
-        else {
-            // Inject script dynamically
-            const s1 = document.createElement('script');
-            s1.src = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs";
-            document.head.appendChild(s1);
-            s1.onload = () => {
-                const s2 = document.createElement('script');
-                s2.src = "https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet";
-                document.head.appendChild(s2);
-                s2.onload = loadMobileNet;
-            }
-        }
 
-        // Typewriter Effect utility
-        function typeWriter(elementId, text, speed = 10) {
-            const el = document.getElementById(elementId);
-            el.innerHTML = '';
-            let i = 0;
-            function type() {
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
-        }
 
         async function analyzeCrop() {
             const btn = document.getElementById('analyzeBtn');
             const scanner = document.getElementById('scanner');
+            const hud = document.getElementById('ai-hud');
+            const subtext = document.getElementById('analyze-subtext');
 
             if (!selectedFile) {
-                alert("Please select or capture an image first.");
+                toast.warning('Please select or capture an image first.');
                 return;
             }
 
-            // UI Loading
+            // UI Loading State
             btn.disabled = true;
-            btn.innerText = "INITIALIZING VISION ENGINE...";
+            btn.querySelector('span:first-child').innerText = 'ANALYZING';
+            subtext.innerText = 'Initializing Neural Vision...';
+            subtext.classList.remove('hidden');
             scanner.classList.remove('hidden');
+            hud.classList.remove('hidden');
 
-            // 1. Client-Side Validation (MobileNet)
-            if (mobilenetModel) {
-                const imgEl = document.getElementById('preview-img');
-                try {
-                    const predictions = await mobilenetModel.classify(imgEl);
-                    const plantKeywords = ['plant', 'leaf', 'flower', 'vegetable', 'fruit', 'tree', 'corn', 'herb', 'broccoli', 'cauliflower', 'cabbage', 'cucumber', 'zucchini', 'ant', 'beetle', 'pot'];
-                    const isPlant = predictions.some(p => plantKeywords.some(k => p.className.toLowerCase().includes(k)) || p.probability > 0.1);
-
-                    // Strict check
-                    const nonPlantKeywords = ['paper', 'wallet', 'money', 'cash', 'pay', 'keyboard', 'phone'];
-                    // Increased threshold to 0.45 and ensure it's NOT a plant
-                    const isClearlyNotPlant = predictions.some(p => nonPlantKeywords.some(k => p.className.toLowerCase().includes(k)) && p.probability > 0.45);
-
-                    // If we found ANY trace of a plant (> 0.05), we override the rejection because it might be a plant next to a phone
-                    const isLikelyPlant = predictions.some(p => plantKeywords.some(k => p.className.toLowerCase().includes(k)) && p.probability > 0.05);
-
-                    if (isClearlyNotPlant && !isLikelyPlant) {
-                        alert("⚠️ Image Rejected.\n\nVision Guard detected non-crop object (" + predictions[0].className + ").\n\nPlease ensure the photo contains a clear view of the crop leaf.");
-                        scanner.classList.add('hidden');
-                        btn.innerText = "DIAGNOSE NOW";
-                        btn.disabled = false;
-                        return;
-                    }
-                } catch (e) { console.log("Validation Skipped", e); }
-            }
-
-            // 2. Proceed to Backend
-            btn.innerText = "ANALYZING PATTERNS...";
+            // Skip client-side validation — let Gemini handle everything
             const formData = new FormData();
             formData.append('image', selectedFile);
 
             try {
-                // Simulate progressive loading steps
-                setTimeout(() => { btn.innerText = "IDENTIFYING PATHOGENS..."; }, 1000);
-                setTimeout(() => { btn.innerText = "GENERATING REPORT..."; }, 2000);
+                // Progressive feedback
+                setTimeout(() => { if (btn.disabled) subtext.innerText = 'Extracting Pattern Features...'; }, 1000);
+                setTimeout(() => { if (btn.disabled) subtext.innerText = 'Cross-referencing Pathogen Database...'; }, 2500);
+                setTimeout(() => { if (btn.disabled) subtext.innerText = 'Generating Treatment Plan...'; }, 4000);
+                setTimeout(() => { if (btn.disabled) subtext.innerText = 'Compiling Clinical Report...'; }, 6000);
 
                 const res = await fetch('/api/doctor/analyze', {
                     method: 'POST',
-                    headers: { 'Authorization': token },
+                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
+
                 const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Server error');
+
                 lastAnalysisResult = data;
-
-                scanner.classList.add('hidden');
-                btn.innerText = "DIAGNOSE NOW";
-                btn.disabled = false;
-
-                // Show Results
-                document.getElementById('placeholder-card').classList.add('hidden');
-                document.getElementById('result-card').classList.remove('hidden');
-
-                document.getElementById('scan-id').innerText = `ID: ${data.scan_id}`;
-                document.getElementById('disease-name').innerText = data.diagnosis;
-
-                // Add scientific name if element exists, or append
-                if (!document.getElementById('sci-name')) {
-                    const sn = document.createElement('p');
-                    sn.id = 'sci-name';
-                    sn.className = 'text-sm text-cyan-400 italic font-mono mb-2';
-                    document.getElementById('disease-name').after(sn);
-                }
-                document.getElementById('sci-name').innerText = data.scientific_name;
-
-                document.getElementById('confidence-score').innerText = data.confidence;
-
-                // Format Treatment (Rich HTML)
-                let treatmentHTML = `
-                    <div class="space-y-4">
-                        <p class="text-sm text-slate-300"><strong>Symptoms detected:</strong> ${data.symptoms}</p>
-                        
-                        <div class="bg-emerald-900/20 p-3 rounded-lg border border-emerald-500/30">
-                            <h4 class="text-emerald-400 font-bold text-sm mb-2">🌱 Organic Cure</h4>
-                            <ul class="list-disc list-inside text-slate-300 text-sm space-y-1">
-                                ${data.treatment.organic.map(step => `<li>${step}</li>`).join('')}
-                            </ul>
-                        </div>
-
-                        <div class="bg-blue-900/20 p-3 rounded-lg border border-blue-500/30">
-                            <h4 class="text-blue-400 font-bold text-sm mb-2">🧪 Chemical Cure</h4>
-                            <ul class="list-disc list-inside text-slate-300 text-sm space-y-1">
-                                ${data.treatment.chemical.map(step => `<li>${step}</li>`).join('')}
-                            </ul>
-                        </div>
-
-                        <div class="bg-slate-700/30 p-3 rounded-lg">
-                            <h4 class="text-slate-200 font-bold text-sm mb-1">🛡️ Future Prevention</h4>
-                            <p class="text-slate-400 text-sm">${data.prevention}</p>
-                        </div>
-                    </div>
-                `;
-
-                document.getElementById('treatment-plan').innerHTML = treatmentHTML;
-
-                if (data.diagnosis === 'Healthy Crop') {
-                    document.getElementById('disease-name').className = 'text-3xl font-black text-green-400 mt-1';
-                } else {
-                    document.getElementById('disease-name').className = 'text-3xl font-black text-red-500 mt-1';
-                }
-
-                // TTS
-                speak(`Analysis complete. Detected ${data.diagnosis}. Confidence ${data.confidence}.`);
+                renderResults(data);
 
             } catch (e) {
                 console.error(e);
-                alert("Analysis Failed. Please try again.");
-                scanner.classList.add('hidden');
-                btn.innerText = "DIAGNOSE NOW";
-                btn.disabled = false;
+                toast.error(e.message || 'Analysis failed. Please try again or check connection.');
+                resetAnalysisUI();
             }
         }
 
-        // --- TTS & REPORT SAVING ---
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            // Optional: Try to find an Indian English or local voice if available
-            // const voices = window.speechSynthesis.getVoices();
-            // utterance.voice = voices.find(v => v.lang.includes('IN')) || voices[0];
-            window.speechSynthesis.speak(utterance);
+        function resetAnalysisUI() {
+            const btn = document.getElementById('analyzeBtn');
+            const scanner = document.getElementById('scanner');
+            const hud = document.getElementById('ai-hud');
+
+            scanner.classList.add('hidden');
+            hud.classList.add('hidden');
+            btn.querySelector('span:first-child').innerText = 'DIAGNOSE NOW';
+            document.getElementById('analyze-subtext').classList.add('hidden');
+            btn.disabled = false;
         }
 
+        function renderResults(data) {
+            resetAnalysisUI();
 
+            document.getElementById('placeholder-card').classList.add('hidden');
+            document.getElementById('result-card').classList.remove('hidden');
+
+            document.getElementById('scan-id').innerText = `ID: ${data.scan_id}`;
+            document.getElementById('disease-name').innerText = data.diagnosis;
+
+            // Scientific name
+            let sciNameEl = document.getElementById('sci-name');
+            if (!sciNameEl) {
+                sciNameEl = document.createElement('p');
+                sciNameEl.id = 'sci-name';
+                sciNameEl.className = 'text-sm text-cyan-400 italic font-mono mt-1 opacity-80';
+                document.getElementById('disease-name').after(sciNameEl);
+            }
+            sciNameEl.innerText = data.scientific_name || '';
+
+            // Color code based on health
+            const nameEl = document.getElementById('disease-name');
+            if (data.diagnosis === 'Healthy Crop' || data.diagnosis.toLowerCase().includes('healthy')) {
+                nameEl.className = 'text-3xl md:text-4xl font-black text-emerald-400 leading-tight drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]';
+                document.getElementById('result-card').style.borderColor = 'rgba(16,185,129,0.3)';
+            } else {
+                nameEl.className = 'text-3xl md:text-4xl font-black text-orange-500 leading-tight drop-shadow-[0_0_10px_rgba(249,115,22,0.3)]';
+                document.getElementById('result-card').style.borderColor = 'rgba(249,115,22,0.3)';
+            }
+
+            document.getElementById('confidence-score').innerText = data.confidence;
+
+            // Rich Treatment HTML
+            const organicSteps = (data.treatment && data.treatment.organic) || [];
+            const chemicalSteps = (data.treatment && data.treatment.chemical) || [];
+            const marketProducts = data.market_products || [];
+
+            let treatmentHTML = `
+                <div class="space-y-4">
+                    ${data.crop_identified ? `
+                    <div class="flex items-center gap-3 bg-blue-500/10 p-3 rounded-xl border border-blue-500/20">
+                        <span class="text-2xl">🌿</span>
+                        <div>
+                            <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Crop Identified</span>
+                            <p class="text-white font-bold">${data.crop_identified}</p>
+                        </div>
+                        ${data.severity ? `<span class="ml-auto px-3 py-1 rounded-full text-xs font-black ${data.severity === 'Healthy' ? 'bg-emerald-500/20 text-emerald-400' :
+                        data.severity === 'Mild' ? 'bg-yellow-500/20 text-yellow-400' :
+                            data.severity === 'Moderate' ? 'bg-orange-500/20 text-orange-400' :
+                                'bg-red-500/20 text-red-400'
+                        }">${data.severity}</span>` : ''}
+                    </div>` : ''}
+                    
+                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5 shadow-inner">
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">Detected Symptoms</p>
+                        <p class="text-sm text-slate-200 leading-relaxed font-medium">${data.symptoms}</p>
+                    </div>
+                    
+                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5 shadow-inner">
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">Root Cause</p>
+                        <p class="text-sm text-slate-200 leading-relaxed font-medium">${data.cause}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-emerald-500/10 p-5 rounded-2xl border border-emerald-500/20 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500 rounded-l"></div>
+                            <h4 class="text-emerald-400 font-bold text-sm mb-3 flex items-center gap-2">
+                                <span class="p-1.5 bg-emerald-500/20 rounded-lg">🌱</span> Organic Cure
+                            </h4>
+                            <ul class="list-none text-slate-300 text-sm space-y-2 relative z-10">
+                                ${organicSteps.map(step => `<li class="flex items-start gap-2"><span class="text-emerald-500 flex-shrink-0 mt-0.5">•</span> <span>${step}</span></li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500 rounded-l"></div>
+                            <h4 class="text-blue-400 font-bold text-sm mb-3 flex items-center gap-2">
+                                <span class="p-1.5 bg-blue-500/20 rounded-lg">🧪</span> Chemical Cure
+                            </h4>
+                            <ul class="list-none text-slate-300 text-sm space-y-2 relative z-10">
+                                ${chemicalSteps.map(step => `<li class="flex items-start gap-2"><span class="text-blue-500 flex-shrink-0 mt-0.5">•</span> <span>${step}</span></li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    ${marketProducts.length > 0 ? `
+                    <div class="bg-purple-500/10 p-4 rounded-2xl border border-purple-500/20">
+                        <h4 class="text-purple-400 font-bold text-sm mb-3 flex items-center gap-2">
+                            <span>🛒</span> Recommended Market Products
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${marketProducts.map(p => `<span class="px-3 py-1.5 bg-purple-500/20 rounded-full text-xs font-bold text-purple-300 border border-purple-500/20">${p}</span>`).join('')}
+                        </div>
+                    </div>` : ''}
+
+                    <div class="bg-slate-800/40 p-4 rounded-2xl border border-white/5 backdrop-blur-sm">
+                        <h4 class="text-slate-200 font-bold text-sm mb-2 flex items-center gap-2">
+                            <span>🛡️</span> Future Prevention
+                        </h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">${data.prevention}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('treatment-plan').innerHTML = treatmentHTML;
+
+            // TTS
+            speak(`Diagnosis complete. Detected ${data.diagnosis}. Confidence level: ${data.confidence}. Check the screen for treatment plans.`);
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                setTimeout(() => window.speechSynthesis.speak(utterance), 500);
+            }
+        }
 
         async function saveReport() {
             if (!lastAnalysisResult) return;
             const btn = document.getElementById('saveBtn');
 
             btn.disabled = true;
-            btn.innerText = "Saving...";
+            btn.innerHTML = `<span class="animate-spin text-lg">⏳</span> Saving...`;
 
             try {
                 const res = await fetch('/api/doctor/save-report', {
@@ -431,30 +505,73 @@
                         diagnosis: lastAnalysisResult.diagnosis,
                         confidence: lastAnalysisResult.confidence,
                         treatment: lastAnalysisResult.treatment,
-                        image_url: lastAnalysisResult.image_url
+                        image_url: lastAnalysisResult.image_url || '/placeholder.jpg' // handle missing url
                     })
                 });
 
                 if (res.ok) {
-                    btn.innerHTML = "<span>✅</span> Saved to History";
+                    btn.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border-emerald-500/30');
+                    btn.classList.remove('bg-white/5', 'text-white', 'border-white/10');
+                    btn.innerHTML = `<span class="text-lg">✅</span> Saved Successfully`;
+                    toast.success('Report saved to history.');
+
                     setTimeout(() => {
-                        btn.innerHTML = "<span>💾</span> Save Report to History";
+                        btn.innerHTML = `<span class="text-lg">💾</span> Save to History`;
+                        btn.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'border-emerald-500/30');
+                        btn.classList.add('bg-white/5', 'text-white', 'border-white/10');
                         btn.disabled = false;
                     }, 3000);
                 } else {
                     throw new Error("Failed");
                 }
             } catch (e) {
-                alert("Failed to save report.");
+                toast.error('Failed to save report to database.');
                 btn.disabled = false;
-                btn.innerText = "Save Report to History";
+                btn.innerHTML = `<span class="text-lg">💾</span> Save to History`;
+            }
+        }
+
+        async function sendSMSReport() {
+            if (!lastAnalysisResult) return;
+            const btn = document.getElementById('smsBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin text-lg">⏳</span> Sending...`;
+
+            try {
+                // Formatting the report text for SMS
+                const reportText = `🌱 Farm Central Diagnosis:\nCrop: ${lastAnalysisResult.crop_identified || 'Unknown'}\nIssue: ${lastAnalysisResult.diagnosis}\nConfidence: ${lastAnalysisResult.confidence}\nSeverity: ${lastAnalysisResult.severity || 'N/A'}\nLog in to dashboard for full treatment plan.`;
+
+                const res = await fetch('/api/sms/send-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ report_text: reportText })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    btn.innerHTML = `<span class="text-lg">✅</span> SMS Sent`;
+                    toast.success(data.message || 'SMS Report sent to your registered mobile.');
+                    setTimeout(() => {
+                        btn.innerHTML = `<span class="text-lg">📱</span> Send SMS Report`;
+                        btn.disabled = false;
+                    }, 3000);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (e) {
+                toast.error(e.message || 'Failed to send SMS.');
+                btn.disabled = false;
+                btn.innerHTML = `<span class="text-lg">📱</span> Send SMS Report`;
             }
         }
     </script>
-    <script src="js/ai-core.js"></script>
-    <script src="js/background-3d.js"></script>
-    <script src="js/global-ticker.js"></script>
-    <script src="js/mobile-nav.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/demo-toggle.js"></script>
 </body>
 
 </html>

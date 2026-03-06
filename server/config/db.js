@@ -25,12 +25,14 @@ if (process.env.DB_HOST && process.env.DB_HOST !== 'localhost') {
 
 const pool = mysql.createPool(dbConfig);
 
-// Test connection on startup
+// Test connection on startup with a timeout
+const dbName = process.env.DB_NAME || 'farming';
 pool.getConnection((err, connection) => {
     if (err) {
-        console.error('❌ Database connection failed:', err.message);
+        console.error(`❌ Database connection failed [${dbName}]:`, err.message);
+        console.error('👉 Make sure your TiDB Cloud credentials and host are correct in .env');
     } else {
-        console.log('✅ Connected to MySQL (farming database)');
+        console.log(`✅ Database Connected: [${dbName}]`);
         connection.release();
     }
 });

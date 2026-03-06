@@ -4,145 +4,231 @@
 <head>
     <meta charset="UTF-8">
     <title>Market Intelligence | Farm Central</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            background: #020617;
-            color: white;
-            font-family: 'Inter', sans-serif;
+            background: #090e17;
+            color: #f8fafc;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            overflow-x: hidden;
         }
 
-        #canvas-bg {
+        /* Abstract glowing orbs for background */
+        .bg-orb {
             position: fixed;
-            top: 0;
-            left: 0;
+            border-radius: 50%;
+            filter: blur(120px);
             z-index: -1;
+            opacity: 0.15;
+            animation: float 15s ease-in-out infinite alternate;
+            pointer-events: none;
         }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .orb-1 {
+            width: 50vw;
+            height: 50vw;
+            background: #8b5cf6;
+            top: -10vh;
+            right: -10vw;
+        }
+
+        .orb-2 {
+            width: 60vw;
+            height: 60vw;
+            background: #ec4899;
+            bottom: -20vh;
+            left: -10vw;
+            animation-delay: -5s;
         }
 
         .trend-up {
-            color: #4ade80;
+            color: #10b981;
         }
 
         .trend-down {
-            color: #f87171;
+            color: #ef4444;
         }
 
-        /* Global Interactive Hover Effects */
-        button:hover,
-        input:hover,
-        .glass:hover,
-        a:hover {
-            transform: scale(1.02);
-            transition: transform 0.2s ease-in-out;
-            cursor: pointer;
+        input::placeholder {
+            color: #64748b;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
     </style>
 </head>
 
-<body class="p-4 md:p-8">
-    <div id="canvas-bg"></div>
+<body class="p-4 md:p-8 selection:bg-purple-500/30 selection:text-purple-200">
+    <!-- Background Elements -->
+    <div id="canvas-bg" class="fixed inset-0 z-[-2]"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
 
     <!-- Back Button -->
     <button onclick="window.history.back()"
-        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-full glass flex items-center justify-center text-white hover:bg-white/10 transition hover:scale-110 shadow-lg">
+        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl btn-premium bg-white/5 border border-white/10 flex items-center justify-center text-white shadow-lg hover:shadow-white/10 hover-lift">
         ←
     </button>
 
-    <div class="max-w-6xl mx-auto pl-12">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-black text-purple-400">MARKET PRICES</h1>
-                <p class="text-gray-400">Live commodity signals (Simulated)</p>
+    <div class="max-w-7xl mx-auto md:pl-16 pt-16 md:pt-0 pb-20 fade-in-up">
+        <header
+            class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white/5 p-6 rounded-[2rem] border border-white/5 backdrop-blur-md shadow-2xl">
+            <div class="flex items-center gap-4 text-center md:text-left">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-3xl shadow-lg shadow-purple-500/30">
+                    📈
+                </div>
+                <div>
+                    <h1
+                        class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 tracking-tighter">
+                        MARKET INTELLIGENCE
+                    </h1>
+                    <p class="text-slate-400 font-medium text-sm mt-0.5 uppercase tracking-wider">Live Commodity Signals
+                    </p>
+                </div>
             </div>
+
             <div class="flex gap-4">
+                <button onclick="window.location.href='dashboard.html'"
+                    class="btn-premium px-5 py-2.5 rounded-xl bg-slate-800/10 border border-white/5 hover:bg-slate-700 transition font-bold text-slate-300 text-sm flex items-center gap-2 shadow-md">
+                    🏠 <span class="hidden sm:inline">Dashboard</span>
+                </button>
                 <button onclick="localStorage.clear(); location.href='index.html'"
-                    class="glass px-6 py-2 rounded-full border border-red-500/30 font-bold hover:bg-red-500/10 transition text-red-400">Logout</button>
-                <!-- Hub Button Removed -->
+                    class="btn-premium px-6 py-2.5 rounded-xl border border-red-500/30 font-bold bg-rose-500/10 hover:bg-rose-500 hover:text-white transition text-rose-400 text-sm shadow-[0_0_15px_rgba(244,63,94,0.1)]">
+                    Logout
+                </button>
             </div>
         </header>
 
-        <!-- Search Interface -->
-        <div class="glass p-8 rounded-3xl mb-8 border-b-4 border-purple-500">
-            <h2 class="text-xl font-bold mb-4">🔎 Check Real-Time Prices</h2>
-            <div class="flex flex-col md:flex-row gap-4">
-                <input type="text" id="mCrop" placeholder="Crop Name (e.g. Tomato)"
-                    class="flex-1 bg-black/40 p-4 rounded-xl border border-white/20 outline-none text-lg">
-                <input type="text" id="mLoc" placeholder="Market Location (e.g. Pune)"
-                    class="flex-1 bg-black/40 p-4 rounded-xl border border-white/20 outline-none text-lg">
-                <button onclick="checkPrice()"
-                    class="bg-purple-600 hover:bg-purple-500 px-8 py-4 rounded-xl font-bold text-lg transition">Check
-                    Price</button>
-            </div>
-            <div id="priceResult"
-                class="hidden mt-6 p-6 bg-purple-500/10 rounded-xl border border-purple-500/30 flex justify-between items-center animate-fade-in-up">
-                <div>
-                    <p class="text-gray-400 text-sm uppercase tracking-widest">Estimated Market Price</p>
-                    <h3 class="text-4xl font-black text-white" id="resPrice">₹0</h3>
-                </div>
-                <div class="text-right">
-                    <p class="text-gray-400 text-sm">Location</p>
-                    <p class="text-xl font-bold" id="resLoc">--</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="glass p-8 rounded-3xl">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold">🌾 Wheat Price History</h3>
-                    <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded text-xs font-bold">BULLISH</span>
-                </div>
-                <canvas id="chart1"></canvas>
-            </div>
-            <div class="glass p-8 rounded-3xl">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold">🥔 Potato Volatility</h3>
-                    <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded text-xs font-bold">HIGH RISK</span>
-                </div>
-                <canvas id="chart2"></canvas>
-            </div>
-        </div>
-
-        <div class="mt-8 glass p-8 rounded-3xl">
-            <h3 class="text-xl font-bold mb-4 flex justify-between">
-                <span>📰 Live Market News</span>
-                <span class="text-xs font-normal text-gray-400 bg-white/5 py-1 px-3 rounded">Powered by NewsAPI</span>
-            </h3>
-            <div id="newsFeed" class="space-y-4">
-                <div class="text-center text-gray-500 animate-pulse">Loading latest verified news...</div>
-            </div>
-        </div>
-    </div>
-
-
-    </div>
-
-    <!-- Highest Recommended Crop -->
-    <div class="glass p-8 rounded-3xl mb-8 border-l-4 border-yellow-500 bg-yellow-500/5">
-        <div class="flex justify-between items-center">
+        <!-- Highest Recommended Crop -->
+        <div
+            class="glass-premium p-8 rounded-[2.5rem] mb-12 border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-500/10 to-transparent hover-lift flex flex-col md:flex-row justify-between items-center shadow-[0_0_30px_rgba(234,179,8,0.1)] gap-6">
             <div>
-                <h3 class="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-1">⭐ Top Recommendation</h3>
-                <h2 class="text-3xl font-black text-white">Export Quality Cotton</h2>
-                <p class="text-gray-400">Current Market Leader due to high global demand</p>
+                <div class="flex items-center gap-2 mb-2">
+                    <h3
+                        class="text-xs font-bold text-yellow-400 uppercase tracking-widest border border-yellow-500/30 bg-yellow-500/10 px-3 py-1 rounded-full">
+                        ⭐ Top Recommendation</h3>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">Export Quality Cotton</h2>
+                <p class="text-yellow-100/70 font-light mt-1">Current Market Leader due to high global demand</p>
             </div>
-            <div class="text-right">
-                <p class="text-4xl font-black text-yellow-400">₹6,850</p>
-                <p class="text-xs text-gray-400">per Quintal</p>
+            <div class="text-left md:text-right bg-black/30 p-4 md:p-6 rounded-2xl border border-white/5 min-w-[200px]">
+                <p class="text-4xl font-black text-yellow-400 drop-shadow-md">₹6,850</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">per Quintal</p>
+            </div>
+        </div>
+
+        <!-- Search Interface -->
+        <div
+            class="glass-premium p-8 rounded-[2.5rem] mb-12 border-t-4 border-t-purple-500 hover-lift shadow-[0_10px_40px_rgba(168,85,247,0.1)]">
+            <h2 class="text-2xl font-black mb-6 flex items-center gap-3 tracking-tight">
+                <span class="p-2 bg-purple-500/20 rounded-xl text-purple-400 border border-purple-500/20">🔎</span>
+                Check Real-Time Prices
+            </h2>
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1 relative">
+                    <span class="absolute left-4 top-4 text-slate-400">🌾</span>
+                    <input type="text" id="mCrop" placeholder="Crop Name (e.g. Tomato)"
+                        class="w-full bg-slate-900/60 p-4 pl-12 rounded-xl border border-white/10 outline-none text-lg focus:border-purple-500 focus:bg-slate-900/80 transition-all placeholder:text-slate-500">
+                </div>
+                <div class="flex-1 relative">
+                    <span class="absolute left-4 top-4 text-slate-400">📍</span>
+                    <input type="text" id="mLoc" placeholder="Market Location (e.g. Pune)"
+                        class="w-full bg-slate-900/60 p-4 pl-12 rounded-xl border border-white/10 outline-none text-lg focus:border-purple-500 focus:bg-slate-900/80 transition-all placeholder:text-slate-500">
+                </div>
+                <button onclick="checkPrice()"
+                    class="btn-premium bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 px-10 py-4 rounded-xl font-bold text-lg transition flex items-center justify-center gap-2 shadow-lg shadow-purple-500/30 border border-purple-400/50">
+                    Search
+                </button>
+            </div>
+
+            <div id="priceResult"
+                class="hidden mt-8 p-6 md:p-8 bg-gradient-to-br from-purple-900/30 to-slate-900/80 rounded-2xl border border-purple-500/30 flex flex-col md:flex-row justify-between items-center animate-pulse-once gap-6 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+                <div>
+                    <p class="text-purple-300 text-xs font-bold uppercase tracking-widest mb-1">Estimated Market Price
+                    </p>
+                    <h3 class="text-5xl font-black text-white tracking-tighter" id="resPrice">₹0</h3>
+                </div>
+                <div class="text-left md:text-right w-full md:w-auto p-4 bg-black/40 rounded-xl border border-white/5">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Mandi Location</p>
+                    <p class="text-2xl font-bold text-white tracking-tight" id="resLoc">--</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div
+                class="glass-premium p-8 rounded-[2rem] border border-white/5 hover:border-emerald-500/30 transition shadow-xl">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-xl mr-3 border border-emerald-500/30 flex items-center justify-center">🌾</span>
+                        Price History
+                    </h3>
+                    <span
+                        class="bg-emerald-500/20 text-emerald-400 px-4 py-1.5 rounded-full text-xs font-black tracking-widest border border-emerald-500/20">BULLISH</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart1"></canvas>
+                </div>
+            </div>
+
+            <div
+                class="glass-premium p-8 rounded-[2rem] border border-white/5 hover:border-rose-500/30 transition shadow-xl">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-bold text-white flex items-center">
+                        <span
+                            class="bg-rose-500/20 text-rose-400 p-2.5 rounded-xl mr-3 border border-rose-500/30 flex items-center justify-center">📈</span>
+                        Demand Volatility
+                    </h3>
+                    <span
+                        class="bg-rose-500/20 text-rose-400 px-4 py-1.5 rounded-full text-xs font-black tracking-widest border border-rose-500/20">HIGH
+                        RISK</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart2"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-premium p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
+            <h3
+                class="text-2xl font-black mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 tracking-tight">
+                <div class="flex items-center gap-3">
+                    <span class="p-2 bg-blue-500/20 rounded-xl text-blue-400 border border-blue-500/20">📰</span> Live
+                    Market News
+                </div>
+                <span
+                    class="text-[10px] font-bold text-white uppercase tracking-widest bg-blue-600 px-4 py-2 rounded-full border border-blue-400/50 shadow-lg shadow-blue-500/20">Real-Time
+                    Feed</span>
+            </h3>
+            <div id="newsFeed" class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                <div class="text-center text-slate-500 animate-pulse font-medium py-10">Loading verified global
+                    agri-updates...</div>
             </div>
         </div>
     </div>
 
     <script>
-
+        // Set global chart defaults for dark theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+        Chart.defaults.plugins.tooltip.titleColor = '#fff';
+        Chart.defaults.plugins.tooltip.bodyColor = '#cbd5e1';
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
 
         let chart1Instance = null;
         let chart2Instance = null;
@@ -156,16 +242,25 @@
                     datasets: [{
                         label: 'Price Trend (₹/Qtl)',
                         data: [2200, 2250, 2230, 2280, 2350, 2400, 2450],
-                        borderColor: '#10B981',
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
                         tension: 0.4,
-                        fill: false
+                        fill: true,
+                        pointBackgroundColor: '#090e17',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { ticks: { color: 'white' }, grid: { display: false } },
-                        y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' } }
                     }
                 }
             });
@@ -178,15 +273,25 @@
                     datasets: [{
                         label: 'Volatility Index',
                         data: [1100, 1300, 1050, 1150, 1400, 1000, 1200],
-                        borderColor: '#F87171',
-                        tension: 0.4
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.05)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#090e17',
+                        pointBorderColor: '#f43f5e',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { ticks: { color: 'white' }, grid: { display: false } },
-                        y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' } }
                     }
                 }
             });
@@ -196,19 +301,27 @@
         // 2. Refresh Prices
         async function checkPrice() {
             const crop = document.getElementById('mCrop').value;
-            // Location is mostly ignored by simulator but kept for realism/future
-            if (!crop) return alert("Please enter a Crop Name");
+            if (!crop) {
+                if (typeof toast !== 'undefined') toast.error("Please enter a Crop Name");
+                else alert("Please enter a Crop Name");
+                return;
+            }
 
             const resBox = document.getElementById('priceResult');
             resBox.classList.remove('hidden');
+            resBox.style.animation = 'none';
+            resBox.offsetHeight; // trigger reflow
+            resBox.style.animation = 'fadeInUp 0.5s ease forwards';
+
             document.getElementById('resPrice').innerText = "Fetching...";
-            document.getElementById('resLoc').innerText = "Connecting to Mandi...";
+            document.getElementById('resPrice').className = "text-5xl font-black text-slate-400 tracking-tighter animate-pulse";
+            document.getElementById('resLoc').innerText = "Connecting...";
 
             try {
                 const res = await fetch(`/api/market/price/${crop}`);
                 const data = await res.json();
 
-                // Artifical delay for "Connecting" feel
+                // Artificial delay for "Connecting" feel
                 setTimeout(() => {
                     document.getElementById('resPrice').innerText = `₹${data.price}/Qtl`;
                     document.getElementById('resLoc').innerText = data.location + " Mandi";
@@ -218,78 +331,73 @@
 
                     // Simple color coding based on trend
                     if (data.trend === 'up') {
-                        document.getElementById('resPrice').classList.add('text-green-400');
-                        document.getElementById('resPrice').classList.remove('text-red-400');
+                        document.getElementById('resPrice').className = "text-5xl md:text-6xl font-black text-emerald-400 tracking-tighter drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]";
                     } else {
-                        document.getElementById('resPrice').classList.add('text-red-400');
-                        document.getElementById('resPrice').classList.remove('text-green-400');
+                        document.getElementById('resPrice').className = "text-5xl md:text-6xl font-black text-rose-400 tracking-tighter drop-shadow-[0_0_10px_rgba(244,63,94,0.3)]";
                     }
                 }, 800);
             } catch (e) {
                 document.getElementById('resPrice').innerText = "Error";
+                document.getElementById('resPrice').className = "text-5xl font-black text-rose-500 tracking-tighter";
             }
         }
 
         function updateCharts(cropName, currentPrice) {
-            // Generate pseudo-random history based on current price
             const history = [];
             const volatility = [];
             let p = currentPrice;
             for (let i = 0; i < 7; i++) {
-                p = p * (0.95 + Math.random() * 0.1); // +/- 5%
+                p = p * (0.95 + Math.random() * 0.1);
                 history.unshift(Math.floor(p));
-                volatility.unshift(Math.floor(Math.random() * 100)); // 0-100 index
+                volatility.unshift(Math.floor(Math.random() * 100));
             }
 
-            // Update Chart 1
             chart1Instance.data.datasets[0].label = `${cropName} Price (₹/Qtl)`;
             chart1Instance.data.datasets[0].data = history;
             chart1Instance.update();
 
-            // Update Chart 2
             chart2Instance.data.datasets[0].label = `${cropName} Volatility`;
             chart2Instance.data.datasets[0].data = volatility;
             chart2Instance.update();
 
-            // Update Headers
-            document.querySelector('#chart1').previousElementSibling.querySelector('h3').innerText = `🌾 ${cropName} Price History`;
-            document.querySelector('#chart2').previousElementSibling.querySelector('h3').innerText = `📈 ${cropName} Demand Index`;
+            document.querySelector('#chart1').closest('.glass-premium').querySelector('h3').innerHTML = `<span class="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-xl mr-3 border border-emerald-500/30 flex items-center justify-center">🌾</span>${cropName} History`;
+            document.querySelector('#chart2').closest('.glass-premium').querySelector('h3').innerHTML = `<span class="bg-rose-500/20 text-rose-400 p-2.5 rounded-xl mr-3 border border-rose-500/30 flex items-center justify-center">📈</span>${cropName} Demand`;
         }
 
         async function fetchNews() {
             const feed = document.getElementById('newsFeed');
-            feed.innerHTML = '<div class="text-center text-gray-500 animate-pulse">Loading live agri-updates...</div>';
+            feed.innerHTML = '<div class="text-center text-slate-500 animate-pulse font-medium py-10">Connecting to global network...</div>';
 
             try {
                 const res = await fetch('/api/market/news');
                 const news = await res.json();
 
                 feed.innerHTML = news.map(n => `
-                    <div class="border-l-4 border-purple-500 pl-4 py-1 hover:bg-white/5 transition p-2 rounded-r-lg">
-                        <div class="flex justify-between items-start">
-                            <h4 class="font-bold text-purple-200 text-lg"><a href="${n.link || '#'}" target="_blank" class="hover:underline">${n.title}</a></h4>
-                            <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded">${new Date().toLocaleDateString()}</span>
+                    <div class="glass-premium p-5 rounded-2xl border-l-4 border-l-blue-500 hover:border-l-blue-400 hover-lift mb-4 shadow-lg group">
+                        <div class="flex justify-between items-start gap-4">
+                            <h4 class="font-bold text-white text-lg leading-snug group-hover:text-blue-200 transition">
+                                <a href="${n.link || '#'}" target="_blank">${n.title}</a>
+                            </h4>
+                            <span class="text-[10px] bg-slate-800 border border-slate-700 text-slate-400 px-2 py-1 rounded whitespace-nowrap font-bold tracking-wider">${new Date().toLocaleDateString()}</span>
                         </div>
-                        <p class="text-gray-400 text-sm mt-1 line-clamp-2">${n.desc}</p>
-                        <div class="mt-2 flex gap-2 items-center">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">${n.source}</span>
-                            <span class="text-[10px] text-slate-600">• ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <p class="text-slate-400 text-sm mt-3 line-clamp-2 font-light">${n.desc}</p>
+                        <div class="mt-4 flex gap-3 items-center">
+                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20">${n.source}</span>
+                            <span class="text-[10px] text-slate-500 font-bold">• ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                     </div>
                 `).join('');
             } catch (e) {
-                feed.innerHTML = '<div class="text-center text-red-400">Failed to load news.</div>';
+                feed.innerHTML = '<div class="text-center text-rose-400 py-10 font-bold">Failed to load news network.</div>';
             }
         }
 
         fetchNews();
+        // Update news smartly every 3 minutes so it's always real-time without refreshing
+        setInterval(fetchNews, 180000);
     </script>
 
-    <script src="js/ai-core.js"></script>
-    <!-- 3D Removed per request -->
-    <script src="js/global-ticker.js"></script>
-    <script src="js/mobile-nav.js"></script>
+    <script src="js/toast.js"></script>
 </body>
 
 </html>
-```

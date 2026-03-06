@@ -1,0 +1,16 @@
+{
+    "name": "Farm Central Ecosystem",
+    "short_name": "Farm Central",
+    "start_url": "/dashboard.html",
+    "display": "standalone",
+    "background_color": "#090e17",
+    "theme_color": "#090e17",
+    "description": "Next-Gen Agricultural Management Platform.",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "192x192 512x512",
+            "type": "image/svg+xml"
+        }
+    ]
+}

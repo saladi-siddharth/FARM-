@@ -3,143 +3,295 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Farm | Inventory Hub</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            background: #050505;
-            color: white;
+            background: #090e17;
+            color: #f8fafc;
             overflow-x: hidden;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', 'Inter', sans-serif;
         }
 
-        #canvas-bg {
+        .bg-orb {
             position: fixed;
-            top: 0;
-            left: 0;
+            border-radius: 50%;
+            filter: blur(120px);
             z-index: -1;
+            opacity: 0.15;
+            animation: float 15s ease-in-out infinite alternate;
+            pointer-events: none;
         }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .orb-1 {
+            width: 50vw;
+            height: 50vw;
+            background: #10b981;
+            top: -10vh;
+            right: -10vw;
+        }
+
+        .orb-2 {
+            width: 40vw;
+            height: 40vw;
+            background: #06b6d4;
+            bottom: -20vh;
+            left: -10vw;
+            animation-delay: -5s;
         }
 
         .low-stock {
-            border-left: 4px solid #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(239, 68, 68, 0.05)) !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+        }
+
+        .low-stock::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #ef4444;
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
         }
 
         .normal-stock {
-            border-left: 4px solid #22c55e;
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
-        /* Global Interactive Hover Effects */
-        button:hover,
-        input:hover,
-        .glass:hover,
-        a:hover {
-            transform: scale(1.02);
-            transition: transform 0.2s ease-in-out;
-            cursor: pointer;
+        .normal-stock::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #10b981;
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-field:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        select.input-field option {
+            background: #0f172a;
+            color: white;
         }
     </style>
 </head>
 
-<body class="p-6 md:p-12">
-    <div id="canvas-bg"></div>
+<body class="p-4 md:p-8 selection:bg-emerald-500/30 selection:text-emerald-200 min-h-screen">
+    <div id="canvas-bg" class="fixed inset-0 z-[-2]"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
 
     <!-- Back Button -->
     <button onclick="window.history.back()"
-        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-full glass flex items-center justify-center text-white hover:bg-white/10 transition hover:scale-110 shadow-lg">
+        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl btn-premium bg-white/5 border border-white/10 flex items-center justify-center text-white shadow-lg hover:shadow-white/10 hover-lift">
         ←
     </button>
 
-    <div class="max-w-6xl mx-auto pl-12">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-4xl font-black text-green-400 tracking-tighter">INVENTORY CONTROL</h1>
-                <p class="text-gray-400">Manage your seeds, fertilizers, and tools</p>
+    <div class="max-w-7xl mx-auto md:pl-16 pt-16 md:pt-0 pb-20 fade-in-up">
+        <header
+            class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white/5 p-6 rounded-[2rem] border border-white/5 backdrop-blur-md shadow-2xl">
+            <div class="flex items-center gap-4 text-center md:text-left">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-lg group-hover:scale-105 transition">
+                    <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain">
+                </div>
+                <div>
+                    <h1
+                        class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 tracking-tighter">
+                        INVENTORY CONTROL
+                    </h1>
+                    <p class="text-slate-400 font-medium text-sm mt-0.5 uppercase tracking-wider">Storage & Appraisals
+                    </p>
+                </div>
             </div>
+
             <div class="flex gap-4">
+                <button onclick="window.location.href='dashboard.html'"
+                    class="btn-premium px-5 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700 transition font-bold text-slate-300 text-sm border border-slate-600/50 flex items-center gap-2">
+                    🏠 <span class="hidden sm:inline">Dashboard</span>
+                </button>
                 <button onclick="exportCSV()"
-                    class="glass px-6 py-2 rounded-full border border-blue-500/30 font-bold hover:bg-blue-500/10 transition text-blue-400">Export
-                    CSV</button>
-                <button onclick="localStorage.clear(); location.href='index.html'"
-                    class="glass px-6 py-2 rounded-full border border-red-500/30 font-bold hover:bg-red-500/10 transition text-red-400">Logout</button>
-                <!-- Dashboard button removed -->
+                    class="btn-premium px-6 py-2.5 rounded-xl border border-blue-500/30 font-bold bg-blue-500/10 hover:bg-blue-500 hover:text-white transition text-blue-400 text-sm shadow-[0_0_15px_rgba(59,130,246,0.1)] flex items-center gap-2">
+                    <span>⬇️</span> Export CSV
+                </button>
             </div>
         </header>
 
-        <form id="invForm" class="glass p-8 rounded-3xl grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-            <input type="text" id="name" placeholder="Item Name" required
-                class="bg-black/40 p-3 rounded-xl border border-white/10 outline-none">
-            <select id="type" class="bg-black/40 p-3 rounded-xl border border-white/10 outline-none">
-                <option value="Seeds">Seeds</option>
-                <option value="Fertilizer">Fertilizer</option>
-                <option value="Tools">Tools</option>
-                <option value="Crops">Crops</option>
-            </select>
-            <input type="number" id="qty" placeholder="Quantity" required
-                class="bg-black/40 p-3 rounded-xl border border-white/10 outline-none">
-            <input type="number" id="cost" placeholder="Cost per unit" required
-                class="bg-black/40 p-3 rounded-xl border border-white/10 outline-none">
-            <button type="submit"
-                class="bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl py-3 col-span-full transition-all">Update
-                Stock</button>
+        <form id="invForm"
+            class="glass-premium p-8 md:p-10 rounded-[2.5rem] mb-12 border border-white/5 shadow-2xl relative overflow-hidden">
+            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2 tracking-tight">
+                <span
+                    class="p-2 bg-emerald-500/20 rounded-xl text-emerald-400 border border-emerald-500/20 text-sm">➕</span>
+                Add New Stock
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative z-10">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Item
+                        Name</label>
+                    <input type="text" id="name" placeholder="e.g. Urea 46%" required class="input-field">
+                </div>
+
+                <div>
+                    <label
+                        class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Category</label>
+                    <div class="relative">
+                        <select id="type" class="input-field appearance-none cursor-pointer">
+                            <option value="Seeds">Seeds</option>
+                            <option value="Fertilizer">Fertilizer</option>
+                            <option value="Tools">Tools</option>
+                            <option value="Crops">Crops</option>
+                        </select>
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-4 flex items-center px-2 text-slate-400">
+                            ▼</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Quantity</label>
+                    <input type="number" id="qty" placeholder="0" required min="1" class="input-field">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Unit Cost
+                        (₹)</label>
+                    <input type="number" id="cost" placeholder="0.00" required min="1" class="input-field">
+                </div>
+
+                <div class="col-span-1 md:col-span-2 lg:col-span-4 mt-2">
+                    <button type="submit"
+                        class="btn-premium w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-black rounded-xl py-4 transition-all tracking-widest text-lg shadow-[0_0_20px_rgba(16,185,129,0.3)] border border-emerald-400/50">
+                        ADD TO INVENTORY
+                    </button>
+                </div>
+            </div>
         </form>
 
+        <h3 class="text-2xl font-black text-white mb-6 tracking-tight flex items-center gap-3">
+            <span class="p-2 bg-cyan-500/20 rounded-xl text-cyan-400 border border-cyan-500/20 text-sm">📊</span>
+            Current Master Register
+        </h3>
+
         <div id="invDisplay" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="text-center text-slate-400 col-span-full py-12 animate-pulse font-bold">Connecting to warehouse
+                array...</div>
         </div>
     </div>
 
     <script>
-        // --- THREE.JS BACKGROUND ---
-
-
-        // --- DATA LOGIC ---
         const token = localStorage.getItem('token');
         if (!token) window.location.href = 'dashboard.html';
 
         async function load() {
-            const res = await fetch('/api/inventory', { headers: { 'Authorization': token } });
-            const data = await res.json();
+            try {
+                const res = await fetch('/api/inventory', { headers: { 'Authorization': token } });
+                const data = await res.json();
 
-            document.getElementById('invDisplay').innerHTML = data.map(i => {
-                const isLow = i.quantity <= 5;
-                return `
-                <div class="glass p-6 rounded-2xl ${isLow ? 'low-stock' : 'normal-stock'} relative group">
-                    <button onclick="deleteInventory(${i.id})" class="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition hover:bg-red-500/20 p-2 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
-                    </button>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-xs font-bold ${isLow ? 'text-red-400' : 'text-green-400'} uppercase">${i.type}</span>
-                        ${isLow ? '<span class="bg-red-500/20 text-red-400 text-[10px] px-2 py-1 rounded-full animate-pulse">⚠️ LOW STOCK</span>' : ''}
+                const container = document.getElementById('invDisplay');
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                    <div class="col-span-full glass-premium p-12 rounded-[2rem] border-dashed border-2 border-slate-700/50 text-center text-slate-500 flex flex-col items-center">
+                        <div class="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner">🗑️</div>
+                        <p class="font-bold text-lg text-white mb-1">Inventory Empty</p>
+                        <p class="text-sm font-light">Add seeds, fertilizers or tools using the form above.</p>
+                    </div>`;
+                    return;
+                }
+
+                container.innerHTML = data.map((i, index) => {
+                    const isLow = i.quantity <= 5;
+                    const typeIcon = i.type === 'Seeds' ? '🌱' : i.type === 'Fertilizer' ? '🧪' : i.type === 'Tools' ? '⚙️' : '🌾';
+
+                    return `
+                    <div class="glass-premium p-8 rounded-3xl ${isLow ? 'low-stock' : 'normal-stock'} relative group hover-lift animate-fade-in-up" style="animation-delay: ${index * 50}ms">
+                        <button onclick="deleteInventory(${i.id})" class="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition hover:bg-red-500/20 p-2.5 rounded-xl border border-transparent hover:border-red-500/30 z-10 bg-black/40">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+                        </button>
+                        
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="text-[10px] font-black ${isLow ? 'text-red-400 bg-red-500/10 border-red-500/20' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'} uppercase border px-3 py-1 rounded-full flex items-center gap-1">
+                                ${typeIcon} ${i.type}
+                            </span>
+                            ${isLow ? '<span class="bg-red-500/20 text-red-400 text-[9px] font-bold px-3 py-1 rounded-full animate-pulse border border-red-500/30 uppercase tracking-widest mt-0.5">⚠️ Low</span>' : ''}
+                        </div>
+                        
+                        <h3 class="text-2xl font-black mb-6 text-white tracking-tight lead">${i.name}</h3>
+                        
+                        <div class="flex justify-between items-end p-4 bg-black/30 rounded-2xl border border-white/5">
+                            <div>
+                                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Quantity</p>
+                                <p class="text-3xl font-black text-white">${i.quantity.toLocaleString()} <span class="text-sm font-bold text-slate-500 uppercase">Qty</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Valuation</p>
+                                <p class="text-lg font-bold text-emerald-400">₹${(i.quantity * i.cost).toLocaleString()}</p>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-2xl font-bold mb-2">${i.name}</h3>
-                    <div class="flex justify-between items-end">
-                        <p class="text-3xl font-black">${i.quantity} <span class="text-sm font-normal text-gray-500">Units</span></p>
-                        <p class="text-gray-400 text-xs italic">Value: ₹${(i.quantity * i.cost).toLocaleString()}</p>
-                    </div>
-                </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            } catch (e) {
+                document.getElementById('invDisplay').innerHTML = '<div class="col-span-full text-center text-rose-400 font-bold py-10">Error loading inventory from server.</div>';
+            }
         }
 
         async function deleteInventory(id) {
-            if (!confirm("Are you sure you want to delete this item?")) return;
-            const res = await fetch(`/api/inventory/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': token }
-            });
-            if (res.ok) load();
+            if (!confirm("Remove this item from the manifest globally?")) return;
+            try {
+                const res = await fetch(`/api/inventory/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                });
+                if (res.ok) {
+                    if (typeof toast !== 'undefined') toast.success('Entry removed');
+                    load();
+                } else {
+                    if (typeof toast !== 'undefined') toast.error('Failed to remove');
+                }
+            } catch (e) {
+                if (typeof toast !== 'undefined') toast.error('Check server connection');
+            }
         }
 
         document.getElementById('invForm').onsubmit = async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "PROCESSING...";
+            btn.disabled = true;
+
             const body = {
                 name: document.getElementById('name').value,
                 type: document.getElementById('type').value,
@@ -147,15 +299,25 @@
                 cost: document.getElementById('cost').value
             };
 
-            const res = await fetch('/api/inventory', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                body: JSON.stringify(body)
-            });
+            try {
+                const res = await fetch('/api/inventory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                    body: JSON.stringify(body)
+                });
 
-            if (res.ok) {
-                document.getElementById('invForm').reset();
-                load();
+                if (res.ok) {
+                    document.getElementById('invForm').reset();
+                    if (typeof toast !== 'undefined') toast.success('New stock added successfully');
+                    load();
+                } else {
+                    if (typeof toast !== 'undefined') toast.error('Validation failed on server');
+                }
+            } catch (e) {
+                if (typeof toast !== 'undefined') toast.error('Network Error. Changes not saved.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         };
 
@@ -166,24 +328,26 @@
                 const res = await fetch('/api/inventory', { headers: { 'Authorization': token } });
                 const data = await res.json();
 
-                if (!data.length) return alert("No data to export");
+                if (!data || !data.length) return toast.info('No data available to export');
 
                 const csvContent = "data:text/csv;charset=utf-8,"
-                    + "ID,Name,Type,Quantity,Cost\n"
-                    + data.map(e => `${e.id},${e.name},${e.type},${e.quantity},${e.cost}`).join("\n");
+                    + "ID,Item Name,Category,Quantity,Unit Cost,Total Value\n"
+                    + data.map(e => `${e.id},${e.name},${e.type},${e.quantity},${e.cost},${e.quantity * e.cost}`).join("\n");
 
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "inventory_report.csv");
+                link.setAttribute("download", `farm_inventory_export_${new Date().getTime()}.csv`);
                 document.body.appendChild(link);
                 link.click();
-            } catch (e) { console.error(e); }
+                link.remove();
+                if (typeof toast !== 'undefined') toast.success('CSV Export Generated');
+            } catch (e) {
+                if (typeof toast !== 'undefined') toast.error('Export failed');
+            }
         }
     </script>
-    <script src="js/background-3d.js"></script>
-    <script src="js/global-ticker.js"></script>
-    <script src="js/mobile-nav.js"></script>
+    <script src="js/toast.js"></script>
 </body>
 
 </html>

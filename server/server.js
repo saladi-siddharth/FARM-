@@ -12,6 +12,9 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { cors: { origin: "*" } });
 
+// Trust Proxy for Render/Heroku (Required for secure cookies & OAuth redirects)
+app.enable('trust proxy');
+
 // Security Middlewares
 app.use(helmet({
     contentSecurityPolicy: false, // Disable for now to allow inline scripts
@@ -59,6 +62,9 @@ app.use('/api/doctor', require('./routes/doctor'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/trade', require('./routes/trade'));
 app.use('/api/ai', require('./routes/ai')); // NEW AI VOICE ROUTE
+app.use('/api/sms', require('./routes/sms')); // Twilio SMS Route
+app.use('/api/satellite', require('./routes/satellite')); // 🛰️ Satellite Farm Scanner
+app.use('/api/admin', require('./routes/admin')); // 🔧 Admin Panel
 
 // --- SOCKET.IO SIGNALLING (For Calls) ---
 // --- SOCKET.IO SIGNALLING (Real-Time Presence & Calls) ---
@@ -113,32 +119,12 @@ io.on('connection', (socket) => {
 // Import error handlers
 const { errorHandler, notFoundHandler } = require('./middleware/security');
 
-// Default route to serve Dashboard
+// Default route to serve Landing Page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.get('*', (req, res, next) => {
-    // Check if it's an API route
-    if (req.path.startsWith('/api/')) {
-        return next();
-    }
-    res.sendFile(path.join(__dirname, '../public/dashboard.html'));
-});
-
-// Debug Route to check Env Vars (Access via /api/debug-env)
-app.get('/api/debug-env', (req, res) => {
-    res.json({
-        has_db_host: !!process.env.DB_HOST,
-        has_db_user: !!process.env.DB_USER,
-        has_email_user: !!process.env.EMAIL_USER,
-        email_user_value: process.env.EMAIL_USER || "MISSING",
-        has_email_pass: !!process.env.EMAIL_PASS,
-        node_env: process.env.NODE_ENV
-    });
-});
-
-// Health Check (Public)
+// Health Check (Public) — must be BEFORE catch-all
 app.get('/health', async (req, res) => {
     try {
         const db = require('./config/db');
@@ -149,7 +135,34 @@ app.get('/health', async (req, res) => {
     }
 });
 
-// 404 Handler for undefined routes (must be after all routes)
+// Debug Route (Protected — only in development)
+if (process.env.NODE_ENV !== 'production') {
+    app.get('/api/debug-env', (req, res) => {
+        res.json({
+            has_db_host: !!process.env.DB_HOST,
+            has_db_user: !!process.env.DB_USER,
+            has_email_user: !!process.env.EMAIL_USER,
+            has_email_pass: !!process.env.EMAIL_PASS,
+            node_env: process.env.NODE_ENV || 'development'
+        });
+    });
+}
+
+// Catch-all route — serve dashboard.html for any non-API, non-file route
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        return next(); // Let API 404 handler catch it
+    }
+    // Serve the requested HTML file or fallback to dashboard
+    const htmlPath = path.join(__dirname, '../public', req.path);
+    res.sendFile(htmlPath, (err) => {
+        if (err) {
+            res.sendFile(path.join(__dirname, '../public/dashboard.html'));
+        }
+    });
+});
+
+// 404 Handler for undefined API routes
 app.use(notFoundHandler);
 
 // Global Error Handler (must be last)
@@ -172,6 +185,9 @@ if (require.main === module) {
         ⚡ Socket.io: Active (Calling System Ready)
         -----------------------------
         `);
+        if (process.env.NODE_ENV === 'production' && !process.env.APP_URL) {
+            console.warn("⚠️  WARNING: APP_URL is not set! Google Auth redirects will likely fail.");
+        }
     });
 }
 

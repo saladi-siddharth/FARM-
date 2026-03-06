@@ -3,11 +3,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('./db');
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "YOUR_GOOGLE_CLIENT_SECRET",
-    callbackURL: "/api/auth/google/callback",
-    // We use relative URL, but in prod it might need full URL if proxy issues arise,
-    // usually /api/auth/google/callback is fine if on same domain.
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: `${process.env.APP_URL}/api/auth/google/callback`,
 },
     async function (accessToken, refreshToken, profile, done) {
         try {

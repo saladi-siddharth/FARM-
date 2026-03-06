@@ -3,146 +3,174 @@ const router = express.Router();
 const upload = require('../middleware/upload');
 const db = require('../config/db');
 const auth = require('../middleware/auth');
+const fs = require('fs');
+const path = require('path');
 
-// --- GEMINI VISION PRO SIMULATION ---
-// This database simulates the output of a Multimodal LLM analyzing crop images.
-const KNOWLEDGE_GRAPH = [
-    {
-        name: "Tomato Late Blight",
-        scientific_name: "Phytophthora infestans",
-        confidence: "98.4%",
-        symptoms: "Dark, water-soaked spots on leaves; white fungal growth on undersides during humidity.",
-        cause: "Fungal-like oomycete pathogen spread by wind and water splash.",
-        organic_treatment: [
-            "Remove and destroy all infected plant parts immediately (do not compost).",
-            "Spray with a Copper-based fungicide or Bordeaux mixture.",
-            "Improve air circulation by pruning excess foliage."
-        ],
-        chemical_treatment: [
-            "Apply fungicides containing Chlorothalonil (Daconil) every 7-10 days.",
-            "Use systematic fungicides like Metalaxyl for severe infections."
-        ],
-        prevention: "Use drip irrigation to keep foliage dry. Rotate crops every 3 years."
-    },
-    {
-        name: "Wheat Yellow Rust",
-        scientific_name: "Puccinia striiformis",
-        confidence: "96.2%",
-        symptoms: "Yellow or orange powdery pustules arranged in stripes on leaf blades.",
-        cause: "Fungal spores spread by wind over long distances.",
-        organic_treatment: [
-            "Spray Neem Oil (3%) mixed with mild soap water.",
-            "Use bio-fungicides like Trichoderma viride.",
-            "Dust wood ash on leaves in early morning."
-        ],
-        chemical_treatment: [
-            "Spray Propiconazole (Tilt) or Tebuconazole (Folicur) at 1ml/liter.",
-            "Apply Azoxystrobin (Amistar) for preventive control."
-        ],
-        prevention: "Plant resistant varieties like HD-2967 or DBW-187."
-    },
-    {
-        name: "Rice Blast",
-        scientific_name: "Magnaporthe oryzae",
-        confidence: "94.8%",
-        symptoms: "Diamond or spindle-shaped lesions with gray centers and brown margins.",
-        cause: "Fungus favored by high nitrogen fertilizer and high humidity.",
-        organic_treatment: [
-            "Spray Pseudomonas fluorescens bacteria.",
-            "Reduce Nitrogen fertilizer application immediately.",
-            "Maintain water level depth of 5-10 cm."
-        ],
-        chemical_treatment: [
-            "Spray Tricyclazole 75 WP or Isoprothiolane.",
-            "Use Kasugamycin for severe neck blast."
-        ],
-        prevention: "Treat seeds with Carbendazim before sowing."
-    },
-    {
-        name: "Cotton Leaf Curl",
-        scientific_name: "Begomovirus (CLCuD)",
-        confidence: "91.5%",
-        symptoms: "Upward curling of leaves, thickened veins, and stunted growth.",
-        cause: "Viral disease transmitted by Whitefly (Bemisia tabaci).",
-        organic_treatment: [
-            "Install yellow sticky traps (20 per acre) to catch whiteflies.",
-            "Spray Neem Oil (10000 ppm) or Fish Oil Rosin Soap.",
-            "Intercrop with Cowpea or Maize to act as barrier."
-        ],
-        chemical_treatment: [
-            "Control vector using Imidacloprid or Diafenthiuron.",
-            "Apply Acetamiprid for rapid knockdown."
-        ],
-        prevention: "Use virus-resistant hybrids and remove weed hosts."
-    },
-    {
-        name: "Healthy Crop",
-        scientific_name: "N/A",
-        confidence: "99.1%",
-        symptoms: "Leaves are vibrant green, turgid, and free of spots or deformities.",
-        cause: "Optimal growing conditions.",
-        organic_treatment: [
-            "Continue current irrigation schedule.",
-            "Add Vermicompost to maintain soil fertility."
-        ],
-        chemical_treatment: [
-            "Apply NPK 19:19:19 water-soluble fertilizer for maintenance.",
-            "Monitor regularly for early signs of pests."
-        ],
-        prevention: "Maintain good field hygiene."
-    }
-];
+// Helper: Call Gemini Vision API with Groq Fallback
+async function callGeminiVision(base64Image, mimeType) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("GEMINI_API_KEY is missing from .env");
 
-router.post('/analyze', upload.single('image'), (req, res) => {
-    // 1. Simulate "Vision Processing"
-    // In a real app, we would send req.file.path to Gemini Pro Vision API here.
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    setTimeout(() => {
-        // Pick a random result based on a "pseudo-hash" of the filename length to be somewhat consistent
-        // or just random for demo diversity.
-        const randomIndex = Math.floor(Math.random() * KNOWLEDGE_GRAPH.length);
-        const result = KNOWLEDGE_GRAPH[randomIndex];
-
-        res.json({
-            success: true,
-            scan_id: "VIS-" + Math.floor(Math.random() * 100000),
-            diagnosis: result.name,
-            scientific_name: result.scientific_name,
-            confidence: result.confidence,
-            symptoms: result.symptoms,
-            cause: result.cause,
-            treatment: {
-                organic: result.organic_treatment,
-                chemical: result.chemical_treatment
+    const prompt = `
+        You are "Agri-Vision Elite", a world-renowned plant pathologist, agronomist, and crop scientist with 30+ years of field and laboratory experience.
+        
+        MISSION: Analyze the provided plant/crop image with maximum scientific rigor.
+        
+        ANALYSIS PROTOCOL:
+        1. SPECIES IDENTIFICATION: Identify the exact crop species, variety if possible (e.g., Tomato - Roma, Rice - Basmati 1121).
+        2. HEALTH ASSESSMENT: Classify as Healthy, Mild Risk, Moderate Disease, or Severe Infection.
+        3. PATHOGEN DETECTION: If diseased, identify the exact pathogen — fungal (e.g., Alternaria solani), bacterial (e.g., Xanthomonas), viral (e.g., Tomato Yellow Leaf Curl Virus), or pest (e.g., Spodoptera litura).
+        4. NUTRIENT DEFICIENCY: Check for visual markers of N, P, K, Zn, Fe, Mg, Ca deficiencies.
+        5. TREATMENT PLAN: Provide both organic and chemical solutions with EXACT product names and dosages used in Indian agriculture.
+        6. PREVENTION: Long-term crop management strategy.
+        
+        If the image is NOT a plant/crop (e.g., a person, car, random object), return diagnosis as "Not a Plant" with confidence "0%" and empty treatment arrays.
+        
+        Return ONLY a valid JSON object with NO markdown formatting, NO backticks:
+        {
+            "success": true,
+            "diagnosis": "Exact disease name or Healthy Crop or Not a Plant",
+            "scientific_name": "Pathogen scientific name or N/A",
+            "crop_identified": "e.g., Tomato, Rice, Wheat",
+            "severity": "Healthy / Mild / Moderate / Severe",
+            "confidence": "e.g., 94.7%",
+            "symptoms": "Detailed clinical observations of what is visible in the image",
+            "cause": "Root cause — pathogen name, environmental trigger, or nutrient deficiency",
+            "treatment": {
+                "organic": ["Step 1 with specific product", "Step 2", "Step 3"],
+                "chemical": ["Active ingredient + dose per liter/acre", "Step 2", "Step 3"]
             },
-            prevention: result.prevention,
-            image_url: req.file ? `/uploads/${req.file.filename}` : null
+            "prevention": "Comprehensive future prevention strategy",
+            "market_products": ["Specific Indian market product name 1", "Product 2"]
+        }
+    `;
+
+    const requestBody = {
+        contents: [{
+            parts: [
+                { text: prompt },
+                { inlineData: { mimeType, data: base64Image } }
+            ]
+        }],
+        generationConfig: {
+            temperature: 0.2,
+            topP: 0.8,
+            topK: 40,
+            maxOutputTokens: 2048
+        }
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
         });
-    }, 3000); // 3 seconds to simulate deep "AI Thinking"
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error?.message || `Gemini API returned ${response.status}`);
+        }
+
+        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+            throw new Error("Gemini returned an empty or blocked response.");
+        }
+
+        let aiText = data.candidates[0].content.parts[0].text;
+        // Clean markdown code fences
+        aiText = aiText.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+
+        return JSON.parse(aiText);
+    } catch (geminiError) {
+        console.warn(`⚠️ Gemini Vision failed: ${geminiError.message}. Falling back to Groq Vision...`);
+        try {
+            const Groq = require('groq-sdk');
+            const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+            const chatCompletion = await groq.chat.completions.create({
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "text", text: prompt },
+                            { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } }
+                        ]
+                    }
+                ],
+                model: "llama-3.2-90b-vision-preview",
+                temperature: 0.2
+            });
+
+            let groqText = chatCompletion.choices[0]?.message?.content || "";
+            groqText = groqText.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+
+            return JSON.parse(groqText);
+
+        } catch (groqError) {
+            console.error("❌ Both Gemini and Groq Vision Failed:", groqError.message);
+            throw new Error("AI Vision Services are currently down. Please try again later.");
+        }
+    }
+}
+
+// POST /api/doctor/analyze — Main Diagnosis Endpoint
+router.post('/analyze', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No image provided. Please upload or capture a photo." });
+        }
+
+        console.log(`📸 Crop Doctor: Received image — ${req.file.originalname} (${(req.file.size / 1024).toFixed(1)} KB)`);
+
+        // Read image to Base64
+        const imageBuffer = fs.readFileSync(req.file.path);
+        const base64Image = imageBuffer.toString('base64');
+        const mimeType = req.file.mimetype;
+
+        // Call Gemini Vision
+        const result = await callGeminiVision(base64Image, mimeType);
+
+        // Attach metadata
+        result.scan_id = "VIS-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 1000);
+        result.image_url = `/uploads/${req.file.filename}`;
+        result.analyzed_at = new Date().toISOString();
+
+        console.log(`✅ Diagnosis: ${result.diagnosis} (${result.confidence})`);
+        res.json(result);
+
+    } catch (err) {
+        console.error("❌ AI Doctor Analysis Error:", err.message);
+        res.status(500).json({
+            error: err.message || "AI analysis failed. Please try again.",
+            suggestion: "Ensure the image is clear, well-lit, and shows the affected leaf/plant part."
+        });
+    }
 });
 
+// POST /api/doctor/save-report — Save diagnosis to DB
 router.post('/save-report', auth, async (req, res) => {
     try {
         const { scan_id, diagnosis, confidence, treatment, image_url } = req.body;
-        // treatment comes as object, stringify it for simple storage or just store summary
-        // For existing DB compatibility, we'll store a summary string
-        const treatmentSummary = `Organic: ${treatment.organic[0]} | Chemical: ${treatment.chemical[0]}`;
-
-        const userId = req.user.id;
+        const treatmentSummary = typeof treatment === 'object'
+            ? `Organic: ${(treatment.organic || []).join('; ')} | Chemical: ${(treatment.chemical || []).join('; ')}`
+            : String(treatment);
 
         await db.execute(`
             INSERT INTO medical_reports (user_id, scan_id, diagnosis, confidence, treatment, image_url)
             VALUES (?, ?, ?, ?, ?, ?)
-        `, [userId, scan_id, diagnosis, confidence, treatmentSummary, image_url || null]);
+        `, [req.user.id, scan_id, diagnosis, confidence, treatmentSummary, image_url || null]);
 
-        res.json({ message: "Saved" });
+        res.json({ message: "Report saved successfully." });
     } catch (err) {
-        console.error(err);
+        console.error("Save Report Error:", err);
         res.status(500).json({ error: "Failed to save report" });
     }
 });
 
-// GET: My Past Reports
+// GET /api/doctor/history — Past diagnoses
 router.get('/history', auth, async (req, res) => {
     try {
         const [rows] = await db.execute('SELECT * FROM medical_reports WHERE user_id = ? ORDER BY created_at DESC', [req.user.id]);
@@ -152,64 +180,45 @@ router.get('/history', auth, async (req, res) => {
     }
 });
 
-// GET: Generate PDF
+// GET /api/doctor/report/:id — Generate PDF
 router.get('/report/:id', auth, async (req, res) => {
     const PDFDocument = require('pdfkit');
-    const fs = require('fs');
-    const path = require('path');
 
     try {
-        const reportId = req.params.id;
-        const [rows] = await db.execute('SELECT * FROM medical_reports WHERE id = ? AND user_id = ?', [reportId, req.user.id]);
-
+        const [rows] = await db.execute('SELECT * FROM medical_reports WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
         if (rows.length === 0) return res.status(404).send("Report not found");
-        const report = rows[0];
 
+        const report = rows[0];
         const doc = new PDFDocument();
 
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=Crop_Doctor_Report_${report.scan_id}.pdf`);
         doc.pipe(res);
 
-        // Header
         doc.fontSize(24).fillColor('#10b981').text('FARM CENTRAL VISION', { align: 'center' });
         doc.fontSize(16).fillColor('black').text('AI DIAGNOSTIC REPORT', { align: 'center' });
         doc.moveDown();
-
-        // Info
         doc.fontSize(12).text(`Scan ID: ${report.scan_id}`);
         doc.text(`Date: ${new Date(report.created_at).toLocaleString()}`);
         doc.moveDown();
 
-        // Image
         if (report.image_url) {
             const imagePath = path.join(__dirname, '../../public', report.image_url);
             if (fs.existsSync(imagePath)) {
-                try {
-                    doc.image(imagePath, { fit: [500, 300], align: 'center' });
-                    doc.moveDown();
-                } catch (e) { }
+                try { doc.image(imagePath, { fit: [500, 300], align: 'center' }); doc.moveDown(); } catch (e) { }
             }
         }
         doc.moveDown();
 
-        // Diagnosis
         doc.fontSize(18).fillColor(report.diagnosis === 'Healthy Crop' ? 'green' : 'red')
             .text(`Diagnosis: ${report.diagnosis}`, { underline: true });
-
         doc.fontSize(12).fillColor('grey').text(`Confidence: ${report.confidence}`);
         doc.moveDown();
-
-        // Treatment
         doc.fillColor('black').fontSize(14).text("Treatment Plan:");
         doc.fontSize(11).text(report.treatment);
-
-        // Footer
         doc.moveDown(3);
-        doc.fontSize(10).fillColor('grey').text('Generated by Farm Central Gemini Vision Engine.', { align: 'center' });
-
+        doc.fontSize(10).fillColor('grey').text('Generated by Farm Central Agri-Vision Elite Engine.', { align: 'center' });
         doc.end();
-
     } catch (err) {
         console.error(err);
         res.status(500).send("PDF Generation Failed");

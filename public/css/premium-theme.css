@@ -1,0 +1,122 @@
+/* Premium Theme CSS for Farm Central */
+
+/* Global Smooth Scrolling & Fonts */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism Utilities */
+.glass-premium {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-premium:hover {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.7);
+    transform: translateY(-4px);
+}
+
+/* Dynamic Gradients */
+.gradient-text {
+    background: linear-gradient(135deg, #4ade80 0%, #06b6d4 50%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    background-size: 200% 200%;
+    animation: gradientShift 5s ease infinite;
+}
+
+/* Micro-Animations */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(74, 222, 128, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+}
+
+.glow-hover:hover {
+    animation: glowPulse 2s infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f172a; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1); 
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2); 
+}
+
+/* Button Premium Styles */
+.btn-premium {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.btn-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: all 0.5s ease;
+    z-index: -1;
+}
+
+.btn-premium:hover::before {
+    left: 100%;
+}
+
+.btn-premium:active {
+    transform: scale(0.95);
+}
+
+/* Base Neon Borders */
+.border-neon-green { border: 1px solid rgba(74, 222, 128, 0.3); }
+.border-neon-blue { border: 1px solid rgba(59, 130, 246, 0.3); }
+.border-neon-purple { border: 1px solid rgba(168, 85, 247, 0.3); }
+
+.border-neon-green:hover { border-color: rgba(74, 222, 128, 0.8); box-shadow: 0 0 15px rgba(74, 222, 128, 0.2); }
+.border-neon-blue:hover { border-color: rgba(59, 130, 246, 0.8); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+.border-neon-purple:hover { border-color: rgba(168, 85, 247, 0.8); box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }

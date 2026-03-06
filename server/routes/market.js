@@ -6,20 +6,33 @@ const parser = new RSSParser();
 // 1. Get Live Market News (Real RSS Feed)
 router.get('/news', async (req, res) => {
     try {
-        // Fetch from The Hindu Business Line (Agriculture) or similar
-        const feedUrl = 'https://www.thehindubusinessline.com/economy/agri-business/rss/';
+        // Fetch from Google News (reliable & real-time)
+        const feedUrl = 'https://news.google.com/rss/search?q=agriculture+OR+farming+market+india&hl=en-IN&gl=IN&ceid=IN:en';
         const feed = await parser.parseURL(feedUrl);
 
         // Transform for frontend
-        const newsItems = feed.items.slice(0, 5).map(item => ({
-            title: item.title,
-            desc: item.contentSnippet || item.content,
-            source: 'Business Line',
-            link: item.link
-        }));
+        const newsItems = feed.items.slice(0, 8).map(item => {
+            let cleanTitle = item.title || 'Market Update';
+            let finalSource = item.creator || item.source || 'Agri News';
+
+            // Google News often appends " - Publisher" to the title. We cleanly separate it.
+            const lastDashIndex = cleanTitle.lastIndexOf(' - ');
+            if (lastDashIndex !== -1) {
+                finalSource = cleanTitle.substring(lastDashIndex + 3).trim();
+                cleanTitle = cleanTitle.substring(0, lastDashIndex).trim();
+            }
+
+            return {
+                title: cleanTitle,
+                desc: item.contentSnippet || item.content || 'Click to explore the full article and latest market developments.',
+                source: finalSource,
+                link: item.link
+            };
+        });
 
         res.json(newsItems);
     } catch (err) {
+        console.error("RSS Fetch Error:", err.message);
         // Fallback to mock if RSS fails
         res.json([
             { title: "Rains delayed in central India", desc: "IMD predicts a 4-day delay in monsoon activity over MP and Maharashtra.", source: "AgriWeather" },

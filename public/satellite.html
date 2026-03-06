@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Farm Scanner | Farm Central</title>
+    <meta name="description" content="Satellite-powered farm health analysis using NASA data and AI">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #090e17;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        body {
+            margin: 0;
+            background: #090e17;
+            /* High-end dark theme */
+            color: #f8fafc;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Abstract glowing orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: 0;
+            opacity: 0.15;
+            animation: float 15s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 50vw;
+            height: 50vw;
+            background: #3b82f6;
+            top: -20vh;
+            right: -10vw;
+        }
+
+        .orb-2 {
+            width: 60vw;
+            height: 60vw;
+            background: #10b981;
+            bottom: -30vh;
+            left: -10vw;
+            animation-delay: -7s;
+            opacity: 0.1;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                transform: translateY(-20px) scale(1.05);
+            }
+        }
+
+        /* Premium Glass Container */
+        .glass-premium {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+        }
+
+        .glass-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            outline: none;
+        }
+
+        /* Map Tweaks for Dark Mode */
+        #sat-map {
+            height: 380px;
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1;
+            background: #1e293b;
+        }
+
+        .leaflet-container {
+            background: #0f172a;
+        }
+
+        .leaflet-layer,
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out,
+        .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
+        /* Glowing Marker */
+        .pulse-marker {
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-marker 2s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+
+        @keyframes pulse-marker {
+            to {
+                box-shadow: 0 0 0 30px rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Radar Overlay Animation */
+        .radar-sweep {
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+        }
+
+        .radar-sweep::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(from 0deg, transparent 70%, rgba(16, 185, 129, 0.4) 100%);
+            transform-origin: 0 0;
+            animation: radar 2s linear infinite;
+        }
+
+        @keyframes radar {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Gauge Ring */
+        .gauge-ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-ring svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .gauge-ring .gauge-track {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 8;
+        }
+
+        .gauge-ring .gauge-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Scan Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s forwards;
+            opacity: 0;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s;
+        }
+
+        select option {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-emerald-500/30 selection:text-emerald-200">
+    <!-- Back button -->
+    <button onclick="window.history.back()"
+        class="fixed top-5 left-5 z-50 w-11 h-11 rounded-xl glass-premium flex items-center justify-center text-slate-300 hover:text-white hover:border-emerald-500/50 transition-all hover:-translate-y-0.5 group">
+        <span class="transform group-hover:-translate-x-1 transition-transform">←</span>
+    </button>
+
+    <!-- Background Orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <div class="max-w-7xl mx-auto px-4 pt-20 md:pt-16 pb-20 relative z-10">
+        <!-- HEADER -->
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 pl-10 md:pl-14 gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-1">
+                    <span class="text-4xl">🛰️</span>
+                    <h1 class="text-3xl md:text-5xl font-black gradient-text tracking-tight uppercase">
+                        Space Scanner
+                    </h1>
+                </div>
+                <p class="text-slate-400 font-medium text-sm md:text-base ml-14">High-resolution Earth observation data
+                    powered by NASA & Sentinel</p>
+            </div>
+            <div class="flex gap-3 hidden sm:flex">
+                <div class="glass-premium px-4 py-2 rounded-lg flex items-center gap-2 border-blue-500/30">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span class="text-xs font-bold text-blue-400">SENTINEL-2 ACTIVE</span>
+                </div>
+                <div class="glass-premium px-4 py-2 rounded-lg flex items-center gap-2 border-emerald-500/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-bold text-emerald-400">LANDSAT 9 LINKED</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- LEFT COLUMN: CONTROLS & MAP (5 cols) -->
+            <div class="lg:col-span-4 space-y-6">
+
+                <!-- Map Container -->
+                <div class="glass-premium p-1 rounded-2xl relative">
+                    <div id="sat-map-container" class="relative rounded-xl overflow-hidden">
+                        <div id="sat-map"></div>
+                        <div id="radar-sweep" class="radar-sweep"></div>
+
+                        <!-- HUD Overlay -->
+                        <div class="absolute top-3 left-3 z-[400] pointer-events-none">
+                            <div
+                                class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex flex-col">
+                                <span class="text-[10px] text-emerald-400 font-bold tracking-widest uppercase">Target
+                                    Area</span>
+                                <span id="hud-coords" class="text-xs font-mono text-white">Select Location</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="glass-premium p-6 rounded-2xl space-y-5 border-t border-white/5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Latitude</label>
+                            <input type="number" id="lat-input" step="0.0001" placeholder="20.5937"
+                                class="w-full px-4 py-3 rounded-xl glass-input font-mono text-sm">
+                        </div>
+                        <div>
+                            <label
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Longitude</label>
+                            <input type="number" id="lng-input" step="0.0001" placeholder="78.9629"
+                                class="w-full px-4 py-3 rounded-xl glass-input font-mono text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Crop
+                            Target (Optional)</label>
+                        <select id="crop-type"
+                            class="w-full px-4 py-3 rounded-xl glass-input text-sm appearance-none cursor-pointer">
+                            <option value="">Auto-Detect via Multispectral</option>
+                            <option value="Rice">🌾 Rice (Paddy)</option>
+                            <option value="Wheat">🌾 Wheat</option>
+                            <option value="Corn/Maize">🌽 Corn / Maize</option>
+                            <option value="Cotton">🏵️ Cotton</option>
+                            <option value="Sugarcane">🎋 Sugarcane</option>
+                            <option value="Soybean">🫘 Soybean</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="useMyLocation()"
+                            class="flex-1 py-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 font-bold text-xs uppercase tracking-wider transition">
+                            📡 GPS
+                        </button>
+                        <button onclick="runSatelliteAnalysis()" id="scan-btn"
+                            class="flex-[3] py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.3)] transition border border-emerald-400/50 flex justify-center items-center gap-2">
+                            <span>🛰️ INIT SCAN</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-premium p-4 rounded-xl flex items-center gap-4 text-xs">
+                    <div
+                        class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 flex-shrink-0">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg" alt="NASA"
+                            class="w-7">
+                    </div>
+                    <div class="text-slate-400">
+                        <p class="text-white font-bold mb-0.5">NASA POWER API</p>
+                        <p>Aggregating daily agrometeorology from satellite payloads.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: RESULTS (8 cols) -->
+            <div class="lg:col-span-8">
+
+                <!-- Initial State -->
+                <div id="placeholder-panel"
+                    class="glass-premium p-10 rounded-3xl min-h-[600px] flex flex-col items-center justify-center text-center border border-white/5">
+                    <div
+                        class="w-32 h-32 rounded-full border border-slate-700 flex items-center justify-center mb-6 relative">
+                        <div class="absolute inset-0 rounded-full border border-emerald-500/30 animate-pulse"></div>
+                        <span class="text-5xl opacity-50">🌍</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-3">Awaiting Coordinates</h3>
+                    <p class="text-slate-400 max-w-sm mb-8">Pinpoint a location on the tactical map to establish a
+                        downlink and retrieve surface condition telemetry.</p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                        <div class="glass-premium p-4 rounded-xl text-center border-emerald-500/20">
+                            <span class="text-2xl block mb-2">🌿</span>
+                            <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">NDVI
+                                Index</span>
+                        </div>
+                        <div class="glass-premium p-4 rounded-xl text-center border-orange-500/20">
+                            <span class="text-2xl block mb-2">🔥</span>
+                            <span class="text-[9px] font-bold text-orange-400 uppercase tracking-widest">Heat
+                                Stress</span>
+                        </div>
+                        <div class="glass-premium p-4 rounded-xl text-center border-blue-500/20">
+                            <span class="text-2xl block mb-2">💧</span>
+                            <span class="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Moisture</span>
+                        </div>
+                        <div class="glass-premium p-4 rounded-xl text-center border-purple-500/20">
+                            <span class="text-2xl block mb-2">🤖</span>
+                            <span class="text-[9px] font-bold text-purple-400 uppercase tracking-widest">AI
+                                Verdict</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scanning State -->
+                <div id="loading-panel"
+                    class="glass-premium p-10 rounded-3xl min-h-[600px] hidden flex-col items-center justify-center text-center relative overflow-hidden">
+                    <div
+                        class="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-10 blur-[1px] animate-[spin_40s_linear_infinite] pointer-events-none">
+                    </div>
+
+                    <div class="relative w-32 h-32 mb-8">
+                        <div class="absolute inset-0 rounded-full border-t-2 border-emerald-500 animate-spin"></div>
+                        <div
+                            class="absolute inset-2 rounded-full border-b-2 border-blue-500 animate-[spin_2s_linear_infinite_reverse]">
+                        </div>
+                        <span class="absolute inset-0 flex items-center justify-center text-4xl">🛰️</span>
+                    </div>
+
+                    <h3 class="text-2xl font-black text-white mb-2 tracking-widest uppercase" id="loading-status-main">
+                        ESTABLISHING UPLINK</h3>
+                    <p class="text-emerald-400 font-mono text-sm" id="loading-status-sub">Connecting to Earth
+                        Observation Server...</p>
+
+                    <div class="mt-8 w-64 h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                            class="h-full bg-gradient-to-r from-emerald-500 to-blue-500 w-1/2 animate-[pulse_1s_ease-in-out_infinite]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results State -->
+                <div id="results-panel" class="hidden space-y-6">
+
+                    <!-- Top Summary Bar -->
+                    <div
+                        class="glass-premium p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 animate-fade-in-up border-emerald-500/20">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+                                <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase font-mono"
+                                    id="result-scan-id">SAT-XXXX</span>
+                            </div>
+                            <h2 class="text-xl font-black text-white" id="result-location-label">Telemetry Received</h2>
+                        </div>
+                        <div
+                            class="px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2">
+                            <span class="text-lg">✅</span>
+                            <div>
+                                <p class="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Overall
+                                    Status</p>
+                                <p class="text-emerald-300 font-bold text-sm" id="result-veg-health">Healthy</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Gauges -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- NDVI -->
+                        <div
+                            class="glass-premium p-6 rounded-2xl flex flex-col items-center text-center animate-fade-in-up delay-1">
+                            <div class="gauge-ring mb-4">
+                                <svg viewBox="0 0 140 140">
+                                    <circle class="gauge-track" cx="70" cy="70" r="58" />
+                                    <circle class="gauge-fill" id="ndvi-gauge" cx="70" cy="70" r="58" stroke="#10b981"
+                                        stroke-dasharray="364.42" stroke-dashoffset="364.42" />
+                                </svg>
+                                <div class="text-center z-10">
+                                    <p class="text-3xl font-black text-white" id="ndvi-value">0.0</p>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">NDVI Index
+                            </p>
+                            <p class="text-xs font-bold" id="ndvi-label">--</p>
+                        </div>
+
+                        <!-- Stress -->
+                        <div
+                            class="glass-premium p-6 rounded-2xl flex flex-col items-center text-center animate-fade-in-up delay-2">
+                            <div class="gauge-ring mb-4">
+                                <svg viewBox="0 0 140 140">
+                                    <circle class="gauge-track" cx="70" cy="70" r="58" />
+                                    <circle class="gauge-fill" id="stress-gauge" cx="70" cy="70" r="58" stroke="#f59e0b"
+                                        stroke-dasharray="364.42" stroke-dashoffset="364.42" />
+                                </svg>
+                                <div class="text-center z-10">
+                                    <p class="text-3xl font-black text-white" id="stress-value">0%</p>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Crop Stress
+                            </p>
+                            <p class="text-xs font-bold" id="stress-label">--</p>
+                        </div>
+
+                        <!-- Moisture -->
+                        <div
+                            class="glass-premium p-6 rounded-2xl flex flex-col items-center text-center animate-fade-in-up delay-3">
+                            <div class="gauge-ring mb-4">
+                                <svg viewBox="0 0 140 140">
+                                    <circle class="gauge-track" cx="70" cy="70" r="58" />
+                                    <circle class="gauge-fill" id="moisture-gauge" cx="70" cy="70" r="58"
+                                        stroke="#3b82f6" stroke-dasharray="364.42" stroke-dashoffset="364.42" />
+                                </svg>
+                                <div class="text-center z-10">
+                                    <p class="text-3xl font-black text-white" id="moisture-value">0%</p>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Soil Moisture
+                            </p>
+                            <p class="text-xs font-bold" id="moisture-label">--</p>
+                        </div>
+
+                        <!-- Irrigation -->
+                        <div
+                            class="glass-premium p-6 rounded-2xl flex flex-col items-center text-center animate-fade-in-up delay-4">
+                            <div class="gauge-ring mb-4">
+                                <svg viewBox="0 0 140 140">
+                                    <circle class="gauge-track" cx="70" cy="70" r="58" />
+                                    <circle class="gauge-fill" id="irrigation-gauge" cx="70" cy="70" r="58"
+                                        stroke="#06b6d4" stroke-dasharray="364.42" stroke-dashoffset="364.42" />
+                                </svg>
+                                <div class="text-center z-10">
+                                    <p class="text-3xl font-black text-white" id="irrigation-value">0%</p>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Irrig. Need
+                            </p>
+                            <p class="text-xs font-bold" id="irrigation-label">--</p>
+                        </div>
+                    </div>
+
+                    <!-- AI Intelligence -->
+                    <div
+                        class="glass-premium p-6 rounded-2xl animate-fade-in-up delay-2 relative overflow-hidden border-purple-500/30">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/10 blur-3xl rounded-full"></div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
+                            <span
+                                class="px-2 py-1 rounded bg-purple-500/20 text-purple-400 text-xs border border-purple-500/30">AI</span>
+                            Intelligence Report
+                        </h3>
+                        <p class="text-sm text-slate-300 leading-relaxed font-light" id="result-analysis">Generating
+                            neural analysis...</p>
+                    </div>
+
+                    <!-- Risks & Recommendations -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="glass-premium p-5 rounded-2xl animate-fade-in-up delay-3 border-orange-500/20">
+                            <h4
+                                class="text-xs font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+                                <span>⚠️ Risk Factors</span>
+                            </h4>
+                            <ul class="space-y-3" id="result-risks"></ul>
+                        </div>
+                        <div class="glass-premium p-5 rounded-2xl animate-fade-in-up delay-4 border-emerald-500/20">
+                            <h4
+                                class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+                                <span>💡 Action Plan</span>
+                            </h4>
+                            <ul class="space-y-3" id="result-recommendations"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Action Bar -->
+                    <div class="flex gap-3 pt-4 border-t border-white/5 animate-fade-in-up delay-4">
+                        <button onclick="saveScan()" id="save-scan-btn"
+                            class="flex-1 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-sm transition flex items-center justify-center gap-2">
+                            💾 Save Telemetry
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/toast.js"></script>
+    <script>
+        // Auth check
+        const token = localStorage.getItem('token');
+        if (!token) location.href = 'login.html';
+
+        // State
+        let map, marker, heatmapLayer, lastResult = null;
+
+        // Custom Glowing Icon
+        const pulseIcon = L.divIcon({
+            className: 'pulse-icon',
+            html: '<div class="pulse-marker"></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        // Initialize Map
+        function initMap() {
+            // Dark matter map
+            map = L.map('sat-map', { zoomControl: false }).setView([20.5937, 78.9629], 4);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            map.on('click', function (e) {
+                placeMarker(e.latlng.lat, e.latlng.lng);
+            });
+
+            document.getElementById('lat-input').addEventListener('change', syncFromInputs);
+            document.getElementById('lng-input').addEventListener('change', syncFromInputs);
+        }
+
+        function placeMarker(lat, lng) {
+            if (marker) map.removeLayer(marker);
+            if (heatmapLayer) map.removeLayer(heatmapLayer); // Clear old scan data
+
+            marker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
+            map.flyTo([lat, lng], 13, { duration: 1.5 });
+
+            document.getElementById('lat-input').value = lat.toFixed(4);
+            document.getElementById('lng-input').value = lng.toFixed(4);
+            document.getElementById('hud-coords').innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        }
+
+        function syncFromInputs() {
+            const lat = parseFloat(document.getElementById('lat-input').value);
+            const lng = parseFloat(document.getElementById('lng-input').value);
+            if (!isNaN(lat) && !isNaN(lng)) placeMarker(lat, lng);
+        }
+
+        function useMyLocation() {
+            if (!navigator.geolocation) return toast.error('No GPS support');
+            navigator.geolocation.getCurrentPosition(
+                pos => { placeMarker(pos.coords.latitude, pos.coords.longitude); toast.success('Target acquired'); },
+                err => toast.error('GPS offline')
+            );
+        }
+
+        // Draw Fake NDVI Heatmap over the location
+        function drawHeatmap(lat, lng) {
+            if (heatmapLayer) map.removeLayer(heatmapLayer);
+
+            // Draw a subtle colored bounding box representing the "scan" area
+            const offset = 0.015;
+            const bounds = [[lat - offset, lng - offset], [lat + offset, lng + offset]];
+
+            heatmapLayer = L.rectangle(bounds, {
+                color: '#10b981',
+                weight: 1,
+                fillColor: "url(#grad)", // Fallback to semi-transparent green 
+                fillOpacity: 0.2
+            }).addTo(map);
+
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function setGauge(id, percent, color) {
+            const offset = 364.42 - (percent / 100) * 364.42;
+            const el = document.getElementById(id);
+            if (el) { el.style.stroke = color; el.style.strokeDashoffset = offset; }
+        }
+
+        const cols = {
+            ndvi: v => v >= 0.6 ? '#10b981' : v >= 0.4 ? '#f59e0b' : '#ef4444',
+            stress: v => v <= 30 ? '#10b981' : v <= 60 ? '#f59e0b' : '#ef4444',
+            moist: v => v >= 50 ? '#3b82f6' : v >= 25 ? '#06b6d4' : '#ef4444',
+            irrig: v => v <= 30 ? '#10b981' : v <= 60 ? '#f59e0b' : '#ef4444'
+        };
+
+        async function runSatelliteAnalysis() {
+            const lat = parseFloat(document.getElementById('lat-input').value);
+            const lng = parseFloat(document.getElementById('lng-input').value);
+            if (isNaN(lat) || isNaN(lng)) return toast.warning('Select target coordinates first.');
+
+            // UI State
+            document.getElementById('placeholder-panel').classList.add('hidden');
+            document.getElementById('results-panel').classList.add('hidden');
+            document.getElementById('loading-panel').classList.remove('hidden');
+            document.getElementById('loading-panel').style.display = 'flex';
+
+            // Map Radar Animation
+            document.getElementById('radar-sweep').style.display = 'block';
+
+            const subs = ['DOWNLINKING SENTINEL-2...', 'PROCESSING MULTISPECTRAL...', 'CALCULATING MOISTURE INDEX...'];
+            let sIdx = 0;
+            const t = setInterval(() => {
+                sIdx = (sIdx + 1) % subs.length;
+                document.getElementById('loading-status-sub').innerText = subs[sIdx];
+            }, 1000);
+
+            try {
+                const getApiUrl = (path) => {
+                    return window.location.port !== '3000' && window.location.port !== ''
+                        ? `http://${window.location.hostname}:3000${path}`
+                        : path;
+                };
+
+                const fetchUrl = getApiUrl('/api/satellite/analyze');
+                const res = await fetch(fetchUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                    body: JSON.stringify({ latitude: lat, longitude: lng, crop_type: document.getElementById('crop-type').value })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                lastResult = data;
+                clearInterval(t);
+
+                // Overlay heatmap
+                document.getElementById('radar-sweep').style.display = 'none';
+                drawHeatmap(lat, lng);
+
+                renderResults(data);
+            } catch (err) {
+                clearInterval(t);
+                document.getElementById('radar-sweep').style.display = 'none';
+                toast.error(err.message || 'Scan failed');
+                document.getElementById('loading-panel').classList.add('hidden');
+                document.getElementById('placeholder-panel').classList.remove('hidden');
+            }
+        }
+
+        function renderResults(data) {
+            document.getElementById('loading-panel').classList.add('hidden');
+            document.getElementById('loading-panel').style.display = '';
+            document.getElementById('results-panel').classList.remove('hidden');
+
+            document.getElementById('result-scan-id').innerText = data.scan_id || 'SAT-OK';
+            document.getElementById('result-veg-health').innerText = data.vegetation_health || 'Normal';
+
+            // Gauges
+            const n = data.ndvi_score || 0;
+            document.getElementById('ndvi-value').innerText = n.toFixed(2);
+            document.getElementById('ndvi-label').innerText = data.ndvi_label;
+            document.getElementById('ndvi-label').style.color = cols.ndvi(n);
+            setGauge('ndvi-gauge', n * 100, cols.ndvi(n));
+
+            const s = data.crop_stress_score || 0;
+            document.getElementById('stress-value').innerText = s + '%';
+            document.getElementById('stress-label').innerText = data.crop_stress;
+            document.getElementById('stress-label').style.color = cols.stress(s);
+            setGauge('stress-gauge', s, cols.stress(s));
+
+            const m = data.soil_moisture_percent || 0;
+            document.getElementById('moisture-value').innerText = Math.round(m) + '%';
+            document.getElementById('moisture-label').innerText = data.soil_moisture_label;
+            document.getElementById('moisture-label').style.color = cols.moist(m);
+            setGauge('moisture-gauge', m, cols.moist(m));
+
+            const i = data.irrigation_score || 0;
+            document.getElementById('irrigation-value').innerText = i + '%';
+            document.getElementById('irrigation-label').innerText = data.irrigation_need;
+            document.getElementById('irrigation-label').style.color = cols.irrig(i);
+            setGauge('irrigation-gauge', i, cols.irrig(i));
+
+            // AI text
+            document.getElementById('result-analysis').innerText = data.detailed_analysis;
+
+            // Arrays
+            const mapHtml = (arr, icon, color) => arr.length
+                ? arr.map(a => `<li class="flex gap-2 text-sm text-slate-300"><span class="flex-shrink-0 text-${color}-400">${icon}</span> <span>${a}</span></li>`).join('')
+                : '<li class="text-slate-500 text-sm">None detected</li>';
+
+            document.getElementById('result-risks').innerHTML = mapHtml(data.risk_factors || [], '⚠️', 'orange');
+            document.getElementById('result-recommendations').innerHTML = mapHtml(data.recommendations || [], '✅', 'emerald');
+        }
+
+        async function saveScan() {
+            if (!lastResult) return;
+            const btn = document.getElementById('save-scan-btn');
+            btn.innerHTML = '⏳ Saving...'; btn.disabled = true;
+            try {
+                const saveFetchUrl = (window.location.port !== '3000' && window.location.port !== '')
+                    ? `http://${window.location.hostname}:3000/api/satellite/save-scan`
+                    : '/api/satellite/save-scan';
+                await fetch(saveFetchUrl, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                    body: JSON.stringify({ scan_id: lastResult.scan_id, latitude: lastResult.coordinates.latitude, longitude: lastResult.coordinates.longitude, ndvi_score: lastResult.ndvi_score, crop_stress: lastResult.crop_stress, soil_moisture_percent: lastResult.soil_moisture_percent, irrigation_need: lastResult.irrigation_need, vegetation_health: lastResult.vegetation_health, detailed_analysis: lastResult.detailed_analysis })
+                });
+                toast.success('Saved successfully');
+                btn.innerHTML = '✅ Saved';
+            } catch (e) { toast.error('Save failed'); }
+        }
+
+        window.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+
+</html>

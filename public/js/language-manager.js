@@ -44,7 +44,9 @@ const translations = {
         "direct_messages": "Direct Messages",
         "manager": "Manager",
         "buy_sell": "Buy & Sell Crops",
-        "profile_pref": "Profile & Preferences"
+        "profile_pref": "Profile & Preferences",
+        "download_app": "Download Web App",
+        "install_app": "Install App"
     },
     hi: {
         "welcome": "नमस्ते,",
@@ -88,7 +90,9 @@ const translations = {
         "direct_messages": "सीधे संदेश",
         "manager": "प्रबंधक",
         "buy_sell": "फसल खरीदें और बेचें",
-        "profile_pref": "प्रोफ़ाइल और प्राथमिकताएँ"
+        "profile_pref": "प्रोफ़ाइल और प्राथमिकताएँ",
+        "download_app": "ऐप डाउनलोड करें",
+        "install_app": "ऐप इंस्टॉल करें"
     },
     te: {
         "welcome": "స్వాగతం,",

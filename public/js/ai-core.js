@@ -319,7 +319,8 @@ class FarmVoiceAI {
         if (this.isStandby) {
             this.recognition.stop(); // Triggers onend -> restart with new lang
         }
-        document.getElementById('current-lang-label').innerText = label;
+        const langLabel = document.getElementById('current-lang-label');
+        if (langLabel) langLabel.innerText = label;
         this.speak(`Language switched to ${label}.`, lang);
     }
 

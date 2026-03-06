@@ -5,7 +5,8 @@ const schemas = {
     signup: Joi.object({
         username: Joi.string().min(3).max(50).required(),
         email: Joi.string().email().required(),
-        password: Joi.string().min(6).max(100).required()
+        password: Joi.string().min(6).max(100).required(),
+        phone_number: Joi.string().min(10).max(15).optional()
     }),
 
     signin: Joi.object({
@@ -31,7 +32,7 @@ const schemas = {
 // Validation middleware factory
 const validate = (schema) => {
     return (req, res, next) => {
-        const { error } = schema.validate(req.body, { abortEarly: false });
+        const { error, value } = schema.validate(req.body, { abortEarly: false, stripUnknown: true });
 
         if (error) {
             const errors = error.details.map(detail => detail.message);
@@ -41,6 +42,7 @@ const validate = (schema) => {
             });
         }
 
+        req.body = value;
         next();
     };
 };

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Farm Central</title>
+    <meta name="description" content="Farm Central Admin Panel — Manage users, listings, and platform analytics">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f8fafc;
+            color: #1e293b;
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 40;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+            margin: 0 12px;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .sidebar-link.active {
+            background: #ecfdf5;
+            color: #059669;
+            font-weight: 700;
+        }
+
+        .sidebar-link .icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .table-row {
+            transition: background 0.2s;
+        }
+
+        .table-row:hover {
+            background: #f8fafc;
+        }
+
+        @media (max-width: 1023px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="p-6 border-b border-slate-100">
+            <a href="dashboard.html" class="flex items-center gap-3">
+                <img src="logo.png" alt="Logo" class="w-9 h-9 object-contain">
+                <div>
+                    <h1 class="text-lg font-black text-slate-800 tracking-tight leading-none">FARM CENTRAL</h1>
+                    <p class="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-0.5">Admin Panel</p>
+                </div>
+            </a>
+        </div>
+
+        <nav class="py-4 space-y-1">
+            <div class="sidebar-link active" onclick="showSection('overview')">
+                <span class="icon">📊</span> Overview
+            </div>
+            <div class="sidebar-link" onclick="showSection('users')">
+                <span class="icon">👥</span> Users
+            </div>
+            <div class="sidebar-link" onclick="showSection('listings')">
+                <span class="icon">📦</span> Trade Listings
+            </div>
+            <div class="sidebar-link" onclick="showSection('scans')">
+                <span class="icon">🛰️</span> Satellite Scans
+            </div>
+            <div class="sidebar-link" onclick="showSection('community')">
+                <span class="icon">💬</span> Community Posts
+            </div>
+            <div class="sidebar-link" onclick="showSection('settings')">
+                <span class="icon">⚙️</span> Settings
+            </div>
+        </nav>
+
+        <div class="absolute bottom-4 left-0 right-0 px-6">
+            <button onclick="location.href='dashboard.html'"
+                class="w-full py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition flex items-center justify-center gap-2">
+                ← Back to Dashboard
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile header -->
+    <header
+        class="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-slate-200 px-4 py-3 z-50 flex items-center justify-between">
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')"
+            class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xl">☰</button>
+        <span class="font-bold text-sm text-red-600 uppercase tracking-widest">Admin Panel</span>
+        <a href="dashboard.html"
+            class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-sm">🏠</a>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content mt-16 lg:mt-0">
+
+        <!-- OVERVIEW SECTION -->
+        <section id="section-overview">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard Overview</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1">Platform analytics and management</p>
+                </div>
+                <div
+                    class="text-sm text-slate-400 font-medium bg-white border border-slate-200 px-4 py-2 rounded-xl hidden sm:block">
+                    🕐 <span id="admin-time"></span>
+                </div>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Total Users</span>
+                        <span
+                            class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-lg border border-emerald-100">👥</span>
+                    </div>
+                    <p class="text-3xl font-black text-slate-900" id="stat-users">--</p>
+                    <p class="text-xs text-emerald-600 font-semibold mt-1">↗ +12% this month</p>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Trade Listings</span>
+                        <span
+                            class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-lg border border-indigo-100">📦</span>
+                    </div>
+                    <p class="text-3xl font-black text-slate-900" id="stat-listings">--</p>
+                    <p class="text-xs text-indigo-600 font-semibold mt-1">↗ +8% this week</p>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Sat. Scans</span>
+                        <span
+                            class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-lg border border-teal-100">🛰️</span>
+                    </div>
+                    <p class="text-3xl font-black text-slate-900" id="stat-scans">--</p>
+                    <p class="text-xs text-teal-600 font-semibold mt-1">↗ +25% this week</p>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Revenue</span>
+                        <span
+                            class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-lg border border-amber-100">💰</span>
+                    </div>
+                    <p class="text-3xl font-black text-slate-900">$12.4K</p>
+                    <p class="text-xs text-amber-600 font-semibold mt-1">↗ +18% this month</p>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Activity</h3>
+                <div class="space-y-3" id="activity-feed">
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
+                        <span
+                            class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center text-sm border border-emerald-100">✅</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-slate-700">New user registered via Google</p>
+                            <p class="text-xs text-slate-400">2 minutes ago</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
+                        <span
+                            class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-sm border border-indigo-100">📦</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-slate-700">New trade listing: Organic Wheat (500kg)</p>
+                            <p class="text-xs text-slate-400">15 minutes ago</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
+                        <span
+                            class="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center text-sm border border-teal-100">🛰️</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-slate-700">Satellite scan completed at (20.59, 78.96)
+                            </p>
+                            <p class="text-xs text-slate-400">32 minutes ago</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
+                        <span
+                            class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-sm border border-purple-100">🤖</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-slate-700">AI Crop Doctor diagnosed leaf blight</p>
+                            <p class="text-xs text-slate-400">1 hour ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- USERS SECTION -->
+        <section id="section-users" class="hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">User Management</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1">View, search, and manage all registered users</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex gap-3">
+                    <input type="text" id="user-search" placeholder="Search users by name or email..."
+                        class="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+                        oninput="filterUsers()">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-50 text-left">
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">User
+                                </th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Email
+                                </th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Joined
+                                </th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Provider
+                                </th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table">
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading users...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTINGS SECTION -->
+        <section id="section-listings" class="hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Trade Listings</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1">Manage marketplace listings</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-50 text-left">
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Crop
+                                </th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Seller
+                                </th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Qty</th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Price
+                                </th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Location
+                                </th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="listings-table">
+                            <tr>
+                                <td colspan="6" class="px-4 py-10 text-center text-slate-400 text-sm">Loading
+                                    listings...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCANS SECTION -->
+        <section id="section-scans" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Satellite Scans</h2>
+                <p class="text-sm text-slate-400 font-medium mt-1">View all satellite farm health scans performed by
+                    users</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <p class="text-sm text-slate-500">Satellite scan data from the database will appear here. This section
+                    monitors all NASA POWER API usage and NDVI analysis results across the platform.</p>
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center">
+                        <p class="text-2xl font-black text-emerald-700" id="scan-total">--</p>
+                        <p class="text-xs text-emerald-600 font-bold uppercase tracking-wider mt-1">Total Scans</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
+                        <p class="text-2xl font-black text-blue-700">0.68</p>
+                        <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mt-1">Avg NDVI</p>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 text-center">
+                        <p class="text-2xl font-black text-amber-700">12</p>
+                        <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mt-1">High Stress Alerts</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMMUNITY SECTION -->
+        <section id="section-community" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Community Posts</h2>
+                <p class="text-sm text-slate-400 font-medium mt-1">Moderate community discussions and posts</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <p class="text-sm text-slate-500">Community moderation tools coming soon. Monitor user posts, flag
+                    inappropriate content, and manage discussions.</p>
+            </div>
+        </section>
+
+        <!-- SETTINGS SECTION -->
+        <section id="section-settings" class="hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Platform Settings</h2>
+                <p class="text-sm text-slate-400 font-medium mt-1">Configure platform features and integrations</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span>🔑</span> API Keys</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <span class="text-sm font-medium text-slate-600">Gemini AI</span>
+                            <span
+                                class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">Active</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <span class="text-sm font-medium text-slate-600">NASA POWER</span>
+                            <span
+                                class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">Free
+                                Tier</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <span class="text-sm font-medium text-slate-600">Firebase Auth</span>
+                            <span
+                                class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">Connected</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <span class="text-sm font-medium text-slate-600">Twilio SMS</span>
+                            <span
+                                class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">Trial</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span>🗄️</span> Database</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <span class="text-sm font-medium text-slate-600">TiDB Cloud</span>
+                            <span
+                                class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">Connected</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <span class="text-sm font-medium text-slate-600">Tables</span>
+                            <span class="text-xs font-bold text-slate-500">users, satellite_scans, expenses,
+                                trade_listings</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/toast.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) location.href = 'login.html';
+
+        // Update time
+        function updateTime() {
+            const el = document.getElementById('admin-time');
+            if (el) el.textContent = new Date().toLocaleString();
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Section switching
+        function showSection(name) {
+            document.querySelectorAll('[id^="section-"]').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`section-${name}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        // Fetch users
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/admin/users', { headers: { 'Authorization': token } });
+                if (!res.ok) throw new Error();
+                const users = await res.json();
+                document.getElementById('stat-users').textContent = users.length;
+                renderUsers(users);
+            } catch (e) {
+                // Dummy data
+                const dummy = [
+                    { username: 'John Farmer', email: 'john@farm.com', created_at: '2026-01-15', google_id: null },
+                    { username: 'Priya Singh', email: 'priya@agri.in', created_at: '2026-02-10', google_id: 'ggl123' },
+                    { username: 'Raj Kumar', email: 'raj@fields.com', created_at: '2026-02-28', google_id: null },
+                ];
+                document.getElementById('stat-users').textContent = dummy.length;
+                renderUsers(dummy);
+            }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('users-table');
+            window._allUsers = users;
+            tbody.innerHTML = users.map(u => `
+                <tr class="table-row border-t border-slate-100">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center text-sm font-bold text-emerald-700 border border-emerald-100">${(u.username || 'U')[0].toUpperCase()}</div>
+                            <span class="font-semibold text-sm text-slate-700">${u.username || 'Unknown'}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-500">${u.email}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '--'}</td>
+                    <td class="px-6 py-4">
+                        <span class="text-xs font-bold px-2 py-1 rounded-lg ${u.google_id ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-50 text-slate-500 border border-slate-200'}">
+                            ${u.google_id ? '🔵 Google' : '📧 Email'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button class="text-xs font-bold text-slate-400 hover:text-red-500 transition">Ban</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterUsers() {
+            const q = document.getElementById('user-search').value.toLowerCase();
+            const filtered = (window._allUsers || []).filter(u =>
+                (u.username || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)
+            );
+            renderUsers(filtered);
+        }
+
+        // Fetch listings
+        async function loadListings() {
+            try {
+                const res = await fetch('/api/trade/listings', { headers: { 'Authorization': token } });
+                if (!res.ok) throw new Error();
+                const listings = await res.json();
+                document.getElementById('stat-listings').textContent = listings.length;
+                renderListings(listings);
+            } catch (e) {
+                const dummy = [
+                    { crop: 'Organic Wheat', seller: 'John Farms', qty: 5000, price: 0.35, location: 'Midwest' },
+                    { crop: 'Sweet Corn', seller: 'Green Valley', qty: 2000, price: 0.50, location: 'South' },
+                ];
+                document.getElementById('stat-listings').textContent = dummy.length;
+                renderListings(dummy);
+            }
+        }
+
+        function renderListings(listings) {
+            const tbody = document.getElementById('listings-table');
+            tbody.innerHTML = listings.map(l => `
+                <tr class="table-row border-t border-slate-100">
+                    <td class="px-4 py-4 font-semibold text-sm text-slate-700">${l.crop}</td>
+                    <td class="px-4 py-4 text-sm text-slate-500">${l.seller}</td>
+                    <td class="px-4 py-4 text-sm text-slate-500">${Number(l.qty).toLocaleString()} kg</td>
+                    <td class="px-4 py-4 text-sm font-bold text-emerald-600">$${Number(l.price).toFixed(2)}</td>
+                    <td class="px-4 py-4 text-sm text-slate-400">${l.location}</td>
+                    <td class="px-4 py-4">
+                        <button class="text-xs font-bold text-red-400 hover:text-red-600 transition">Remove</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Stats mock
+        document.getElementById('stat-scans').textContent = '47';
+        document.getElementById('scan-total').textContent = '47';
+
+        loadUsers();
+        loadListings();
+    </script>
+</body>
+
+</html>
