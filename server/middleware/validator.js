@@ -6,7 +6,7 @@ const schemas = {
         username: Joi.string().min(3).max(50).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(6).max(100).required(),
-        phone_number: Joi.string().min(10).max(15).optional()
+        phone_number: Joi.string().min(10).max(15).allow('').optional()
     }),
 
     signin: Joi.object({

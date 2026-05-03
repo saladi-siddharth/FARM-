@@ -40,6 +40,11 @@ router.post('/signin', authLimiter, validate(schemas.signin), async (req, res) =
         if (users.length === 0) return res.status(404).json({ error: "User not found" });
 
         const user = users[0];
+
+        if (!user.password) {
+            return res.status(401).json({ error: "Please log in using Google for this account." });
+        }
+
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
@@ -77,7 +82,12 @@ router.post('/forgot-password', authLimiter, validate(schemas.forgotPassword), a
         // Use Unix Timestamp (Seconds) for 1 hour from now - robust against timezone issues
         const expiresAt = Math.floor(Date.now() / 1000) + 3600;
 
-        await db.query('UPDATE users SET reset_token = ?, reset_expires = ? WHERE id = ?', [otp, expiresAt, user.id]);
+        // Since DB expects DATETIME or INT, let's just save it as string if its DATETIME type, or save integer. 
+        // Best approach for MySQL DATETIME:
+        const date = new Date(expiresAt * 1000);
+        const mysqlDatetime = date.toISOString().slice(0, 19).replace('T', ' ');
+
+        await db.execute('UPDATE users SET reset_token = ?, reset_expires = ? WHERE id = ?', [otp, mysqlDatetime, user.id]);
 
         await sendAlert(email, "Password Reset Request", `Your OTP for password reset is: ${otp}. It will expire in 1 hour.`);
 
@@ -97,9 +107,14 @@ router.post('/reset-password', authLimiter, validate(schemas.resetPassword), asy
 
         const user = users[0];
 
-        // Robust comparison using Unix Timestamps (Seconds)
-        const currentTimestamp = Math.floor(Date.now() / 1000);
-        const isExpired = user.reset_expires ? (Number(user.reset_expires) < currentTimestamp) : true;
+        // Parse MySQL Datetime into timestamp
+        let isExpired = true;
+        if (user.reset_expires) {
+            const expiresTime = new Date(user.reset_expires).getTime();
+            if (expiresTime > Date.now()) {
+                isExpired = false;
+            }
+        }
 
         if (!user.reset_token || user.reset_token !== otp || isExpired) {
             return res.status(400).json({ error: "Invalid or expired OTP" });

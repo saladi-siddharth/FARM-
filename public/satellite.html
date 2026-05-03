@@ -120,11 +120,8 @@
             background: #0f172a;
         }
 
-        .leaflet-layer,
-        .leaflet-control-zoom-in,
-        .leaflet-control-zoom-out,
         .leaflet-control-attribution {
-            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+            display: none;
         }
 
         /* Glowing Marker */
@@ -550,21 +547,14 @@
                             neural analysis...</p>
                     </div>
 
-                    <!-- Risks & Recommendations -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Risks -->
+                    <div class="grid grid-cols-1 gap-4">
                         <div class="glass-premium p-5 rounded-2xl animate-fade-in-up delay-3 border-orange-500/20">
                             <h4
                                 class="text-xs font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-4">
                                 <span>⚠️ Risk Factors</span>
                             </h4>
                             <ul class="space-y-3" id="result-risks"></ul>
-                        </div>
-                        <div class="glass-premium p-5 rounded-2xl animate-fade-in-up delay-4 border-emerald-500/20">
-                            <h4
-                                class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2 mb-4">
-                                <span>💡 Action Plan</span>
-                            </h4>
-                            <ul class="space-y-3" id="result-recommendations"></ul>
                         </div>
                     </div>
 
@@ -590,6 +580,7 @@
 
         // State
         let map, marker, heatmapLayer, lastResult = null;
+        let scanLocationName = '';
 
         // Custom Glowing Icon
         const pulseIcon = L.divIcon({
@@ -599,15 +590,23 @@
             iconAnchor: [10, 10]
         });
 
-        // Initialize Map
+        // Initialize Map with auto GPS
         function initMap() {
-            // Dark matter map
             map = L.map('sat-map', { zoomControl: false }).setView([20.5937, 78.9629], 4);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap &copy; CARTO',
-                subdomains: 'abcd',
-                maxZoom: 20
+
+            // Satellite imagery tile layer for a more impressive look
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri',
+                maxZoom: 19
             }).addTo(map);
+
+            // Add labels layer on top
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 20,
+                pane: 'overlayPane'
+            }).addTo(map);
+
             L.control.zoom({ position: 'bottomright' }).addTo(map);
 
             map.on('click', function (e) {
@@ -616,11 +615,23 @@
 
             document.getElementById('lat-input').addEventListener('change', syncFromInputs);
             document.getElementById('lng-input').addEventListener('change', syncFromInputs);
+
+            // Auto-detect GPS on page load
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        placeMarker(pos.coords.latitude, pos.coords.longitude);
+                        if (typeof toast !== 'undefined') toast.success('📍 GPS locked — your farm location detected');
+                    },
+                    () => { /* silently ignore GPS failure */ },
+                    { enableHighAccuracy: true, timeout: 8000 }
+                );
+            }
         }
 
         function placeMarker(lat, lng) {
             if (marker) map.removeLayer(marker);
-            if (heatmapLayer) map.removeLayer(heatmapLayer); // Clear old scan data
+            if (heatmapLayer) map.removeLayer(heatmapLayer);
 
             marker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
             map.flyTo([lat, lng], 13, { duration: 1.5 });
@@ -628,6 +639,23 @@
             document.getElementById('lat-input').value = lat.toFixed(4);
             document.getElementById('lng-input').value = lng.toFixed(4);
             document.getElementById('hud-coords').innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+            // Reverse geocode to get location name
+            reverseGeocodeSat(lat, lng);
+        }
+
+        async function reverseGeocodeSat(lat, lng) {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=12`);
+                const data = await res.json();
+                const addr = data.address || {};
+                const place = addr.village || addr.town || addr.city || addr.county || addr.state_district || '';
+                const state = addr.state || '';
+                scanLocationName = place ? `${place}, ${state}` : `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                document.getElementById('hud-coords').innerText = scanLocationName;
+            } catch (e) {
+                scanLocationName = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            }
         }
 
         function syncFromInputs() {
@@ -638,28 +666,46 @@
 
         function useMyLocation() {
             if (!navigator.geolocation) return toast.error('No GPS support');
+            toast.info('📡 Acquiring satellite fix...');
             navigator.geolocation.getCurrentPosition(
-                pos => { placeMarker(pos.coords.latitude, pos.coords.longitude); toast.success('Target acquired'); },
-                err => toast.error('GPS offline')
+                pos => { placeMarker(pos.coords.latitude, pos.coords.longitude); toast.success('🎯 Target acquired — GPS locked'); },
+                err => toast.error('GPS signal lost — enter coordinates manually'),
+                { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
-        // Draw Fake NDVI Heatmap over the location
-        function drawHeatmap(lat, lng) {
+        // Draw impressive multi-zone NDVI heatmap
+        function drawHeatmap(lat, lng, ndvi) {
             if (heatmapLayer) map.removeLayer(heatmapLayer);
 
-            // Draw a subtle colored bounding box representing the "scan" area
-            const offset = 0.015;
-            const bounds = [[lat - offset, lng - offset], [lat + offset, lng + offset]];
+            const layers = [];
+            const offset = 0.02;
 
-            heatmapLayer = L.rectangle(bounds, {
-                color: '#10b981',
-                weight: 1,
-                fillColor: "url(#grad)", // Fallback to semi-transparent green 
-                fillOpacity: 0.2
-            }).addTo(map);
+            // Inner zone — strongest color based on NDVI
+            const innerColor = ndvi >= 0.6 ? '#10b981' : ndvi >= 0.4 ? '#f59e0b' : '#ef4444';
+            layers.push(L.rectangle(
+                [[lat - offset * 0.4, lng - offset * 0.4], [lat + offset * 0.4, lng + offset * 0.4]],
+                { color: innerColor, weight: 0, fillColor: innerColor, fillOpacity: 0.35 }
+            ));
 
-            map.fitBounds(bounds, { padding: [50, 50] });
+            // Middle zone
+            layers.push(L.rectangle(
+                [[lat - offset * 0.7, lng - offset * 0.7], [lat + offset * 0.7, lng + offset * 0.7]],
+                { color: innerColor, weight: 1, fillColor: innerColor, fillOpacity: 0.15 }
+            ));
+
+            // Outer scan perimeter
+            layers.push(L.rectangle(
+                [[lat - offset, lng - offset], [lat + offset, lng + offset]],
+                { color: '#10b981', weight: 2, fillColor: '#10b981', fillOpacity: 0.05, dashArray: '8, 4' }
+            ));
+
+            // Crosshair lines
+            layers.push(L.polyline([[lat - offset, lng], [lat + offset, lng]], { color: '#10b981', weight: 1, opacity: 0.4, dashArray: '4' }));
+            layers.push(L.polyline([[lat, lng - offset], [lat, lng + offset]], { color: '#10b981', weight: 1, opacity: 0.4, dashArray: '4' }));
+
+            heatmapLayer = L.layerGroup(layers).addTo(map);
+            map.fitBounds([[lat - offset, lng - offset], [lat + offset, lng + offset]], { padding: [40, 40] });
         }
 
         function setGauge(id, percent, color) {
@@ -680,6 +726,11 @@
             const lng = parseFloat(document.getElementById('lng-input').value);
             if (isNaN(lat) || isNaN(lng)) return toast.warning('Select target coordinates first.');
 
+            // Disable scan button
+            const scanBtn = document.getElementById('scan-btn');
+            scanBtn.disabled = true;
+            scanBtn.innerHTML = '<span class="animate-spin">⏳</span> SCANNING...';
+
             // UI State
             document.getElementById('placeholder-panel').classList.add('hidden');
             document.getElementById('results-panel').classList.add('hidden');
@@ -689,12 +740,23 @@
             // Map Radar Animation
             document.getElementById('radar-sweep').style.display = 'block';
 
-            const subs = ['DOWNLINKING SENTINEL-2...', 'PROCESSING MULTISPECTRAL...', 'CALCULATING MOISTURE INDEX...'];
-            let sIdx = 0;
-            const t = setInterval(() => {
-                sIdx = (sIdx + 1) % subs.length;
-                document.getElementById('loading-status-sub').innerText = subs[sIdx];
-            }, 1000);
+            // Cinematic multi-step scan progress
+            const scanPhases = [
+                { main: 'ESTABLISHING UPLINK', sub: 'Connecting to Earth Observation Server...' },
+                { main: 'HANDSHAKE COMPLETE', sub: 'Authenticating with NASA POWER API...' },
+                { main: 'ACQUIRING IMAGERY', sub: 'Downlinking Sentinel-2 multispectral bands...' },
+                { main: 'SPECTRAL ANALYSIS', sub: 'Processing NDVI, EVI & thermal signatures...' },
+                { main: 'MOISTURE MAPPING', sub: 'Calculating soil water content index...' },
+                { main: 'STRESS DETECTION', sub: 'Running crop anomaly detection algorithms...' },
+                { main: 'AI PROCESSING', sub: 'Gemini AI generating intelligence report...' },
+                { main: 'FINALIZING', sub: 'Compiling telemetry package for delivery...' }
+            ];
+            let phaseIdx = 0;
+            const phaseTimer = setInterval(() => {
+                phaseIdx = Math.min(phaseIdx + 1, scanPhases.length - 1);
+                document.getElementById('loading-status-main').innerText = scanPhases[phaseIdx].main;
+                document.getElementById('loading-status-sub').innerText = scanPhases[phaseIdx].sub;
+            }, 1200);
 
             try {
                 const getApiUrl = (path) => {
@@ -714,19 +776,29 @@
                 if (!res.ok) throw new Error(data.error);
 
                 lastResult = data;
-                clearInterval(t);
+                clearInterval(phaseTimer);
 
-                // Overlay heatmap
+                // Final phase
+                document.getElementById('loading-status-main').innerText = 'SCAN COMPLETE';
+                document.getElementById('loading-status-sub').innerText = 'Telemetry received — rendering results...';
+
+                await new Promise(r => setTimeout(r, 800));
+
+                // Overlay heatmap with NDVI-based colors
                 document.getElementById('radar-sweep').style.display = 'none';
-                drawHeatmap(lat, lng);
+                drawHeatmap(lat, lng, data.ndvi_score || 0.5);
 
                 renderResults(data);
+                toast.success('🛰️ Satellite analysis complete');
             } catch (err) {
-                clearInterval(t);
+                clearInterval(phaseTimer);
                 document.getElementById('radar-sweep').style.display = 'none';
-                toast.error(err.message || 'Scan failed');
+                toast.error(err.message || 'Scan failed — check server connection');
                 document.getElementById('loading-panel').classList.add('hidden');
                 document.getElementById('placeholder-panel').classList.remove('hidden');
+            } finally {
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = '<span>🛰️ INIT SCAN</span>';
             }
         }
 
@@ -736,35 +808,55 @@
             document.getElementById('results-panel').classList.remove('hidden');
 
             document.getElementById('result-scan-id').innerText = data.scan_id || 'SAT-OK';
+            document.getElementById('result-location-label').innerText = scanLocationName || 'Telemetry Received';
             document.getElementById('result-veg-health').innerText = data.vegetation_health || 'Normal';
 
-            // Gauges
-            const n = data.ndvi_score || 0;
-            document.getElementById('ndvi-value').innerText = n.toFixed(2);
-            document.getElementById('ndvi-label').innerText = data.ndvi_label;
-            document.getElementById('ndvi-label').style.color = cols.ndvi(n);
-            setGauge('ndvi-gauge', n * 100, cols.ndvi(n));
+            // Color the overall status
+            const healthEl = document.getElementById('result-veg-health');
+            const health = (data.vegetation_health || '').toLowerCase();
+            if (health.includes('healthy') || health.includes('good') || health.includes('excellent')) {
+                healthEl.style.color = '#10b981';
+            } else if (health.includes('moderate') || health.includes('fair')) {
+                healthEl.style.color = '#f59e0b';
+            } else if (health.includes('poor') || health.includes('critical') || health.includes('stress')) {
+                healthEl.style.color = '#ef4444';
+            }
 
-            const s = data.crop_stress_score || 0;
-            document.getElementById('stress-value').innerText = s + '%';
-            document.getElementById('stress-label').innerText = data.crop_stress;
-            document.getElementById('stress-label').style.color = cols.stress(s);
-            setGauge('stress-gauge', s, cols.stress(s));
+            // Gauges with animation delay
+            setTimeout(() => {
+                const n = data.ndvi_score || 0;
+                document.getElementById('ndvi-value').innerText = n.toFixed(2);
+                document.getElementById('ndvi-label').innerText = data.ndvi_label || '--';
+                document.getElementById('ndvi-label').style.color = cols.ndvi(n);
+                setGauge('ndvi-gauge', n * 100, cols.ndvi(n));
+            }, 200);
 
-            const m = data.soil_moisture_percent || 0;
-            document.getElementById('moisture-value').innerText = Math.round(m) + '%';
-            document.getElementById('moisture-label').innerText = data.soil_moisture_label;
-            document.getElementById('moisture-label').style.color = cols.moist(m);
-            setGauge('moisture-gauge', m, cols.moist(m));
+            setTimeout(() => {
+                const s = data.crop_stress_score || 0;
+                document.getElementById('stress-value').innerText = s + '%';
+                document.getElementById('stress-label').innerText = data.crop_stress || '--';
+                document.getElementById('stress-label').style.color = cols.stress(s);
+                setGauge('stress-gauge', s, cols.stress(s));
+            }, 400);
 
-            const i = data.irrigation_score || 0;
-            document.getElementById('irrigation-value').innerText = i + '%';
-            document.getElementById('irrigation-label').innerText = data.irrigation_need;
-            document.getElementById('irrigation-label').style.color = cols.irrig(i);
-            setGauge('irrigation-gauge', i, cols.irrig(i));
+            setTimeout(() => {
+                const m = data.soil_moisture_percent || 0;
+                document.getElementById('moisture-value').innerText = Math.round(m) + '%';
+                document.getElementById('moisture-label').innerText = data.soil_moisture_label || '--';
+                document.getElementById('moisture-label').style.color = cols.moist(m);
+                setGauge('moisture-gauge', m, cols.moist(m));
+            }, 600);
+
+            setTimeout(() => {
+                const i = data.irrigation_score || 0;
+                document.getElementById('irrigation-value').innerText = i + '%';
+                document.getElementById('irrigation-label').innerText = data.irrigation_need || '--';
+                document.getElementById('irrigation-label').style.color = cols.irrig(i);
+                setGauge('irrigation-gauge', i, cols.irrig(i));
+            }, 800);
 
             // AI text
-            document.getElementById('result-analysis').innerText = data.detailed_analysis;
+            document.getElementById('result-analysis').innerText = data.detailed_analysis || 'Analysis data unavailable.';
 
             // Arrays
             const mapHtml = (arr, icon, color) => arr.length
@@ -787,9 +879,9 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': token },
                     body: JSON.stringify({ scan_id: lastResult.scan_id, latitude: lastResult.coordinates.latitude, longitude: lastResult.coordinates.longitude, ndvi_score: lastResult.ndvi_score, crop_stress: lastResult.crop_stress, soil_moisture_percent: lastResult.soil_moisture_percent, irrigation_need: lastResult.irrigation_need, vegetation_health: lastResult.vegetation_health, detailed_analysis: lastResult.detailed_analysis })
                 });
-                toast.success('Saved successfully');
+                toast.success('💾 Telemetry saved to database');
                 btn.innerHTML = '✅ Saved';
-            } catch (e) { toast.error('Save failed'); }
+            } catch (e) { toast.error('Save failed'); btn.innerHTML = '💾 Save Telemetry'; btn.disabled = false; }
         }
 
         window.addEventListener('DOMContentLoaded', initMap);
