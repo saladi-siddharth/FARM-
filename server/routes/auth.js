@@ -51,7 +51,7 @@ router.post('/signin', authLimiter, validate(schemas.signin), async (req, res) =
 
         const token = jwt.sign(
             { id: user.id, username: user.username },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || 'default_super_secret_key_123',
             { expiresIn: '1d' }
         );
 
@@ -154,7 +154,7 @@ router.get('/google/callback',
         const user = req.user;
         const token = jwt.sign(
             { id: user.id, username: user.username },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || 'default_super_secret_key_123',
             { expiresIn: '1d' }
         );
 
@@ -201,7 +201,7 @@ router.post('/firebase-google', async (req, res) => {
 
         const token = jwt.sign(
             { id: user.id, username: user.username || displayName },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || 'default_super_secret_key_123',
             { expiresIn: '1d' }
         );
 

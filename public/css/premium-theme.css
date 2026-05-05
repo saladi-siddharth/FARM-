@@ -120,3 +120,23 @@ body {
 .border-neon-green:hover { border-color: rgba(74, 222, 128, 0.8); box-shadow: 0 0 15px rgba(74, 222, 128, 0.2); }
 .border-neon-blue:hover { border-color: rgba(59, 130, 246, 0.8); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
 .border-neon-purple:hover { border-color: rgba(168, 85, 247, 0.8); box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .glass-premium:hover {
+        transform: none;
+    }
+
+    .hover-lift:hover {
+        transform: none;
+    }
+
+    .btn-premium:active {
+        transform: scale(0.96);
+    }
+
+    .glass-premium:active {
+        background: rgba(15, 23, 42, 0.7);
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+}

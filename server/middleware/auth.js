@@ -10,7 +10,8 @@ module.exports = (req, res, next) => {
     }
 
     try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        const secret = process.env.JWT_SECRET || 'default_super_secret_key_123';
+        const verified = jwt.verify(token, secret);
         req.user = verified; // Contains { id, username }
         next();
     } catch (err) {
