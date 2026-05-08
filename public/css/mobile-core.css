@@ -148,11 +148,13 @@ body {
     backdrop-filter: blur(4px);
     z-index: 9998;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.3s ease;
 }
 
 .mobile-menu-overlay.active {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .mobile-menu-panel {
@@ -290,7 +292,7 @@ body {
     }
 
     /* CTA glass panel */
-    section .rounded-\\[3rem\\] {
+    section .rounded-\[3rem\] {
         border-radius: 24px !important;
         padding: 32px 20px !important;
         margin-left: 16px !important;
@@ -309,18 +311,18 @@ body {
     }
 
     /* Stats cards */
-    .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-5 {
+    .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 {
         grid-template-columns: repeat(2, 1fr) !important;
     }
 
-    .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-5 > div {
+    .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 > div {
         padding: 16px !important;
         border-radius: 20px !important;
     }
 
-    .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-5 .text-4xl,
-    .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-5 .text-5xl,
-    .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-5 .md\\:text-5xl {
+    .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 .text-4xl,
+    .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 .text-5xl,
+    .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 .md\:text-5xl {
         font-size: 1.75rem !important;
     }
 
@@ -358,20 +360,20 @@ body {
     }
 
     /* Reports banner */
-    .rounded-\\[2\\.5rem\\] {
+    .rounded-\[2\.5rem\] {
         border-radius: 24px !important;
         padding: 24px 20px !important;
     }
 
-    .rounded-\\[2\\.5rem\\] h3 {
+    .rounded-\[2\.5rem\] h3 {
         font-size: 1.3rem !important;
     }
 
-    .rounded-\\[2\\.5rem\\] p {
+    .rounded-\[2\.5rem\] p {
         font-size: 0.9rem !important;
     }
 
-    .rounded-\\[2\\.5rem\\] button {
+    .rounded-\[2\.5rem\] button {
         padding: 14px 24px !important;
         font-size: 0.9rem !important;
     }
@@ -388,7 +390,7 @@ body {
     }
 
     .border-t-cyan-500 .text-6xl,
-    .border-t-cyan-500 .md\\:text-7xl {
+    .border-t-cyan-500 .md\:text-7xl {
         font-size: 2.5rem !important;
     }
 
@@ -477,7 +479,7 @@ body {
     }
 
     /* Mobile header on login */
-    .lg\\:hidden.fixed {
+    .lg\:hidden.fixed {
         padding: 12px 16px !important;
     }
 
@@ -512,8 +514,8 @@ body {
     }
 
     /* Hide desktop-only buttons in nav */
-    nav .hidden.md\\:flex,
-    nav .hidden.md\\:block,
+    nav .hidden.md\:flex,
+    nav .hidden.md\:block,
     nav select {
         display: none !important;
     }
@@ -532,11 +534,11 @@ body {
     }
 
     /* Hero buttons */
-    .flex-col.sm\\:flex-row {
+    .flex-col.sm\:flex-row {
         gap: 12px !important;
     }
 
-    .flex-col.sm\\:flex-row button {
+    .flex-col.sm\:flex-row button {
         padding: 16px 24px !important;
         font-size: 0.95rem !important;
         border-radius: 16px !important;
