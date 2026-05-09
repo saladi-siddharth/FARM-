@@ -45,6 +45,16 @@ app.use('/api/shipments', require('./routes/shipments'));
 app.use('/api/disputes', require('./routes/disputes'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/payouts', require('./routes/payouts'));
+app.use('/api/inventory', require('./routes/inventory'));
+app.use('/api/expenses', require('./routes/expenses'));
+app.use('/api/market', require('./routes/market'));
+app.use('/api/chat', require('./routes/chat'));
+app.use('/api/calendar', require('./routes/calendar'));
+app.use('/api/forum', require('./routes/forum'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/doctor', require('./routes/doctor'));
+app.use('/api/dashboard', require('./routes/dashboard'));
 
 // Socket.io for Real-Time notifications and presence
 const onlineUsers = new Map();

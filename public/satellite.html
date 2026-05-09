@@ -759,11 +759,7 @@
             }, 1200);
 
             try {
-                const getApiUrl = (path) => {
-                    return window.location.port !== '3000' && window.location.port !== ''
-                        ? `http://${window.location.hostname}:3000${path}`
-                        : path;
-                };
+                const getApiUrl = (path) => path;
 
                 const fetchUrl = getApiUrl('/api/satellite/analyze');
                 const res = await fetch(fetchUrl, {
@@ -872,9 +868,7 @@
             const btn = document.getElementById('save-scan-btn');
             btn.innerHTML = '⏳ Saving...'; btn.disabled = true;
             try {
-                const saveFetchUrl = (window.location.port !== '3000' && window.location.port !== '')
-                    ? `http://${window.location.hostname}:3000/api/satellite/save-scan`
-                    : '/api/satellite/save-scan';
+                const saveFetchUrl = '/api/satellite/save-scan';
                 await fetch(saveFetchUrl, {
                     method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': token },
                     body: JSON.stringify({ scan_id: lastResult.scan_id, latitude: lastResult.coordinates.latitude, longitude: lastResult.coordinates.longitude, ndvi_score: lastResult.ndvi_score, crop_stress: lastResult.crop_stress, soil_moisture_percent: lastResult.soil_moisture_percent, irrigation_need: lastResult.irrigation_need, vegetation_health: lastResult.vegetation_health, detailed_analysis: lastResult.detailed_analysis })

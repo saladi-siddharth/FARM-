@@ -848,9 +848,7 @@
     <script>
         // ============== UTILITY ==============
         const getApiUrl = (path) => {
-            return window.location.port !== '3000' && window.location.port !== ''
-                ? `http://${window.location.hostname}:3000${path}`
-                : path;
+            return path;
         };
 
         let uploadedImageBase64 = null;

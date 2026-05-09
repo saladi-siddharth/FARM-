@@ -509,11 +509,7 @@
                 const result = await signInWithPopup(auth, googleProvider);
                 const user = result.user;
 
-                const getApiUrl = (path) => {
-                    return window.location.port !== '3000' && window.location.port !== ''
-                        ? `http://${window.location.hostname}:3000${path}`
-                        : path;
-                };
+                const getApiUrl = (path) => path;
 
                 const res = await fetch(getApiUrl('/api/auth/firebase-google'), {
                     method: 'POST',
@@ -604,17 +600,7 @@
             btn.innerHTML = '<span class="animate-spin text-xl">⏳</span> Sending...';
             btn.disabled = true;
 
-            const getApiUrl = (path) => {
-                // Check if a specific backend URL is defined in localStorage (for easy debugging/override)
-                const override = localStorage.getItem('API_BASE_URL');
-                if (override) return override + path;
-
-                // For local development on different ports
-                if (window.location.hostname === 'localhost' && window.location.port !== '' && window.location.port !== '3000') {
-                    return `http://localhost:3000${path}`;
-                }
-                return path; // Default to relative path for production/Vercel
-            };
+            const getApiUrl = (path) => path;
 
             try {
                 const res = await fetch(getApiUrl('/api/auth/forgot-password'), {
@@ -646,17 +632,7 @@
             btn.innerHTML = '<span class="animate-spin text-xl">⏳</span> Resetting...';
             btn.disabled = true;
 
-            const getApiUrl = (path) => {
-                // Check if a specific backend URL is defined in localStorage (for easy debugging/override)
-                const override = localStorage.getItem('API_BASE_URL');
-                if (override) return override + path;
-
-                // For local development on different ports
-                if (window.location.hostname === 'localhost' && window.location.port !== '' && window.location.port !== '3000') {
-                    return `http://localhost:3000${path}`;
-                }
-                return path; // Default to relative path for production/Vercel
-            };
+            const getApiUrl = (path) => path;
 
             try {
                 const res = await fetch(getApiUrl('/api/auth/reset-password'), {
@@ -704,17 +680,7 @@
                 delete body.phone_number;
             }
 
-            const getApiUrl = (path) => {
-                // Check if a specific backend URL is defined in localStorage (for easy debugging/override)
-                const override = localStorage.getItem('API_BASE_URL');
-                if (override) return override + path;
-
-                // For local development on different ports
-                if (window.location.hostname === 'localhost' && window.location.port !== '' && window.location.port !== '3000') {
-                    return `http://localhost:3000${path}`;
-                }
-                return path; // Default to relative path for production/Vercel
-            };
+            const getApiUrl = (path) => path;
 
             try {
                 const endpoint = isLogin ? '/api/auth/signin' : '/api/auth/signup';

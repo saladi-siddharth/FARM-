@@ -85,19 +85,25 @@
     const isLandingOrLogin = currentPath === '' || currentPath === 'index.html' || currentPath === 'login.html';
 
     // Find the top navigation bar
-    const topNav = document.querySelector('nav.fixed');
+    const topNav = document.querySelector('nav.fixed, #main-nav');
     if (topNav) {
-        const navFlex = topNav.querySelector('.flex.gap-4, .flex.gap-3');
-        if (navFlex) {
-            // Create hamburger button
-            const hamburger = document.createElement('button');
-            hamburger.className = 'mobile-menu-btn';
-            hamburger.setAttribute('aria-label', 'Open menu');
-            hamburger.innerHTML = '<span></span><span></span><span></span>';
+        // Check if trigger already exists
+        let hamburger = document.getElementById('mobile-trigger') || topNav.querySelector('.mobile-menu-btn');
+        
+        if (!hamburger) {
+            const navFlex = topNav.querySelector('.flex.items-center.gap-2, .flex.items-center.gap-3, .flex.items-center.gap-4, .flex.gap-2, .flex.gap-3, .flex.gap-4');
+            if (navFlex) {
+                // Create hamburger button
+                hamburger = document.createElement('button');
+                hamburger.className = 'mobile-menu-btn';
+                hamburger.id = 'mobile-trigger';
+                hamburger.setAttribute('aria-label', 'Open menu');
+                hamburger.innerHTML = '<span></span><span></span><span></span>';
+                navFlex.appendChild(hamburger);
+            }
+        }
 
-            // Insert into nav
-            navFlex.appendChild(hamburger);
-
+        if (hamburger) {
             // Create overlay
             const overlay = document.createElement('div');
             overlay.className = 'mobile-menu-overlay';
