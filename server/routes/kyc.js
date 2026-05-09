@@ -160,6 +160,7 @@ router.get('/status', auth, async (req, res) => {
             : null;
 
         res.json({
+            status: user.kyc_status, // Frontend expects .status
             kyc_status: user.kyc_status,
             submitted_at: user.kyc_submitted_at,
             verified_at: user.kyc_verified_at,

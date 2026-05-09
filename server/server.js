@@ -21,6 +21,16 @@ app.use(helmet({
 }));
 app.use(cors());
 app.use(compression());
+
+// Request Logger (Simple Morgan alternative)
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`);
+    });
+    next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -89,6 +99,23 @@ const setupDatabase = async () => {
             messaged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
         
+        await db.execute(`CREATE TABLE IF NOT EXISTS kyc_documents (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            document_type VARCHAR(50) NOT NULL,
+            file_url VARCHAR(500) NOT NULL,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await db.execute(`CREATE TABLE IF NOT EXISTS satellite_scans (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            scan_id VARCHAR(50) NOT NULL,
+            ndvi_score DECIMAL(5,2),
+            crop_stress VARCHAR(50),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        
         console.log('✅ Database tables verified.');
     } catch (err) {
         console.error('⚠️ Database Warmup Warning:', err.message);
@@ -136,6 +163,17 @@ io.on('connection', (socket) => {
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
+});
+
+// Health Check
+app.get('/health', async (req, res) => {
+    try {
+        const db = require('./config/db');
+        await db.execute('SELECT 1');
+        res.json({ status: 'OK', db: 'Connected', time: new Date() });
+    } catch (err) {
+        res.status(500).json({ status: 'Error', db: err.message });
+    }
 });
 
 const PORT = process.env.PORT || 5000;

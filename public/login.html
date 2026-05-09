@@ -535,8 +535,11 @@
 
                 if (res.ok) {
                     localStorage.setItem('token', data.token);
-                    localStorage.setItem('username', data.username);
-                    localStorage.setItem('email', data.email);
+                    localStorage.setItem('username', data.username || 'Farmer');
+                    localStorage.setItem('email', data.email || '');
+                    
+                    // Show success toast
+                    toast.success(`Welcome back, ${data.username || 'Farmer'}!`);
                     if (typeof toast !== 'undefined') toast.success('Google login successful!');
                     document.body.style.opacity = '0';
                     document.body.style.transition = 'opacity 0.5s ease';
@@ -704,9 +707,9 @@
                 if (res.ok) {
                     if (isLogin) {
                         localStorage.setItem('token', data.token);
-                        localStorage.setItem('username', data.username);
-                        localStorage.setItem('email', data.email);
-                        toast.success('Login successful! Welcome back.');
+                        localStorage.setItem('username', data.username || 'Farmer');
+                        localStorage.setItem('email', data.email || '');
+                        toast.success(`Login successful! Welcome back, ${data.username || 'Farmer'}.`);
                         document.body.style.opacity = '0';
                         document.body.style.transition = 'opacity 0.5s ease';
                         setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
