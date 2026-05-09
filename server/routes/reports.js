@@ -74,4 +74,82 @@ router.get('/expenses', auth, async (req, res) => {
     }
 });
 
+// GENERATE AND EMAIL REPORT
+router.get('/email-weekly', auth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userEmail = req.user.email;
+        if (!userEmail) return res.status(400).json({ error: "No email associated with account" });
+
+        const [expenses] = await db.execute('SELECT * FROM expenses WHERE user_id = ? ORDER BY expense_date DESC LIMIT 50', [userId]);
+
+        const doc = new PDFDocument({ margin: 50 });
+        const buffers = [];
+        
+        doc.on('data', buffers.push.bind(buffers));
+        
+        // --- PDF GENERATION ---
+        doc.fontSize(20).text('FARM CENTRAL', { align: 'center' });
+        doc.fontSize(12).text('Automated Weekly Financial Report', { align: 'center' });
+        doc.moveDown();
+        doc.text(`Generated for: ${req.user.username}`);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`);
+        doc.moveDown();
+
+        const tableTop = 150;
+        doc.font('Helvetica-Bold');
+        doc.text('Date', 50, tableTop);
+        doc.text('Category', 150, tableTop);
+        doc.text('Amount', 450, tableTop);
+        doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+        doc.font('Helvetica');
+
+        let y = tableTop + 30;
+        let total = 0;
+
+        expenses.forEach(item => {
+            const amount = Number(item.amount);
+            total += amount;
+            if (y > 700) { doc.addPage(); y = 50; }
+            doc.text(new Date(item.expense_date).toLocaleDateString(), 50, y);
+            doc.text(item.category, 150, y);
+            doc.text(amount.toFixed(2), 450, y);
+            y += 20;
+        });
+
+        doc.moveDown();
+        doc.moveTo(50, y).lineTo(550, y).stroke();
+        doc.font('Helvetica-Bold').fontSize(14);
+        doc.text(`TOTAL EXPENSES: INR ${total.toFixed(2)}`, 50, y + 10, { align: 'right' });
+        
+        doc.end();
+
+        doc.on('end', async () => {
+            const pdfData = Buffer.concat(buffers);
+            const { createTransporter } = require('../utils/mailer');
+            const transporter = createTransporter();
+            
+            if (transporter) {
+                await transporter.sendMail({
+                    from: `"Farm Central" <${process.env.EMAIL_USER}>`,
+                    to: userEmail,
+                    subject: 'Your Weekly Farm Central Report 📊',
+                    text: 'Please find attached your weekly financial report.',
+                    attachments: [{
+                        filename: 'Weekly_Report.pdf',
+                        content: pdfData
+                    }]
+                });
+                res.json({ message: "Report generated and emailed successfully!" });
+            } else {
+                res.status(500).json({ error: "Email transporter not configured." });
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Report Email Failed" });
+    }
+});
+
 module.exports = router;

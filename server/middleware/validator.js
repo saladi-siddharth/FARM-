@@ -20,7 +20,7 @@ const schemas = {
 
     resetPassword: Joi.object({
         email: Joi.string().email().required(),
-        otp: Joi.string().length(6).required(),
+        otp: Joi.string().length(4).required(),
         newPassword: Joi.string().min(6).max(100).required()
     }),
 

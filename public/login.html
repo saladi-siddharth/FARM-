@@ -412,10 +412,10 @@
             <form id="step2-form" class="hidden space-y-4">
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Enter
-                        6-Digit OTP</label>
+                        4-Digit OTP</label>
                     <input type="text" id="reset-otp" required
-                        class="auth-input tracking-[0.5em] text-center text-lg font-bold" placeholder="• • • • • •"
-                        maxlength="6">
+                        class="auth-input tracking-[0.5em] text-center text-lg font-bold" placeholder="• • • •"
+                        maxlength="4">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">New
@@ -605,9 +605,15 @@
             btn.disabled = true;
 
             const getApiUrl = (path) => {
-                return window.location.port !== '3000' && window.location.port !== ''
-                    ? `http://${window.location.hostname}:3000${path}`
-                    : path;
+                // Check if a specific backend URL is defined in localStorage (for easy debugging/override)
+                const override = localStorage.getItem('API_BASE_URL');
+                if (override) return override + path;
+
+                // For local development on different ports
+                if (window.location.hostname === 'localhost' && window.location.port !== '' && window.location.port !== '3000') {
+                    return `http://localhost:3000${path}`;
+                }
+                return path; // Default to relative path for production/Vercel
             };
 
             try {
@@ -625,7 +631,8 @@
                     msg.className = "text-xs font-bold text-center mt-2 text-red-400 block";
                 }
             } catch (err) {
-                toast.error('Network error. Please try again.');
+                console.error('Reset Error:', err);
+                toast.error('Connection Error: ' + err.message);
             }
             finally { btn.innerText = originalText; btn.disabled = false; }
         };
@@ -640,9 +647,15 @@
             btn.disabled = true;
 
             const getApiUrl = (path) => {
-                return window.location.port !== '3000' && window.location.port !== ''
-                    ? `http://${window.location.hostname}:3000${path}`
-                    : path;
+                // Check if a specific backend URL is defined in localStorage (for easy debugging/override)
+                const override = localStorage.getItem('API_BASE_URL');
+                if (override) return override + path;
+
+                // For local development on different ports
+                if (window.location.hostname === 'localhost' && window.location.port !== '' && window.location.port !== '3000') {
+                    return `http://localhost:3000${path}`;
+                }
+                return path; // Default to relative path for production/Vercel
             };
 
             try {
@@ -692,9 +705,15 @@
             }
 
             const getApiUrl = (path) => {
-                return window.location.port !== '3000' && window.location.port !== ''
-                    ? `http://${window.location.hostname}:3000${path}`
-                    : path;
+                // Check if a specific backend URL is defined in localStorage (for easy debugging/override)
+                const override = localStorage.getItem('API_BASE_URL');
+                if (override) return override + path;
+
+                // For local development on different ports
+                if (window.location.hostname === 'localhost' && window.location.port !== '' && window.location.port !== '3000') {
+                    return `http://localhost:3000${path}`;
+                }
+                return path; // Default to relative path for production/Vercel
             };
 
             try {
@@ -745,7 +764,8 @@
                     }
                 }
             } catch (err) {
-                toast.error('Cannot connect to server. Please try again.');
+                console.error('Auth Error:', err);
+                toast.error('Server Connection Failed: ' + err.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = originalText;
@@ -753,6 +773,8 @@
             }
         };
     </script>
+    <script src="js/pwa-init.js"></script>
+    <script src="js/mobile-nav.js"></script>
 </body>
 
 </html>

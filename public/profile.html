@@ -157,6 +157,27 @@
         <!-- Settings Section -->
         <div class="space-y-6 relative z-10">
 
+            <!-- KYC Verification Section -->
+            <div
+                class="glass-premium p-8 rounded-[2rem] border border-white/5 shadow-lg group hover:border-white/10 transition-colors">
+                <h3
+                    class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-6 flex items-center gap-3">
+                    <span class="p-1.5 bg-amber-500/10 rounded-lg border border-amber-500/20">📋</span>
+                    KYC Verification
+                </h3>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <p class="font-bold text-slate-200 text-lg" id="profile-kyc-status">Checking Status...</p>
+                        <p class="text-xs text-slate-500 mt-1 font-medium" id="profile-kyc-desc">Identity verification is required to buy or sell.</p>
+                    </div>
+                    <button onclick="location.href='kyc.html'" id="profile-kyc-btn"
+                        class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black tracking-widest text-xs rounded-xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all w-full sm:w-auto">
+                        Complete KYC
+                    </button>
+                </div>
+            </div>
+
             <!-- Preferences -->
             <div
                 class="glass-premium p-8 rounded-[2rem] border border-white/5 shadow-lg group hover:border-white/10 transition-colors">
@@ -271,13 +292,15 @@
                     <span class="p-1.5 bg-purple-500/10 rounded-lg border border-purple-500/20">🛡️</span>
                     Account & Security
                 </h3>
-                <div class="setting-item cursor-pointer hover:bg-white/5 transition px-4 -mx-4 rounded-xl group/item"
-                    onclick="alert('Feature coming soon!')">
-                    <p class="font-bold text-slate-200 group-hover/item:text-white transition-colors">Export My Data</p>
-                    <span
-                        class="text-slate-500 bg-black/40 w-8 h-8 rounded-lg flex items-center justify-center border border-white/5 group-hover/item:border-white/20 transition-colors">→</span>
+                <div class="flex gap-4 mb-4">
+                    <button onclick="downloadReport()" class="flex-1 bg-black/40 hover:bg-emerald-500/20 text-emerald-400 font-black tracking-widest text-xs py-4 rounded-xl border border-emerald-500/20 hover:border-emerald-400/50 transition-all shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                        📄 DOWNLOAD PDF
+                    </button>
+                    <button onclick="emailWeeklyReport()" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-black tracking-widest text-xs py-4 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+                        📧 EMAIL WEEKLY REPORT
+                    </button>
                 </div>
-                <div class="setting-item cursor-pointer hover:bg-white/5 transition px-4 -mx-4 rounded-xl group/item border-none pb-2 pt-4"
+                <div class="setting-item cursor-pointer hover:bg-white/5 transition px-4 -mx-4 rounded-xl group/item border-none pb-2 pt-2"
                     onclick="window.location.href='mailto:support@farmcentral.com'">
                     <p class="font-bold text-slate-200 group-hover/item:text-white transition-colors">Support & Help</p>
                     <span
@@ -319,6 +342,48 @@
             location.href = 'index.html';
         }
 
+        // Fetch KYC
+        async function fetchKYCStatus() {
+            try {
+                const res = await fetch('/api/kyc/status', { headers: { 'Authorization': token } });
+                const statusEl = document.getElementById('profile-kyc-status');
+                const descEl = document.getElementById('profile-kyc-desc');
+                const btnEl = document.getElementById('profile-kyc-btn');
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.status === 'verified') {
+                        statusEl.innerHTML = '<span class="text-emerald-400">Verified ✅</span>';
+                        descEl.innerText = 'Your identity is fully verified. You are ready to trade!';
+                        btnEl.innerText = 'View Documents';
+                        btnEl.classList.replace('from-amber-500', 'from-emerald-500');
+                        btnEl.classList.replace('hover:from-amber-400', 'hover:from-emerald-400');
+                        btnEl.classList.replace('to-orange-500', 'to-teal-500');
+                        btnEl.classList.replace('hover:to-orange-400', 'hover:to-teal-400');
+                        btnEl.classList.replace('shadow-amber-500/20', 'shadow-emerald-500/20');
+                    } else if (data.status === 'under_review' || data.status === 'pending') {
+                        statusEl.innerHTML = '<span class="text-blue-400">Under Review ⏳</span>';
+                        descEl.innerText = 'Your documents are being reviewed by an admin.';
+                        btnEl.innerText = 'Check Status';
+                        btnEl.classList.replace('from-amber-500', 'from-blue-500');
+                        btnEl.classList.replace('hover:from-amber-400', 'hover:from-blue-400');
+                        btnEl.classList.replace('to-orange-500', 'to-indigo-500');
+                        btnEl.classList.replace('hover:to-orange-400', 'hover:to-indigo-400');
+                        btnEl.classList.replace('shadow-amber-500/20', 'shadow-blue-500/20');
+                    } else if (data.status === 'rejected') {
+                        statusEl.innerHTML = '<span class="text-rose-400">Rejected ❌</span>';
+                        descEl.innerText = `Reason: ${data.rejection_reason || 'Document mismatch. Please try again.'}`;
+                        btnEl.innerText = 'Resubmit KYC';
+                    }
+                } else {
+                    statusEl.innerHTML = '<span class="text-amber-400">Not Submitted ⚠️</span>';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        fetchKYCStatus();
+
         // Settings Logic
         function updateSetting(key, value) {
             console.log(`Updated ${key} to ${value}`);
@@ -336,6 +401,39 @@
                     window.LanguageManager.setLanguage(lang);
                 }
             } catch (e) { }
+        }
+        async function downloadReport() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error("Please login first");
+                return;
+            }
+            window.open(`/api/reports/expenses?token=${token}`, '_blank');
+        }
+
+        async function emailWeeklyReport() {
+            const token = localStorage.getItem('token');
+            if (!token) return toast.error("Please login first");
+            
+            const btn = document.querySelector('button[onclick="emailWeeklyReport()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="animate-spin text-lg inline-block">⏳</span>`;
+            
+            try {
+                const res = await fetch('/api/reports/email-weekly', {
+                    headers: { 'Authorization': token }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    toast.success(data.message || "Report emailed successfully!");
+                } else {
+                    toast.error(data.error || "Failed to email report.");
+                }
+            } catch (e) {
+                toast.error("Network error.");
+            } finally {
+                btn.innerHTML = originalText;
+            }
         }
     </script>
     <script src="js/language-manager.js"></script>

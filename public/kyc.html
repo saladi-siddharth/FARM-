@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYC Verification | Farm Central</title>
+    <meta name="description" content="Complete your KYC verification to start trading on Farm Central marketplace">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin:0; background:#f8fafc; color:#1e293b; font-family:'Outfit','Inter',sans-serif; overflow-x:hidden; }
+        .glass { background:rgba(255,255,255,0.85); backdrop-filter:blur(20px); border:1px solid rgba(226,232,240,0.8); }
+        .form-input { width:100%; padding:12px 16px; border-radius:12px; background:#f8fafc; border:1.5px solid #e2e8f0; color:#1e293b; outline:none; font-size:14px; font-family:'Inter',sans-serif; font-weight:500; transition:all 0.3s; }
+        .form-input:focus { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.1); background:white; }
+        .upload-zone { border:2px dashed #cbd5e1; border-radius:16px; padding:24px; text-align:center; cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden; background:#fafbfc; }
+        .upload-zone:hover, .upload-zone.dragover { border-color:#6366f1; background:#eef2ff; }
+        .upload-zone.uploaded { border-color:#10b981; background:#ecfdf5; }
+        .upload-zone input[type="file"] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:10; }
+        .step-dot { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; transition:all 0.3s; }
+        .step-dot.active { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; box-shadow:0 4px 15px rgba(99,102,241,0.3); }
+        .step-dot.done { background:#10b981; color:white; }
+        .step-dot.pending { background:#e2e8f0; color:#94a3b8; }
+        .step-section { display:none; animation:fadeIn 0.4s ease; }
+        .step-section.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+    </style>
+</head>
+<body class="selection:bg-indigo-200 selection:text-indigo-900">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="window.history.back()" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition">←</button>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-500/20">🛡️</div>
+                    <div>
+                        <h1 class="text-lg font-black bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent tracking-tight leading-none">KYC Verification</h1>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Identity Portal</p>
+                    </div>
+                </div>
+            </div>
+            <div id="kyc-status-nav" class="hidden"></div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-20">
+
+        <!-- Status Banner -->
+        <div id="status-banner" class="hidden mb-8 p-6 rounded-2xl border"></div>
+
+        <!-- Already Verified State -->
+        <div id="verified-state" class="hidden">
+            <div class="bg-white rounded-3xl border border-emerald-200 p-10 text-center shadow-sm">
+                <div class="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-200 mx-auto flex items-center justify-center text-4xl mb-5">✅</div>
+                <h2 class="text-2xl font-black text-slate-900 mb-2">KYC Verified</h2>
+                <p class="text-slate-500 mb-6">Your identity is verified. You can trade freely on the marketplace.</p>
+                <div id="verified-details" class="grid grid-cols-2 gap-3 max-w-md mx-auto text-left mb-6"></div>
+                <button onclick="location.href='trading.html'" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl transition">🤝 Go to Trade Hub</button>
+            </div>
+        </div>
+
+        <!-- Pending State -->
+        <div id="pending-state" class="hidden">
+            <div class="bg-white rounded-3xl border border-amber-200 p-10 text-center shadow-sm">
+                <div class="w-20 h-20 rounded-full bg-amber-50 border-2 border-amber-200 mx-auto flex items-center justify-center text-4xl mb-5 animate-pulse">⏳</div>
+                <h2 class="text-2xl font-black text-slate-900 mb-2">Under Review</h2>
+                <p class="text-slate-500 mb-2">Your KYC documents are being verified. This typically takes 24-48 hours.</p>
+                <p class="text-sm text-amber-600 font-semibold">You'll receive an email once your verification is complete.</p>
+            </div>
+        </div>
+
+        <!-- Rejected State -->
+        <div id="rejected-state" class="hidden">
+            <div class="bg-white rounded-3xl border border-red-200 p-8 shadow-sm mb-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-2xl flex-shrink-0">❌</div>
+                    <div>
+                        <h2 class="text-xl font-black text-slate-900 mb-1">KYC Rejected</h2>
+                        <p class="text-sm text-slate-500 mb-2">Please fix the issues below and re-submit.</p>
+                        <div class="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-700" id="rejection-reason"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KYC Form (shown for not_submitted or rejected) -->
+        <div id="kyc-form-container" class="hidden">
+
+            <!-- Step Indicators -->
+            <div class="flex items-center justify-center gap-3 mb-10">
+                <div class="step-dot active" id="dot-1">1</div>
+                <div class="w-12 h-0.5 bg-slate-200 rounded" id="line-1"></div>
+                <div class="step-dot pending" id="dot-2">2</div>
+                <div class="w-12 h-0.5 bg-slate-200 rounded" id="line-2"></div>
+                <div class="step-dot pending" id="dot-3">3</div>
+            </div>
+
+            <form id="kycForm" enctype="multipart/form-data">
+
+                <!-- Step 1: Personal Information -->
+                <div class="step-section active" id="step-1">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                        <h2 class="text-xl font-black text-slate-900 mb-1 flex items-center gap-2">👤 Personal Information</h2>
+                        <p class="text-sm text-slate-400 mb-6">Basic identity details for verification</p>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Aadhaar Number *</label>
+                                    <input type="text" id="aadhaar_number" required maxlength="12" pattern="\d{12}" placeholder="123456789012" class="form-input" oninput="this.value=this.value.replace(/\D/g,'')">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">PAN Number *</label>
+                                    <input type="text" id="pan_number" required maxlength="10" placeholder="ABCDE1234F" class="form-input uppercase" style="text-transform:uppercase">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">I am a</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 hover:border-indigo-200 transition">
+                                        <input type="radio" name="role" value="farmer" class="accent-indigo-500"> <span class="text-sm font-medium">🌾 Farmer</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 hover:border-indigo-200 transition">
+                                        <input type="radio" name="role" value="customer" class="accent-indigo-500"> <span class="text-sm font-medium">🛒 Customer</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 hover:border-indigo-200 transition">
+                                        <input type="radio" name="role" value="both" checked class="accent-indigo-500"> <span class="text-sm font-medium">🤝 Both</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Full Address</label>
+                                <textarea id="address" rows="2" placeholder="House/Plot No., Street, Village/Town" class="form-input resize-none"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">State</label>
+                                    <input type="text" id="state" placeholder="e.g. Punjab" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">District</label>
+                                    <input type="text" id="district" placeholder="e.g. Ludhiana" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pincode</label>
+                                    <input type="text" id="pincode" maxlength="6" placeholder="141001" class="form-input" oninput="this.value=this.value.replace(/\D/g,'')">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="goToStep(2)" class="w-full mt-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl transition text-sm uppercase tracking-wider">Next → Banking Details</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Banking Details -->
+                <div class="step-section" id="step-2">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                        <h2 class="text-xl font-black text-slate-900 mb-1 flex items-center gap-2">🏦 Banking Details</h2>
+                        <p class="text-sm text-slate-400 mb-6">For receiving payments from sales</p>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Bank Account Number</label>
+                                    <input type="text" id="bank_account" placeholder="Account Number" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">IFSC Code</label>
+                                    <input type="text" id="ifsc_code" placeholder="e.g. SBIN0001234" class="form-input uppercase" style="text-transform:uppercase">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">UPI ID (Optional)</label>
+                                <input type="text" id="upi_id" placeholder="yourname@upi" class="form-input">
+                            </div>
+                            <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 text-sm text-blue-700">
+                                <p>💡 Banking details are used for farmer payouts. After a buyer confirms delivery, the sale amount (minus 5% platform fee) is credited to your account.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="button" onclick="goToStep(1)" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold transition hover:bg-slate-200 text-sm">← Back</button>
+                            <button type="button" onclick="goToStep(3)" class="flex-[2] py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition text-sm uppercase tracking-wider">Next → Upload Documents</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Document Upload -->
+                <div class="step-section" id="step-3">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                        <h2 class="text-xl font-black text-slate-900 mb-1 flex items-center gap-2">📄 Upload Documents</h2>
+                        <p class="text-sm text-slate-400 mb-6">Upload clear photos of your ID documents</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <!-- Aadhaar Front -->
+                            <div class="upload-zone" id="zone-aadhaar_front">
+                                <input type="file" name="aadhaar_front" accept="image/*,.pdf" onchange="handleUpload(this,'aadhaar_front')" required>
+                                <div class="pointer-events-none" id="placeholder-aadhaar_front">
+                                    <span class="text-3xl block mb-2">🪪</span>
+                                    <p class="text-sm font-bold text-slate-600">Aadhaar Front *</p>
+                                    <p class="text-xs text-slate-400 mt-1">Click or drag to upload</p>
+                                </div>
+                            </div>
+                            <!-- Aadhaar Back -->
+                            <div class="upload-zone" id="zone-aadhaar_back">
+                                <input type="file" name="aadhaar_back" accept="image/*,.pdf" onchange="handleUpload(this,'aadhaar_back')">
+                                <div class="pointer-events-none" id="placeholder-aadhaar_back">
+                                    <span class="text-3xl block mb-2">🪪</span>
+                                    <p class="text-sm font-bold text-slate-600">Aadhaar Back</p>
+                                    <p class="text-xs text-slate-400 mt-1">Optional</p>
+                                </div>
+                            </div>
+                            <!-- PAN Card -->
+                            <div class="upload-zone" id="zone-pan_card">
+                                <input type="file" name="pan_card" accept="image/*,.pdf" onchange="handleUpload(this,'pan_card')" required>
+                                <div class="pointer-events-none" id="placeholder-pan_card">
+                                    <span class="text-3xl block mb-2">💳</span>
+                                    <p class="text-sm font-bold text-slate-600">PAN Card *</p>
+                                    <p class="text-xs text-slate-400 mt-1">Click or drag to upload</p>
+                                </div>
+                            </div>
+                            <!-- Selfie -->
+                            <div class="upload-zone" id="zone-selfie">
+                                <input type="file" name="selfie" accept="image/*" onchange="handleUpload(this,'selfie')" required>
+                                <div class="pointer-events-none" id="placeholder-selfie">
+                                    <span class="text-3xl block mb-2">🤳</span>
+                                    <p class="text-sm font-bold text-slate-600">Live Selfie *</p>
+                                    <p class="text-xs text-slate-400 mt-1">Clear face photo</p>
+                                </div>
+                            </div>
+                            <!-- Bank Proof -->
+                            <div class="upload-zone" id="zone-bank_proof">
+                                <input type="file" name="bank_proof" accept="image/*,.pdf" onchange="handleUpload(this,'bank_proof')">
+                                <div class="pointer-events-none" id="placeholder-bank_proof">
+                                    <span class="text-3xl block mb-2">🏦</span>
+                                    <p class="text-sm font-bold text-slate-600">Bank Proof</p>
+                                    <p class="text-xs text-slate-400 mt-1">Passbook / Cheque</p>
+                                </div>
+                            </div>
+                            <!-- Farm Certificate -->
+                            <div class="upload-zone" id="zone-farm_certificate">
+                                <input type="file" name="farm_certificate" accept="image/*,.pdf" onchange="handleUpload(this,'farm_certificate')">
+                                <div class="pointer-events-none" id="placeholder-farm_certificate">
+                                    <span class="text-3xl block mb-2">🌿</span>
+                                    <p class="text-sm font-bold text-slate-600">Farm Certificate</p>
+                                    <p class="text-xs text-slate-400 mt-1">Optional (Premium badge)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-amber-50 border border-amber-100 text-sm text-amber-700 mb-6">
+                            <p>⚠️ Fields marked with * are mandatory. All documents must be clear, unblurred, and in JPEG/PNG/PDF format (max 5MB each).</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="goToStep(2)" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold transition hover:bg-slate-200 text-sm">← Back</button>
+                            <button type="submit" id="submitKYC" class="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-black shadow-lg shadow-emerald-500/20 transition text-sm uppercase tracking-wider hover:shadow-xl active:scale-[0.98]">🚀 Submit KYC for Verification</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const API = window.location.origin + '/api';
+        const token = localStorage.getItem('token');
+        if (!token) { location.href = 'login.html'; }
+
+        let currentStep = 1;
+
+        // Step navigation
+        function goToStep(step) {
+            if (step === 2) {
+                const aadhaar = document.getElementById('aadhaar_number').value;
+                const pan = document.getElementById('pan_number').value;
+                if (!aadhaar || aadhaar.length !== 12) { alert('Please enter a valid 12-digit Aadhaar number.'); return; }
+                if (!pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.toUpperCase())) { alert('Please enter a valid PAN number (e.g. ABCDE1234F).'); return; }
+            }
+            document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                dot.className = 'step-dot ' + (i < step ? 'done' : i === step ? 'active' : 'pending');
+                dot.textContent = i < step ? '✓' : i;
+            }
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // File upload handler
+        function handleUpload(input, name) {
+            const zone = document.getElementById(`zone-${name}`);
+            const placeholder = document.getElementById(`placeholder-${name}`);
+            if (input.files && input.files[0]) {
+                zone.classList.add('uploaded');
+                placeholder.innerHTML = `<span class="text-3xl block mb-2">✅</span><p class="text-sm font-bold text-emerald-700">${input.files[0].name}</p><p class="text-xs text-emerald-500 mt-1">${(input.files[0].size / 1024).toFixed(0)} KB</p>`;
+            }
+        }
+
+        // Check KYC status on load
+        async function checkKYCStatus() {
+            try {
+                const res = await fetch(`${API}/kyc/status`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                const status = data.kyc_status || 'not_submitted';
+
+                if (status === 'verified') {
+                    document.getElementById('verified-state').classList.remove('hidden');
+                    const details = document.getElementById('verified-details');
+                    details.innerHTML = `
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">Aadhaar</p><p class="text-sm font-bold text-slate-700">${data.aadhaar || '—'}</p></div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">PAN</p><p class="text-sm font-bold text-slate-700">${data.pan || '—'}</p></div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">Role</p><p class="text-sm font-bold text-slate-700 capitalize">${data.role || '—'}</p></div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">Verified</p><p class="text-sm font-bold text-emerald-600">${data.verified_at ? new Date(data.verified_at).toLocaleDateString('en-IN') : 'Yes'}</p></div>
+                    `;
+                } else if (status === 'pending') {
+                    document.getElementById('pending-state').classList.remove('hidden');
+                } else if (status === 'rejected') {
+                    document.getElementById('rejected-state').classList.remove('hidden');
+                    document.getElementById('rejection-reason').textContent = data.rejection_reason || 'No reason provided.';
+                    document.getElementById('kyc-form-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('kyc-form-container').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('KYC Status Error:', err);
+                document.getElementById('kyc-form-container').classList.remove('hidden');
+            }
+        }
+
+        // Submit KYC
+        document.getElementById('kycForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitKYC');
+            btn.disabled = true;
+            btn.textContent = '⏳ Submitting...';
+
+            const formData = new FormData();
+            formData.append('aadhaar_number', document.getElementById('aadhaar_number').value);
+            formData.append('pan_number', document.getElementById('pan_number').value.toUpperCase());
+            formData.append('bank_account', document.getElementById('bank_account').value);
+            formData.append('ifsc_code', document.getElementById('ifsc_code').value.toUpperCase());
+            formData.append('upi_id', document.getElementById('upi_id').value);
+            formData.append('address', document.getElementById('address').value);
+            formData.append('state', document.getElementById('state').value);
+            formData.append('district', document.getElementById('district').value);
+            formData.append('pincode', document.getElementById('pincode').value);
+            const role = document.querySelector('input[name="role"]:checked');
+            formData.append('role', role ? role.value : 'both');
+
+            // Append files
+            const fileFields = ['aadhaar_front','aadhaar_back','pan_card','selfie','bank_proof','farm_certificate'];
+            for (const field of fileFields) {
+                const input = document.querySelector(`input[name="${field}"]`);
+                if (input && input.files[0]) formData.append(field, input.files[0]);
+            }
+
+            try {
+                const res = await fetch(`${API}/kyc/submit`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('kyc-form-container').classList.add('hidden');
+                    document.getElementById('rejected-state').classList.add('hidden');
+                    document.getElementById('pending-state').classList.remove('hidden');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    alert(data.error || 'Submission failed.');
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Submit KYC for Verification';
+                }
+            } catch (err) {
+                console.error('KYC Submit Error:', err);
+                alert('Network error. Please try again.');
+                btn.disabled = false;
+                btn.textContent = '🚀 Submit KYC for Verification';
+            }
+        });
+
+        checkKYCStatus();
+    </script>
+</body>
+</html>

@@ -203,10 +203,9 @@
                             Insights</button>
                     </div>
                     <!-- Wallet -->
-                    <div
-                        class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold">
+                    <a href="payouts.html" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-bold hover:bg-emerald-100 transition cursor-pointer" title="View Payouts">
                         💰 <span>₹42,500</span>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -246,6 +245,20 @@
             <span>🌶️ Chilli <span class="text-emerald-400">₹12,500/qtl ↑1.7%</span></span>
             <span>🧅 Onion <span class="text-red-400">₹1,680/qtl ↓2.3%</span></span>
             <span>☕ Coffee <span class="text-emerald-400">₹42,000/qtl ↑4.1%</span></span>
+        </div>
+    </div>
+
+    <!-- KYC Banner -->
+    <div id="kyc-banner" class="hidden fixed top-24 md:top-24 w-full z-30 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-amber-500/10">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">⚠️</span>
+                <div>
+                    <h3 class="font-bold text-amber-800" id="kyc-banner-title">KYC Verification Required</h3>
+                    <p class="text-xs text-amber-700 font-medium" id="kyc-banner-text">You must complete KYC to buy or sell on the platform.</p>
+                </div>
+            </div>
+            <a href="kyc.html" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-sm transition shadow-sm whitespace-nowrap">Complete KYC Now</a>
         </div>
     </div>
 
@@ -471,9 +484,14 @@
 
         <!-- ============ ORDERS TAB ============ -->
         <div id="orders-section" class="hidden fade-in-up">
-            <div class="mb-6">
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight brand">Order History</h2>
-                <p class="text-sm text-slate-400 mt-1">Track your purchases and sales</p>
+            <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight brand">Order History</h2>
+                    <p class="text-sm text-slate-400 mt-1">Track your purchases and sales</p>
+                </div>
+                <a href="disputes.html" class="px-5 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl font-bold text-sm hover:bg-rose-100 transition flex items-center gap-2">
+                    <span>⚖️</span> Dispute Center
+                </a>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white border border-slate-200 rounded-xl p-4 text-center">
@@ -498,7 +516,7 @@
                             <th class="px-5 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Crop</th>
                             <th class="px-5 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
                             <th class="px-5 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                            <th class="px-5 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Date</th>
+                            <th class="px-5 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="orders-tbody">
@@ -796,7 +814,21 @@
                     <label class="text-xs font-bold text-slate-400 mb-1.5 block uppercase tracking-wider">Order Quantity
                         (kg)</label>
                     <input type="number" id="modal-order-qty" placeholder="Enter quantity" class="form-input mb-4"
-                        min="1">
+                        min="1" oninput="updateModalPrice()">
+                </div>
+                <div id="modal-commission-box" class="hidden mb-6 bg-slate-50 rounded-xl border border-slate-200 p-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-slate-500">Subtotal</span>
+                        <span id="modal-subtotal" class="font-bold text-slate-700">₹0</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-slate-500">Platform Fee (5%)</span>
+                        <span id="modal-commission" class="font-bold text-amber-600">₹0</span>
+                    </div>
+                    <div class="flex justify-between text-base border-t border-slate-200 pt-2 mt-2">
+                        <span class="font-bold text-slate-800">Total Payable</span>
+                        <span id="modal-total-payable" class="font-black text-emerald-600">₹0</span>
+                    </div>
                 </div>
                 <div class="flex gap-3">
                     <button id="modal-contactBtn"
@@ -860,10 +892,38 @@
 
         // ============== INIT ==============
         document.addEventListener('DOMContentLoaded', () => {
+            checkKYCStatus();
             fetchListings();
             fetchMyListings();
             fetchOrders();
         });
+
+        // ============== CHECK KYC STATUS ==============
+        let userKycStatus = 'pending';
+        async function checkKYCStatus() {
+            try {
+                const res = await fetch(getApiUrl('/api/kyc/status'), { headers: { 'Authorization': token } });
+                if (res.ok) {
+                    const data = await res.json();
+                    userKycStatus = data.status;
+                    if (data.status !== 'verified') {
+                        document.getElementById('kyc-banner').classList.remove('hidden');
+                        if (data.status === 'under_review' || data.status === 'pending') {
+                            document.getElementById('kyc-banner-title').innerText = 'KYC Under Review';
+                            document.getElementById('kyc-banner-text').innerText = 'Your KYC application is currently being reviewed. You cannot trade until it is verified.';
+                            document.querySelector('#kyc-banner a').innerText = 'View Status';
+                        } else if (data.status === 'rejected') {
+                            document.getElementById('kyc-banner-title').innerText = 'KYC Rejected';
+                            document.getElementById('kyc-banner-text').innerText = 'Your KYC application was rejected. Please resubmit your documents.';
+                        }
+                    }
+                } else {
+                    document.getElementById('kyc-banner').classList.remove('hidden');
+                }
+            } catch (e) {
+                document.getElementById('kyc-banner').classList.remove('hidden');
+            }
+        }
 
         // ============== TAB SWITCH ==============
         function switchTab(tab) {
@@ -1075,8 +1135,10 @@
         // ============== BUY MODAL ==============
         const modal = document.getElementById('buyModal');
         const modalContent = modal.querySelector('div > div');
+        let currentModalItem = null;
 
         function openDetails(item) {
+            currentModalItem = item;
             document.getElementById('modal-title').innerText = item.crop;
             document.getElementById('modal-seller').innerHTML = `👤 <span>${item.seller}</span>`;
             document.getElementById('modal-price').innerText = `₹${Number(item.price).toFixed(0)}`;
@@ -1085,9 +1147,27 @@
             document.getElementById('modal-icon').innerText = getIcon(item.crop);
             document.getElementById('modal-order-qty').value = '';
             document.getElementById('modal-order-qty').max = item.qty;
+            document.getElementById('modal-commission-box').classList.add('hidden');
             document.getElementById('modal-buyBtn').onclick = () => confirmPurchase(item.id);
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); modalContent.classList.add('scale-100'); }, 10);
+        }
+
+        function updateModalPrice() {
+            if (!currentModalItem) return;
+            const qty = parseInt(document.getElementById('modal-order-qty').value) || 0;
+            const box = document.getElementById('modal-commission-box');
+            if (qty > 0) {
+                const subtotal = qty * currentModalItem.price;
+                const commission = subtotal * 0.05;
+                const total = subtotal + commission;
+                document.getElementById('modal-subtotal').innerText = `₹${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('modal-commission').innerText = `₹${commission.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('modal-total-payable').innerText = `₹${total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
         }
 
         function closeModal() {
@@ -1131,6 +1211,9 @@
                 ];
             }
             const statusClasses = {
+                'delivered': 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                'processing': 'bg-blue-50 text-blue-700 border-blue-100',
+                'in_transit': 'bg-amber-50 text-amber-700 border-amber-100',
                 'Delivered': 'bg-emerald-50 text-emerald-700 border-emerald-100',
                 'Processing': 'bg-blue-50 text-blue-700 border-blue-100',
                 'In Transit': 'bg-amber-50 text-amber-700 border-amber-100'
@@ -1140,12 +1223,56 @@
                 tbody.innerHTML = orders.map(o => `
                     <tr class="border-t border-slate-100 hover:bg-slate-50 transition">
                         <td class="px-5 py-4 text-sm font-mono text-indigo-600 font-bold">${o.id}</td>
-                        <td class="px-5 py-4 text-sm font-semibold text-slate-700">${o.crop}</td>
+                        <td class="px-5 py-4 text-sm font-semibold text-slate-700">
+                            ${o.crop}
+                            ${o.commission ? `<div class="text-[10px] text-slate-400 mt-1">Includes ${o.commission} fee</div>` : ''}
+                        </td>
                         <td class="px-5 py-4 text-sm font-bold text-emerald-600">${o.amount}</td>
-                        <td class="px-5 py-4"><span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${statusClasses[o.status] || statusClasses['Processing']}">${o.status}</span></td>
-                        <td class="px-5 py-4 text-sm text-slate-400">${o.date}</td>
+                        <td class="px-5 py-4">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${statusClasses[o.status] || statusClasses['Processing']}">${o.status}</span>
+                            ${o.escrow ? `<div class="text-[10px] text-amber-600 mt-1 font-bold">Escrow: ${o.escrow}</div>` : ''}
+                        </td>
+                        <td class="px-5 py-4">
+                            ${o.has_shipment ? `<button onclick="trackShipment('${o.transaction_id}')" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-bold hover:bg-indigo-100 transition mb-1 w-full text-center">Track</button>` : ''}
+                            ${(o.status === 'in_transit' || o.status === 'delivered') && !o.delivery_confirmed ? `<button onclick="confirmDelivery('${o.transaction_id}')" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-lg text-xs font-bold hover:bg-emerald-100 transition w-full text-center mt-1">Confirm</button>` : ''}
+                            ${o.delivery_confirmed ? `<span class="text-xs text-emerald-600 font-bold block mt-1">✓ Confirmed</span>` : ''}
+                            <div class="text-xs text-slate-400 mt-1">${o.date}</div>
+                        </td>
                     </tr>
                 `).join('');
+            }
+        }
+
+        async function trackShipment(txnId) {
+            try {
+                const res = await fetch(getApiUrl(`/api/shipments/${txnId}`), { headers: { 'Authorization': token } });
+                const data = await res.json();
+                if (res.ok) {
+                    alert(`Shipment Status: ${data.shipment.current_status}\nCarrier: ${data.shipment.carrier_name || 'N/A'}\nTracking Number: ${data.shipment.tracking_number || 'N/A'}`);
+                } else {
+                    toast.error(data.error || 'Failed to fetch tracking details');
+                }
+            } catch (err) {
+                toast.error('Network error');
+            }
+        }
+
+        async function confirmDelivery(txnId) {
+            if (!confirm('Are you sure you want to confirm delivery? This will release the payment from escrow to the farmer.')) return;
+            try {
+                const res = await fetch(getApiUrl(`/api/shipments/${txnId}/confirm-delivery`), { 
+                    method: 'POST',
+                    headers: { 'Authorization': token }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    toast.success('Delivery confirmed! Payment released.');
+                    fetchOrders();
+                } else {
+                    toast.error(data.error || 'Failed to confirm delivery');
+                }
+            } catch (err) {
+                toast.error('Network error');
             }
         }
 

@@ -7,7 +7,28 @@ const { sendAlert } = require('../utils/mailer');
 const passport = require('passport');
 const { validate, schemas } = require('../middleware/validator');
 const { authLimiter } = require('../middleware/security');
+const twilio = require('twilio');
 
+async function sendWhatsAppAlert(to, message) {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const fromPhone = process.env.TWILIO_PHONE_NUMBER;
+    if (!accountSid || !authToken || !fromPhone) return;
+    
+    try {
+        const client = twilio(accountSid, authToken);
+        let formattedTo = to.startsWith('+') ? to : `+91${to}`;
+        const fromWhatsapp = fromPhone.startsWith('whatsapp:') ? fromPhone : `whatsapp:${fromPhone}`;
+        await client.messages.create({
+            body: message,
+            from: fromWhatsapp,
+            to: `whatsapp:${formattedTo}`
+        });
+        console.log(`WhatsApp alert sent to ${formattedTo}`);
+    } catch (err) {
+        console.error("WhatsApp Error:", err.message);
+    }
+}
 
 // SIGN UP (New Farmer Registration)
 router.post('/signup', authLimiter, validate(schemas.signup), async (req, res) => {
@@ -20,6 +41,19 @@ router.post('/signup', authLimiter, validate(schemas.signup), async (req, res) =
             'INSERT INTO users (username, email, password, phone_number) VALUES (?, ?, ?, ?)',
             [username, email, hashedPass, phone_number || null]
         );
+
+        if (phone_number) {
+            await sendWhatsAppAlert(phone_number, `Welcome to Farm Central, ${username}! 🚀 Your account is active. Trade securely with 0% risk.`);
+        }
+
+        // Emit live social proof
+        if (req.io) {
+            req.io.emit('live-activity', {
+                type: 'registration',
+                message: `🎉 New farmer registered: ${username}`,
+                time: new Date()
+            });
+        }
 
         res.status(201).json({ message: "Registration successful! Please login." });
     } catch (err) {
@@ -77,7 +111,7 @@ router.post('/forgot-password', authLimiter, validate(schemas.forgotPassword), a
         if (users.length === 0) return res.status(404).json({ error: "User not found" });
 
         const user = users[0];
-        const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
+        const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit OTP
 
         // Use Unix Timestamp (Seconds) for 1 hour from now - robust against timezone issues
         const expiresAt = Math.floor(Date.now() / 1000) + 3600;

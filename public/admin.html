@@ -129,8 +129,17 @@
             <div class="sidebar-link" onclick="showSection('users')">
                 <span class="icon">👥</span> Users
             </div>
+            <div class="sidebar-link" onclick="showSection('kyc')">
+                <span class="icon">📋</span> KYC Approvals
+            </div>
             <div class="sidebar-link" onclick="showSection('listings')">
                 <span class="icon">📦</span> Trade Listings
+            </div>
+            <div class="sidebar-link" onclick="showSection('disputes')">
+                <span class="icon">⚖️</span> Disputes
+            </div>
+            <div class="sidebar-link" onclick="showSection('payouts')">
+                <span class="icon">💸</span> Payout Requests
             </div>
             <div class="sidebar-link" onclick="showSection('scans')">
                 <span class="icon">🛰️</span> Satellite Scans
@@ -300,6 +309,39 @@
             </div>
         </section>
 
+        </section>
+
+        <!-- KYC SECTION -->
+        <section id="section-kyc" class="hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">KYC Approvals</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1">Review pending KYC documents</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-50 text-left">
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">User ID</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Aadhaar</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">PAN</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Submitted At</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kyc-table">
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading KYC applications...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- LISTINGS SECTION -->
         <section id="section-listings" class="hidden">
             <div class="flex items-center justify-between mb-8">
@@ -331,6 +373,62 @@
                                 <td colspan="6" class="px-4 py-10 text-center text-slate-400 text-sm">Loading
                                     listings...</td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DISPUTES SECTION -->
+        <section id="section-disputes" class="hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Dispute Resolution</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1">Review and resolve transaction disputes</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-50 text-left">
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Crop / ID</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Parties</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Reason</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disputes-table">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading disputes...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAYOUTS SECTION -->
+        <section id="section-payouts" class="hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Payout Requests</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1">Manage farmer withdrawal requests</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-50 text-left">
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Farmer</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Method</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Details</th>
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payouts-table-admin">
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading payouts...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -542,8 +640,194 @@
         document.getElementById('stat-scans').textContent = '47';
         document.getElementById('scan-total').textContent = '47';
 
+        // Fetch KYC
+        async function loadKYC() {
+            try {
+                // The route in kyc.js is GET /api/admin/kyc/pending
+                // But it's mounted at /api/kyc. So the full route is /api/kyc/admin/pending
+                // Wait, if it was documented as /api/admin/kyc/pending, it might be in admin.js or kyc.js. Let's try /api/kyc/admin/pending first.
+                const res = await fetch('/api/kyc/admin/pending', { headers: { 'Authorization': token } });
+                if (!res.ok) throw new Error();
+                const kyc = await res.json();
+                renderKYC(kyc);
+            } catch (e) {
+                document.getElementById('kyc-table').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Error loading or no pending KYC applications.</td></tr>';
+            }
+        }
+
+        function renderKYC(kycApps) {
+            const tbody = document.getElementById('kyc-table');
+            if(kycApps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">No pending KYC applications.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = kycApps.map(k => `
+                <tr class="table-row border-t border-slate-100">
+                    <td class="px-6 py-4 font-semibold text-sm text-slate-700">${k.user_id}</td>
+                    <td class="px-6 py-4 text-sm text-blue-500"><a href="${k.document_url || '#'}" target="_blank">View Aadhaar</a></td>
+                    <td class="px-6 py-4 text-sm text-slate-500">${k.document_type}</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${new Date(k.created_at).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 flex gap-2">
+                        <button onclick="approveKYC(${k.user_id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 font-bold rounded-md hover:bg-emerald-100 text-xs">Approve</button>
+                        <button onclick="rejectKYC(${k.user_id})" class="px-3 py-1 bg-rose-50 text-rose-600 font-bold rounded-md hover:bg-rose-100 text-xs">Reject</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function approveKYC(userId) {
+            if(!confirm('Approve this KYC?')) return;
+            try {
+                const res = await fetch(`/api/kyc/admin/approve/${userId}`, { method: 'POST', headers: { 'Authorization': token } });
+                if(res.ok) { toast.success('Approved'); loadKYC(); loadUsers(); }
+                else toast.error('Failed to approve');
+            } catch(e) { toast.error('Network error'); }
+        }
+
+        async function rejectKYC(userId) {
+            const reason = prompt('Reason for rejection:');
+            if(!reason) return;
+            try {
+                const res = await fetch(`/api/kyc/admin/reject/${userId}`, { 
+                    method: 'POST', 
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                if(res.ok) { toast.success('Rejected'); loadKYC(); }
+                else toast.error('Failed to reject');
+            } catch(e) { toast.error('Network error'); }
+        }
+
+        // Fetch Disputes
+        async function loadDisputes() {
+            try {
+                const res = await fetch('/api/disputes/admin/all', { headers: { 'Authorization': token } });
+                if (!res.ok) throw new Error();
+                const disputes = await res.json();
+                renderDisputes(disputes);
+            } catch (e) {
+                document.getElementById('disputes-table').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Error loading disputes.</td></tr>';
+            }
+        }
+
+        function renderDisputes(disputes) {
+            const tbody = document.getElementById('disputes-table');
+            if(disputes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">No active disputes.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = disputes.map(d => `
+                <tr class="table-row border-t border-slate-100">
+                    <td class="px-6 py-4">
+                        <p class="font-bold text-sm text-slate-700">${d.crop_name}</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold">TXN #${d.transaction_id}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-xs font-bold text-slate-600">By: ${d.filer_name}</p>
+                        <p class="text-xs text-slate-400">Against: ${d.against_name}</p>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-slate-500 max-w-xs truncate" title="${d.description}">${d.reason}: ${d.description}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border uppercase ${d.status === 'open' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-slate-50 text-slate-500 border-slate-200'}">${d.status}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            <button onclick="resolveDispute(${d.id}, 'refund')" class="px-2 py-1 bg-rose-50 text-rose-600 font-bold rounded-md hover:bg-rose-100 text-[10px]">Refund Buyer</button>
+                            <button onclick="resolveDispute(${d.id}, 'reject')" class="px-2 py-1 bg-slate-50 text-slate-600 font-bold rounded-md hover:bg-slate-100 text-[10px]">Reject Claim</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function resolveDispute(id, action) {
+            const notes = prompt(`Resolution notes for ${action}:`);
+            if(notes === null) return;
+            try {
+                const res = await fetch(`/api/disputes/admin/resolve/${id}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, resolution_notes: notes })
+                });
+                if(res.ok) { toast.success('Dispute resolved'); loadDisputes(); }
+                else toast.error('Failed to resolve');
+            } catch(e) { toast.error('Network error'); }
+        }
+
+        // Fetch Payouts
+        async function loadPayouts() {
+            try {
+                const res = await fetch('/api/payouts/admin/pending', { headers: { 'Authorization': token } });
+                if (!res.ok) throw new Error();
+                const payouts = await res.json();
+                renderPayoutsAdmin(payouts);
+            } catch (e) {
+                document.getElementById('payouts-table-admin').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Error loading payouts.</td></tr>';
+            }
+        }
+
+        function renderPayoutsAdmin(payouts) {
+            const tbody = document.getElementById('payouts-table-admin');
+            if(payouts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">No pending payout requests.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = payouts.map(p => `
+                <tr class="table-row border-t border-slate-100">
+                    <td class="px-6 py-4">
+                        <p class="font-bold text-sm text-slate-700">${p.username}</p>
+                        <p class="text-[10px] text-slate-400">${p.email}</p>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-black text-emerald-600">₹${Number(p.amount).toLocaleString()}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase">${p.payout_method}</span>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-slate-500">
+                        ${p.payout_method === 'upi' ? `UPI: ${p.upi_id}` : `Bank: ${p.bank_account}<br>IFSC: ${p.ifsc_code}`}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            <button onclick="approvePayout(${p.id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 font-bold rounded-md hover:bg-emerald-100 text-xs">Approve</button>
+                            <button onclick="rejectPayout(${p.id})" class="px-3 py-1 bg-rose-50 text-rose-600 font-bold rounded-md hover:bg-rose-100 text-xs">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function approvePayout(id) {
+            const ref = prompt('Enter payment reference ID:');
+            if(!ref) return;
+            try {
+                const res = await fetch(`/api/payouts/admin/approve/${id}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference_id: ref })
+                });
+                if(res.ok) { toast.success('Payout approved'); loadPayouts(); }
+                else toast.error('Failed to approve');
+            } catch(e) { toast.error('Network error'); }
+        }
+
+        async function rejectPayout(id) {
+            const notes = prompt('Reason for rejection:');
+            if(!notes) return;
+            try {
+                const res = await fetch(`/api/payouts/admin/reject/${id}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notes })
+                });
+                if(res.ok) { toast.success('Payout rejected & refunded'); loadPayouts(); }
+                else toast.error('Failed to reject');
+            } catch(e) { toast.error('Network error'); }
+        }
+
         loadUsers();
         loadListings();
+        loadKYC();
+        loadDisputes();
+        loadPayouts();
     </script>
 </body>
 

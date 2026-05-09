@@ -112,32 +112,44 @@
         }
     </style>
     <script>
-        /* Access functions - defined early for reliability */
-        function enterDashboard() {
-            const token = localStorage.getItem('token');
-            if (token) {
-                window.location.href = 'dashboard.html';
-            } else {
-                window.location.href = 'login.html';
+        /* Global access function - improved for maximum reliability */
+        window.enterDashboard = function() {
+            console.log("🚀 Enter Dashboard triggered");
+            
+            // Visual feedback
+            if (typeof toast !== 'undefined') {
+                toast.info('Accessing Farm Central Hub...');
             }
-        }
 
-        function navigateTo(page) {
             const token = localStorage.getItem('token');
-            if (token) {
-                window.location.href = page;
-            } else {
-                if (typeof toast !== 'undefined' && toast.info) {
-                    toast.info('Please login to access this feature.');
+            const hasValidToken = token && token !== 'undefined' && token !== 'null' && token.length > 10;
+
+            setTimeout(() => {
+                if (hasValidToken) {
+                    window.location.assign('dashboard.html');
                 } else {
-                    alert('Please login to access this feature.');
+                    window.location.assign('login.html');
                 }
-                setTimeout(() => { window.location.href = 'login.html'; }, 1200);
+            }, 300);
+        };
+
+        window.navigateTo = function(page) {
+            if (typeof toast !== 'undefined') {
+                toast.info('Navigating to ' + page + '...');
             }
-        }
-        
-        window.enterDashboard = enterDashboard;
-        window.navigateTo = navigateTo;
+            
+            const token = localStorage.getItem('token');
+            const hasValidToken = token && token !== 'undefined' && token !== 'null' && token.length > 10;
+
+            if (hasValidToken) {
+                window.location.assign(page);
+            } else {
+                if (typeof toast !== 'undefined') {
+                    toast.warning('Please login to access this feature.');
+                }
+                setTimeout(() => { window.location.assign('login.html'); }, 1000);
+            }
+        };
     </script>
 </head>
 
@@ -175,12 +187,12 @@
                     <span>🛰️</span> Satellite Scan
                 </button>
 
-                <button onclick="enterDashboard()" data-i18n="enter_dashboard"
-                    class="hidden sm:block px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-semibold transition hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                <button id="nav-dashboard-btn" data-i18n="enter_dashboard"
+                    class="hidden sm:block px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs font-semibold transition hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] relative z-[60]">
                     Dashboard
                 </button>
-                <button onclick="location.href='login.html'" data-i18n="login"
-                    class="btn-premium px-5 py-2 md:px-8 md:py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 rounded-full text-xs md:text-sm font-bold shadow-lg shadow-emerald-500/20 text-white border border-emerald-400/50">
+                <button onclick="window.location.assign('login.html')" data-i18n="login"
+                    class="btn-premium px-5 py-2 md:px-8 md:py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 rounded-full text-xs md:text-sm font-bold shadow-lg shadow-emerald-500/20 text-white border border-emerald-400/50 relative z-[60]">
                     Login
                 </button>
             </div>
@@ -202,8 +214,8 @@
                 The all-in-one digital marketplace for modern farmers and wholesale buyers. Trade securely with 0% risk, track finances, and leverage AI satellite health scans.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-6 fade-in-up delay-300">
-                <button onclick="enterDashboard()"
-                    class="btn-premium px-10 py-5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-lg font-bold rounded-2xl shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 border border-emerald-400/30 text-white">
+                <button id="hero-dashboard-btn"
+                    class="btn-premium px-10 py-5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-lg font-bold rounded-2xl shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 border border-emerald-400/30 text-white relative z-[100]">
                     <span>🚀</span> <span data-i18n="enter_dashboard">Start Trading Now</span>
                 </button>
                 <button onclick="document.getElementById('features').scrollIntoView()"
@@ -442,6 +454,13 @@
     <script>
         // Simple Intersection Observer for scroll animations (fade-in)
         document.addEventListener("DOMContentLoaded", function () {
+            // Attach event listeners for maximum reliability
+            const heroBtn = document.getElementById('hero-dashboard-btn');
+            const navBtn = document.getElementById('nav-dashboard-btn');
+
+            if (heroBtn) heroBtn.onclick = window.enterDashboard;
+            if (navBtn) navBtn.onclick = window.enterDashboard;
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {

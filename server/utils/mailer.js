@@ -72,4 +72,4 @@ const verifyConnection = async () => {
     }
 };
 
-module.exports = { sendAlert, verifyConnection };
+module.exports = { sendAlert, verifyConnection, createTransporter };

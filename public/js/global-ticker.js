@@ -65,8 +65,11 @@
             100% { transform: translateX(-50%); } 
         }
 
-        /* Adjust body to not hide behind ticker */
+        /* Adjust body and fixed nav to not hide behind ticker */
         body { padding-top: 30px !important; }
+        nav.fixed { top: 30px !important; }
+        .mobile-menu-panel { top: 30px !important; height: calc(100% - 30px) !important; }
+        .mobile-menu-overlay { top: 30px !important; }
     `;
     document.head.appendChild(style);
 

@@ -526,23 +526,7 @@
 
         showStats();
 
-        // --- 4. WEATHER (Initial fallback, overridden by GPS in smart-dashboard.js) ---
-        async function fetchWeather() {
-            try {
-                // This runs as a fast fallback. smart-dashboard.js will override with real GPS coords.
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=20.59&longitude=78.96&current_weather=true`);
-                const data = await res.json();
-                document.getElementById('weather-temp').innerText = `${data.current_weather.temperature}°C`;
-                document.getElementById('weather-wind').innerText = `Wind: ${data.current_weather.windspeed} km/h`;
-
-                const code = data.current_weather.weathercode;
-                const weatherMap = { 0: '☀️ Clear Sky', 1: '🌤️ Mainly Clear', 2: '⛅ Partly Cloudy', 3: '☁️ Overcast', 45: '🌫️ Fog', 51: '🌧️ Drizzle', 53: '🌧️ Drizzle', 61: '🌧️ Rain', 63: '🌧️ Rain', 65: '🌧️ Heavy Rain', 71: '❄️ Snow', 80: '🌦️ Showers', 95: '⛈️ Thunderstorm' };
-                document.getElementById('weather-desc').innerText = weatherMap[code] || "Clear";
-            } catch (e) {
-                console.log("Weather fallback failed.");
-            }
-        }
-        fetchWeather();
+        // --- WEATHER IS NOW HANDLED BY smart-dashboard.js ---
 
         // --- 5. CHARTS ---
         let chartInstance = null;
@@ -643,7 +627,45 @@
 
     <script src="js/smart-dashboard.js"></script>
     <script src="js/demo-toggle.js"></script>
+    <script src="js/pwa-init.js"></script>
     <script src="js/mobile-nav.js"></script>
+    <!-- LIVE ACTIVITY FEED (Social Proof) -->
+    <div id="live-feed" class="fixed bottom-24 left-6 z-50 flex flex-col gap-3 pointer-events-none md:bottom-6"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const feedContainer = document.getElementById('live-feed');
+
+        socket.on('live-activity', (data) => {
+            const el = document.createElement('div');
+            el.className = 'glass-premium px-5 py-3 rounded-xl border border-white/10 shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-500 bg-[#090e17]/80 backdrop-blur-xl';
+            
+            const icon = data.type === 'trade' ? '🤝' : '🎉';
+            const color = data.type === 'trade' ? 'text-emerald-400' : 'text-blue-400';
+
+            el.innerHTML = `
+                <div class="text-2xl">${icon}</div>
+                <div>
+                    <p class="text-sm font-bold text-white">${data.message}</p>
+                    <p class="text-[10px] ${color} font-bold uppercase tracking-widest mt-0.5">Live • Verified</p>
+                </div>
+            `;
+            
+            feedContainer.prepend(el);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                el.classList.remove('translate-y-10', 'opacity-0');
+            });
+
+            // Remove after 6 seconds
+            setTimeout(() => {
+                el.classList.add('opacity-0', '-translate-x-10');
+                setTimeout(() => el.remove(), 500);
+            }, 6000);
+        });
+    </script>
 </body>
 
 </html>

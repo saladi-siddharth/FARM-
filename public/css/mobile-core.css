@@ -278,7 +278,15 @@ body {
 
     /* CTA Section */
     section .text-6xl {
-        font-size: 1.75rem !important;
+        font-size: 1.5rem !important;
+    }
+
+    section .text-4xl {
+        font-size: 1.4rem !important;
+    }
+
+    section .text-5xl {
+        font-size: 1.6rem !important;
     }
 
     /* Feature cards */
@@ -287,16 +295,16 @@ body {
     }
 
     .glass-premium {
-        padding: 20px !important;
-        border-radius: 20px !important;
+        padding: 16px !important;
+        border-radius: 16px !important;
     }
 
     /* CTA glass panel */
     section .rounded-\[3rem\] {
-        border-radius: 24px !important;
-        padding: 32px 20px !important;
-        margin-left: 16px !important;
-        margin-right: 16px !important;
+        border-radius: 20px !important;
+        padding: 24px 16px !important;
+        margin-left: 12px !important;
+        margin-right: 12px !important;
     }
 
     /* Dashboard header */
@@ -522,8 +530,12 @@ body {
 
     /* Login button in nav - compact */
     nav .btn-premium {
-        padding: 8px 16px !important;
-        font-size: 12px !important;
+        padding: 10px 20px !important;
+        font-size: 13px !important;
+        min-width: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Hero section */

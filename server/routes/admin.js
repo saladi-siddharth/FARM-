@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const isAdmin = require('../middleware/admin');
 const db = require('../config/db');
 
 // GET /api/admin/users — List all users (admin only)
-router.get('/users', auth, async (req, res) => {
+router.get('/users', auth, isAdmin, async (req, res) => {
     try {
         const [users] = await db.execute(
-            'SELECT id, username, email, phone_number, google_id, created_at FROM users ORDER BY created_at DESC'
+            'SELECT id, username, email, phone_number, google_id, created_at, role FROM users ORDER BY created_at DESC'
         );
         res.json(users);
     } catch (err) {
@@ -17,7 +18,7 @@ router.get('/users', auth, async (req, res) => {
 });
 
 // GET /api/admin/stats — Platform stats
-router.get('/stats', auth, async (req, res) => {
+router.get('/stats', auth, isAdmin, async (req, res) => {
     try {
         const [[userCount]] = await db.execute('SELECT COUNT(*) as count FROM users');
         let listingCount = 0, scanCount = 0;
