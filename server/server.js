@@ -33,6 +33,69 @@ app.use((req, res, next) => {
 // Serve Static Files
 app.use(express.static(path.join(__dirname, '../public')));
 
+// --- DATABASE AUTO-MIGRATION (for Render/Production) ---
+const setupDatabase = async () => {
+    try {
+        console.log('🔄 Checking database tables...');
+        // We'll run a simplified version of setup_database.js here
+        const db = require('./config/db');
+        
+        // Example check: Ensure users table exists
+        await db.execute(`CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL,
+            email VARCHAR(255) UNIQUE NOT NULL,
+            password VARCHAR(255),
+            role ENUM('farmer','customer','both','admin') DEFAULT 'both',
+            kyc_status ENUM('not_submitted','pending','verified','rejected') DEFAULT 'not_submitted',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        
+        await db.execute(`CREATE TABLE IF NOT EXISTS inventory (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            type VARCHAR(50),
+            quantity DECIMAL(10,2) NOT NULL,
+            cost DECIMAL(10,2),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await db.execute(`CREATE TABLE IF NOT EXISTS expenses (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            category VARCHAR(100) NOT NULL,
+            amount DECIMAL(10,2) NOT NULL,
+            expense_date DATE NOT NULL,
+            description TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        
+        await db.execute(`CREATE TABLE IF NOT EXISTS tasks (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            task_date DATE NOT NULL,
+            task_time TIME NOT NULL,
+            description TEXT NOT NULL,
+            status ENUM('pending', 'completed') DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await db.execute(`CREATE TABLE IF NOT EXISTS messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            sender_id INT NOT NULL,
+            receiver_id INT NOT NULL,
+            content TEXT,
+            messaged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        
+        console.log('✅ Database tables verified.');
+    } catch (err) {
+        console.error('⚠️ Database Warmup Warning:', err.message);
+    }
+};
+setupDatabase();
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/trade', require('./routes/trade'));
