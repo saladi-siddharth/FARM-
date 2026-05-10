@@ -29,8 +29,14 @@ const pool = mysql.createPool(dbConfig);
 const dbName = process.env.DB_NAME || 'farming';
 pool.getConnection((err, connection) => {
     if (err) {
-        console.error(`❌ Database connection failed [${dbName}]:`, err.message);
-        console.error('👉 Make sure your TiDB Cloud credentials and host are correct in .env');
+        console.error('\n❌ --- DATABASE CONNECTION CRITICAL ERROR ---');
+        console.error(`ID: [${dbName}] at ${dbConfig.host}:${dbConfig.port}`);
+        console.error(`ERROR: ${err.message}`);
+        console.error('POSSIBLE CAUSES:');
+        console.error('1. TiDB Cloud IP Access List: Did you whitelist 0.0.0.0/0?');
+        console.error('2. Wrong Port: Is it definitely 4000 in Render settings?');
+        console.error('3. SSL: Is SSL enabled (it should be automatically)?');
+        console.error('----------------------------------------------\n');
     } else {
         console.log(`✅ Database Connected: [${dbName}]`);
         connection.release();

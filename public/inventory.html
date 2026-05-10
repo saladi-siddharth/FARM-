@@ -217,6 +217,8 @@
             try {
                 const res = await fetch('/api/inventory', { headers: { 'Authorization': token } });
                 const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || `Server returned ${res.status}`);
 
                 const container = document.getElementById('invDisplay');
 
@@ -263,7 +265,13 @@
                     `;
                 }).join('');
             } catch (e) {
-                document.getElementById('invDisplay').innerHTML = '<div class="col-span-full text-center text-rose-400 font-bold py-10">Error loading inventory from server.</div>';
+                console.error("Inventory Load Error:", e);
+                document.getElementById('invDisplay').innerHTML = `
+                <div class="col-span-full text-center py-10">
+                    <p class="text-rose-400 font-bold mb-2">Error loading inventory from server.</p>
+                    <p class="text-slate-500 text-xs font-mono">Details: ${e.message}</p>
+                    <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/10">Retry Connection</button>
+                </div>`;
             }
         }
 
