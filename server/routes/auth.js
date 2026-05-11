@@ -255,5 +255,43 @@ router.post('/firebase-google', async (req, res) => {
         res.status(500).json({ error: "Authentication failed" });
     }
 });
+// --- DELETE ACCOUNT (Permanent) ---
+router.delete('/delete-account', require('../middleware/auth'), async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        // Delete all user data from every table
+        const tables = [
+            ['transactions', 'buyer_id'],
+            ['transactions', 'seller_id'],
+            ['trade_listings', 'user_id'],
+            ['inventory', 'user_id'],
+            ['expenses', 'user_id'],
+            ['tasks', 'user_id'],
+            ['messages', 'sender_id'],
+            ['messages', 'receiver_id'],
+            ['kyc_documents', 'user_id'],
+            ['satellite_scans', 'user_id'],
+            ['payout_requests', 'user_id'],
+            ['disputes', 'complainant_id'],
+            ['disputes', 'respondent_id'],
+            ['kyc_verification_logs', 'user_id'],
+        ];
+        
+        for (const [table, col] of tables) {
+            try {
+                await db.execute(`DELETE FROM ${table} WHERE ${col} = ?`, [userId]);
+            } catch (e) { /* table may not exist */ }
+        }
+        
+        // Finally delete the user
+        await db.execute('DELETE FROM users WHERE id = ?', [userId]);
+        
+        res.json({ message: 'Account and all data permanently deleted' });
+    } catch (err) {
+        console.error('Delete Account Error:', err.message);
+        res.status(500).json({ error: 'Failed to delete account' });
+    }
+});
 
-module.exports = router;
+module.exports = router;

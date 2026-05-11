@@ -3,6 +3,13 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const { requireKYC } = require('../middleware/kyc');
 const db = require('../config/db');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+    key_secret: process.env.RAZORPAY_KEY_SECRET || 'secret_placeholder'
+});
 
 // ============================================================
 // TRADE HUB — Full Marketplace API with Commission & KYC
@@ -144,7 +151,7 @@ router.post('/buy/:id', auth, requireKYC, async (req, res) => {
     try {
         const listingId = req.params.id;
         const buyerId = req.user.id;
-        const { order_qty } = req.body;
+        const { order_qty, payment_method } = req.body;
 
         // Validate listing
         const [listings] = await db.execute(
@@ -195,16 +202,16 @@ router.post('/buy/:id', auth, requireKYC, async (req, res) => {
             await db.execute("UPDATE trade_listings SET quantity = quantity - ? WHERE id = ?", [qty, listingId]);
         }
 
-        // Record transaction with commission
+        // Record transaction with commission and payment method
         const [txnResult] = await db.execute(`
             INSERT INTO transactions 
             (listing_id, buyer_id, seller_id, total_amount, quantity, status,
              commission_rate, commission_amount, net_farmer_amount, escrow_status, 
-             order_id, buyer_kyc_verified, seller_kyc_verified) 
-            VALUES (?, ?, ?, ?, ?, 'processing', ?, ?, ?, 'held', ?, 1, 1)
+             order_id, buyer_kyc_verified, seller_kyc_verified, payment_method, payment_status) 
+            VALUES (?, ?, ?, ?, ?, 'processing', ?, ?, ?, 'held', ?, 1, 1, ?, 'completed')
         `, [
             listingId, buyerId, listing.seller_id, totalPayable, qty,
-            COMMISSION_RATE, commissionAmount, netFarmerAmount, orderId
+            COMMISSION_RATE, commissionAmount, netFarmerAmount, orderId, payment_method || 'direct'
         ]);
 
         // Record in commission ledger
@@ -394,6 +401,109 @@ router.post('/calculate', (req, res) => {
         total_payable: total,
         farmer_receives: subtotal
     });
+});
+
+// ============================================================
+// 10. REAL-TIME PAYMENT GATEWAY: CREATE RAZORPAY ORDER
+// ============================================================
+router.post('/create-payment-order', auth, requireKYC, async (req, res) => {
+    try {
+        const { listing_id, order_qty } = req.body;
+        
+        const [listings] = await db.execute("SELECT * FROM trade_listings WHERE id = ?", [listing_id]);
+        if (listings.length === 0) return res.status(404).json({ error: "Listing not found" });
+        
+        const listing = listings[0];
+        const qty = parseFloat(order_qty);
+        
+        const subtotal = Math.round(qty * listing.price_per_unit * 100) / 100;
+        const commissionAmount = Math.round(subtotal * COMMISSION_RATE * 100) / 100;
+        const totalPayable = Math.round((subtotal + commissionAmount) * 100) / 100;
+
+        // Razorpay expects amount in paise (₹1 = 100 paise)
+        const options = {
+            amount: Math.round(totalPayable * 100), 
+            currency: "INR",
+            receipt: `rcpt_${Date.now()}`,
+            notes: {
+                listing_id: listing_id,
+                buyer_id: req.user.id,
+                quantity: qty
+            }
+        };
+
+        const order = await razorpay.orders.create(options);
+        res.json({
+            order_id: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            key_id: process.env.RAZORPAY_KEY_ID
+        });
+    } catch (err) {
+        console.error("Razorpay Order Error:", err);
+        res.status(500).json({ error: "Could not initiate payment gateway" });
+    }
+});
+
+// ============================================================
+// 11. REAL-TIME PAYMENT GATEWAY: VERIFY SIGNATURE & FINALIZE
+// ============================================================
+router.post('/verify-payment', auth, async (req, res) => {
+    try {
+        const { 
+            razorpay_order_id, 
+            razorpay_payment_id, 
+            razorpay_signature,
+            listing_id,
+            order_qty
+        } = req.body;
+
+        // Verify Signature
+        const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'secret_placeholder');
+        hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+        const generated_signature = hmac.digest('hex');
+
+        if (generated_signature !== razorpay_signature) {
+            return res.status(400).json({ error: "Payment verification failed. Invalid signature." });
+        }
+
+        // --- SUCCESS: FINALIZE TRADE ---
+        // (Similar to the buy logic but with payment verification)
+        const buyerId = req.user.id;
+        const [listings] = await db.execute("SELECT * FROM trade_listings WHERE id = ?", [listing_id]);
+        const listing = listings[0];
+        const qty = parseFloat(order_qty);
+
+        const subtotal = Math.round(qty * listing.price_per_unit * 100) / 100;
+        const commissionAmount = Math.round(subtotal * COMMISSION_RATE * 100) / 100;
+        const totalPayable = Math.round((subtotal + commissionAmount) * 100) / 100;
+        const orderId = generateOrderId();
+
+        // Update listing stock
+        if (qty >= listing.quantity) {
+            await db.execute("UPDATE trade_listings SET status = 'sold' WHERE id = ?", [listing_id]);
+        } else {
+            await db.execute("UPDATE trade_listings SET quantity = quantity - ? WHERE id = ?", [qty, listing_id]);
+        }
+
+        // Record transaction
+        const [txnResult] = await db.execute(`
+            INSERT INTO transactions 
+            (listing_id, buyer_id, seller_id, total_amount, quantity, status,
+             commission_rate, commission_amount, net_farmer_amount, escrow_status, 
+             order_id, payment_method, payment_status, razorpay_payment_id) 
+            VALUES (?, ?, ?, ?, ?, 'processing', ?, ?, ?, 'held', ?, 'razorpay', 'completed', ?)
+        `, [
+            listing_id, buyerId, listing.seller_id, totalPayable, qty,
+            COMMISSION_RATE, commissionAmount, subtotal, orderId, razorpay_payment_id
+        ]);
+
+        res.json({ success: true, order_id: orderId, message: "Payment verified and trade finalized!" });
+
+    } catch (err) {
+        console.error("Verification Error:", err);
+        res.status(500).json({ error: "Internal server error during verification" });
+    }
 });
 
 module.exports = router;

@@ -38,6 +38,10 @@ async function migrateSchema() {
             {
                 name: 'updated_at',
                 sql: 'ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'
+            },
+            {
+                name: 'status',
+                sql: "ALTER TABLE users ADD COLUMN IF NOT EXISTS status ENUM('active','banned','suspended') DEFAULT 'active'"
             }
         ];
 

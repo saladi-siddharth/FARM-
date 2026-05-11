@@ -830,20 +830,56 @@
                         <span id="modal-total-payable" class="font-black text-emerald-600">₹0</span>
                     </div>
                 </div>
+
+                <!-- PAYMENT GATEWAY SELECTION -->
+                <div id="payment-gateway-selection" class="hidden mb-6 space-y-3">
+                    <label class="text-xs font-bold text-slate-400 mb-1.5 block uppercase tracking-wider">Select Payment Method</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="selectPaymentMethod('upi')" class="pay-method-btn flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition text-left group">
+                            <span class="text-xl group-hover:scale-110 transition">📱</span>
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">UPI / BHIM</p>
+                                <p class="text-[9px] text-slate-400">Instant Pay</p>
+                            </div>
+                        </button>
+                        <button onclick="selectPaymentMethod('card')" class="pay-method-btn flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition text-left group">
+                            <span class="text-xl group-hover:scale-110 transition">💳</span>
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">Card</p>
+                                <p class="text-[9px] text-slate-400">Visa / Master</p>
+                            </div>
+                        </button>
+                        <button onclick="selectPaymentMethod('netbank')" class="pay-method-btn flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition text-left group">
+                            <span class="text-xl group-hover:scale-110 transition">🏦</span>
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">Net Banking</p>
+                                <p class="text-[9px] text-slate-400">All Banks</p>
+                            </div>
+                        </button>
+                        <button onclick="selectPaymentMethod('wallet')" class="pay-method-btn flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition text-left group">
+                            <span class="text-xl group-hover:scale-110 transition">👛</span>
+                            <div>
+                                <p class="text-xs font-bold text-slate-800">Wallet</p>
+                                <p class="text-[9px] text-slate-400">Escrow Credits</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
                 <div class="flex gap-3">
-                    <button id="modal-contactBtn"
-                        class="flex-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold transition text-sm flex items-center justify-center gap-2">
-                        💬 Message
+                    <button id="modal-cancelBtn" onclick="closeModal()"
+                        class="hidden flex-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold transition text-sm">
+                        Back
                     </button>
                     <button id="modal-buyBtn"
                         class="flex-[2] bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-3.5 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 transition active:scale-[0.98] text-sm">
-                        Confirm Purchase
+                        Proceed to Payment
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="js/toast.js"></script>
     <script>
         // ============== UTILITY ==============
@@ -1145,10 +1181,48 @@
             document.getElementById('modal-icon').innerText = getIcon(item.crop);
             document.getElementById('modal-order-qty').value = '';
             document.getElementById('modal-order-qty').max = item.qty;
+            document.getElementById('modal-order-qty').parentElement.classList.remove('hidden');
             document.getElementById('modal-commission-box').classList.add('hidden');
-            document.getElementById('modal-buyBtn').onclick = () => confirmPurchase(item.id);
+            document.getElementById('payment-gateway-selection').classList.add('hidden');
+            document.getElementById('modal-cancelBtn').classList.add('hidden');
+            
+            const buyBtn = document.getElementById('modal-buyBtn');
+            buyBtn.innerText = 'Proceed to Payment';
+            buyBtn.onclick = () => showPaymentGateway();
+            
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); modalContent.classList.add('scale-100'); }, 10);
+        }
+
+        let selectedMethod = null;
+        function showPaymentGateway() {
+            const qty = document.getElementById('modal-order-qty').value;
+            if (!qty || qty <= 0) { toast.warning('Please enter a valid quantity'); return; }
+            if (qty > currentModalItem.qty) { toast.warning('Quantity exceeds stock'); return; }
+
+            document.getElementById('modal-order-qty').parentElement.classList.add('hidden');
+            document.getElementById('payment-gateway-selection').classList.remove('hidden');
+            document.getElementById('modal-cancelBtn').classList.remove('hidden');
+            
+            const buyBtn = document.getElementById('modal-buyBtn');
+            buyBtn.innerText = 'Confirm & Pay Securely';
+            buyBtn.onclick = () => confirmPurchase(currentModalItem.id);
+            buyBtn.disabled = true;
+            buyBtn.classList.add('opacity-50');
+        }
+
+        function selectPaymentMethod(method) {
+            selectedMethod = method;
+            document.querySelectorAll('.pay-method-btn').forEach(b => {
+                b.classList.remove('border-indigo-500', 'bg-indigo-50');
+                b.classList.add('border-slate-200');
+            });
+            event.currentTarget.classList.remove('border-slate-200');
+            event.currentTarget.classList.add('border-indigo-500', 'bg-indigo-50');
+            
+            const buyBtn = document.getElementById('modal-buyBtn');
+            buyBtn.disabled = false;
+            buyBtn.classList.remove('opacity-50');
         }
 
         function updateModalPrice() {
@@ -1174,26 +1248,108 @@
         }
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-        // ============== CONFIRM PURCHASE (REAL API POST) ==============
+        // ============== CONFIRM PURCHASE (REAL-TIME RAZORPAY GATEWAY) ==============
         async function confirmPurchase(id) {
+            if (!selectedMethod) { toast.warning('Please select a payment method'); return; }
+            
+            // If user selects something other than Razorpay (simulated), we can handle it or force Razorpay
+            // For "realtime", we'll route everything through the Razorpay SDK
+            
             const qty = document.getElementById('modal-order-qty').value;
-            if (!qty || qty <= 0) { toast.warning('Please enter a valid quantity'); return; }
             const btn = document.getElementById('modal-buyBtn');
-            btn.innerHTML = '⏳ Processing...'; btn.disabled = true;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="flex items-center justify-center gap-2">🔒 Initializing Secure Gateway...</span>';
+            btn.disabled = true;
 
             try {
-                const res = await fetch(getApiUrl(`/api/trade/buy/${id}`), {
+                // 1. Create Order on Backend
+                const orderRes = await fetch(getApiUrl('/api/trade/create-payment-order'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                    body: JSON.stringify({ order_qty: parseInt(qty) })
+                    body: JSON.stringify({ 
+                        listing_id: id,
+                        order_qty: parseInt(qty)
+                    })
                 });
-                const data = await res.json();
-                if (res.ok) {
-                    toast.success(`Purchase confirmed! 🎉 Total: ₹${data.total?.toLocaleString() || qty}`);
-                    closeModal(); await fetchListings(); await fetchOrders();
-                } else { toast.error(data.error || 'Purchase failed'); }
-            } catch (e) { toast.error('Network error.'); }
-            btn.innerHTML = 'Confirm Purchase'; btn.disabled = false;
+                
+                const orderData = await orderRes.json();
+                if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
+
+                // 2. Open Razorpay Checkout
+                const options = {
+                    key: orderData.key_id,
+                    amount: orderData.amount,
+                    currency: orderData.currency,
+                    name: "Farm Central",
+                    description: `Escrow Payment for ${qty}kg of ${currentModalItem.crop}`,
+                    order_id: orderData.order_id,
+                    handler: async function (response) {
+                        // 3. Verify Payment on Backend
+                        btn.innerHTML = '<span class="flex items-center justify-center gap-2">🔄 Verifying Payment...</span>';
+                        
+                        const verifyRes = await fetch(getApiUrl('/api/trade/verify-payment'), {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                listing_id: id,
+                                order_qty: parseInt(qty)
+                            })
+                        });
+
+                        const verifyData = await verifyRes.json();
+                        if (verifyRes.ok) {
+                            btn.innerHTML = '✅ Payment Successful';
+                            btn.classList.replace('from-emerald-500', 'from-indigo-600');
+                            btn.classList.replace('to-teal-500', 'to-purple-600');
+                            
+                            toast.success(`Trade Secured! Order ID: ${verifyData.order_id}`);
+                            
+                            setTimeout(() => {
+                                closeModal();
+                                fetchListings();
+                                fetchOrders();
+                                // Reset
+                                btn.innerHTML = 'Proceed to Payment';
+                                btn.classList.replace('from-indigo-600', 'from-emerald-500');
+                                btn.classList.replace('to-purple-600', 'to-teal-500');
+                                btn.disabled = false;
+                                selectedMethod = null;
+                            }, 1500);
+                        } else {
+                            toast.error(verifyData.error || "Verification failed");
+                            btn.innerHTML = 'Retry Verification';
+                            btn.disabled = false;
+                        }
+                    },
+                    prefill: {
+                        name: currentUser,
+                        email: localStorage.getItem('email') || ""
+                    },
+                    theme: {
+                        color: "#6366f1"
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            btn.innerHTML = "Proceed to Payment";
+                            btn.disabled = false;
+                            toast.info("Payment cancelled");
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (err) {
+                console.error(err);
+                toast.error(err.message || "Payment initialization failed");
+                btn.innerHTML = "Retry Payment";
+                btn.disabled = false;
+            }
         }
 
         // ============== FETCH ORDERS (REAL API) ==============

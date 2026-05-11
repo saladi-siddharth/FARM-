@@ -125,6 +125,29 @@ const setupDatabase = async () => {
         )`);
         
         console.log('✅ Database tables verified.');
+
+        // Admin infrastructure tables
+        await db.execute(`CREATE TABLE IF NOT EXISTS kyc_verification_logs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT, admin_id INT, action VARCHAR(100), reason TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        await db.execute(`CREATE TABLE IF NOT EXISTS platform_commission_ledger (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            transaction_id INT, order_id VARCHAR(100),
+            total_charged DECIMAL(12,2), commission_amount DECIMAL(10,2),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        // Safe column adds
+        const safeCols = [
+            ["users", "status", "ENUM('active','banned','suspended') DEFAULT 'active'"],
+            ["users", "wallet_balance", "DECIMAL(12,2) DEFAULT 0"],
+            ["users", "phone_number", "VARCHAR(20) DEFAULT NULL"],
+        ];
+        for (const [tbl, col, def] of safeCols) {
+            try { await db.execute(`ALTER TABLE ${tbl} ADD COLUMN ${col} ${def}`); } catch(e) {}
+        }
+        console.log('✅ Admin tables verified.');
     } catch (err) {
         console.error('⚠️ Database Warmup Warning:', err.message);
     }

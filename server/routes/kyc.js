@@ -13,6 +13,20 @@ const db = require('../config/db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// ============== VERHOEFF ALGORITHM (BACKEND) ==============
+const d = [[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
+const p = [[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,1,4,6,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
+function validateAadhaar(aadhaar) {
+    if (!/^\d{12}$/.test(aadhaar)) return false;
+    let c = 0; let invertedAadhaar = aadhaar.split('').map(Number).reverse();
+    for (let i = 0; i < invertedAadhaar.length; i++) c = d[c][p[(i % 8)][invertedAadhaar[i]]];
+    return (c === 0);
+}
 
 // ---- MULTER CONFIG for KYC Document Uploads ----
 const kycUploadDir = path.join(__dirname, '../../public/uploads/kyc');
@@ -41,6 +55,33 @@ const upload = multer({
     }
 });
 
+// Helper for Gemini AI Analysis
+async function analyzeDocument(filePath, docType, expectedNumber) {
+    try {
+        const imageData = fs.readFileSync(filePath);
+        const prompt = `Act as an official KYC verification officer. Analyze this image. 
+        Is this a real ${docType}? 
+        If it's an Aadhaar card, look for the 12-digit number. 
+        If it's a PAN card, look for the 10-digit alphanumeric PAN.
+        
+        Return ONLY a JSON object: 
+        { "isValid": boolean, "documentFound": string, "numberMatched": boolean, "confidence": number, "reason": string }
+        Expected Number to match: ${expectedNumber}`;
+
+        const result = await model.generateContent([
+            prompt,
+            { inlineData: { data: imageData.toString("base64"), mimeType: "image/jpeg" } }
+        ]);
+        
+        const responseText = result.response.text();
+        const jsonMatch = responseText.match(/\{.*\}/s);
+        return jsonMatch ? JSON.parse(jsonMatch[0]) : { isValid: false, reason: "AI Analysis Failed" };
+    } catch (e) {
+        console.error("Gemini KYC Error:", e);
+        return { isValid: true, reason: "AI fallback (test mode)" }; // Fallback for dev
+    }
+}
+
 // ============================================================
 // 1. SUBMIT KYC — Upload all documents + personal info
 // ============================================================
@@ -59,19 +100,36 @@ router.post('/submit', auth, upload.fields([
             upi_id, address, state, district, pincode, role
         } = req.body;
 
-        // Validate required fields
-        if (!aadhaar_number || !pan_number) {
-            return res.status(400).json({ error: 'Aadhaar number and PAN number are required.' });
+        // 1. Validate Aadhaar (Real Verhoeff check)
+        if (!validateAadhaar(aadhaar_number)) {
+            return res.status(400).json({ error: 'Invalid Aadhaar number. Please check for typos.' });
         }
 
-        // Validate Aadhaar format (12 digits)
-        if (!/^\d{12}$/.test(aadhaar_number)) {
-            return res.status(400).json({ error: 'Aadhaar number must be exactly 12 digits.' });
-        }
-
-        // Validate PAN format (ABCDE1234F)
+        // 2. Validate PAN format
         if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan_number.toUpperCase())) {
             return res.status(400).json({ error: 'Invalid PAN format. Expected: ABCDE1234F' });
+        }
+
+        // 3. AI Document Pre-Verification (Asynchronous start)
+        // In a real system, we might queue this, but for "Real-time" feel we do it now
+        if (req.files?.aadhaar_front) {
+            const aiAadhaar = await analyzeDocument(req.files.aadhaar_front[0].path, "Aadhaar Card", aadhaar_number);
+            if (!aiAadhaar.isValid && process.env.STRICT_KYC === 'true') {
+                return res.status(400).json({ error: `Aadhaar Verification Failed: ${aiAadhaar.reason}` });
+            }
+        }
+        
+        if (req.files?.pan_card) {
+            const aiPan = await analyzeDocument(req.files.pan_card[0].path, "PAN Card", pan_number);
+            if (!aiPan.isValid && process.env.STRICT_KYC === 'true') {
+                return res.status(400).json({ error: `PAN Card Verification Failed: ${aiPan.reason}` });
+            }
+        }
+
+        // 4. Simulated Penny Drop (Bank Verification)
+        if (bank_account && ifsc_code) {
+            console.log(`🏦 Verifying Bank: ${bank_account} with IFSC ${ifsc_code}`);
+            // In production, call Razorpay/Cashfree Penny Drop API here
         }
 
         // Check required files

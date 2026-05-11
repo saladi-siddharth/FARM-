@@ -393,9 +393,9 @@
             </div>
 
             <h2 id="reset-title" class="text-2xl font-black mb-1 tracking-tight text-white">Reset Password</h2>
-            <p class="text-sm text-slate-400 mb-8 font-medium">We'll send you a secure one-time code to your email.</p>
+            <p id="reset-subtitle" class="text-sm text-slate-400 mb-8 font-medium">We'll send a secure 4-digit code to your email.</p>
 
-            <!-- STEP 1: SEND EMAIL -->
+            <!-- STEP 1: ENTER EMAIL -->
             <form id="step1-form" class="space-y-4">
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Account
@@ -408,24 +408,39 @@
                     Code</button>
             </form>
 
-            <!-- STEP 2: VERIFY OTP -->
+            <!-- STEP 2: ENTER OTP ONLY -->
             <form id="step2-form" class="hidden space-y-4">
+                <p class="text-xs text-emerald-400 font-bold text-center mb-4 bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">✅ A 4-digit code has been sent to your email. Check your inbox!</p>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Enter
                         4-Digit OTP</label>
                     <input type="text" id="reset-otp" required
-                        class="auth-input tracking-[0.5em] text-center text-lg font-bold" placeholder="• • • •"
-                        maxlength="4">
+                        class="auth-input tracking-[0.5em] text-center text-2xl font-black" placeholder="• • • •"
+                        maxlength="4" inputmode="numeric" pattern="[0-9]{4}">
                 </div>
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-4 mt-2 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 border border-emerald-400/50 transition active:scale-[0.98] text-sm">Verify
+                    Code</button>
+            </form>
+
+            <!-- STEP 3: NEW PASSWORD -->
+            <form id="step3-form" class="hidden space-y-4">
+                <p class="text-xs text-emerald-400 font-bold text-center mb-4 bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">✅ Code verified! Set your new password below.</p>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">New
                         Password</label>
                     <input type="password" id="reset-newpass" required class="auth-input"
-                        placeholder="Enter new password">
+                        placeholder="Enter new password (min 6 chars)" minlength="6">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Confirm
+                        Password</label>
+                    <input type="password" id="reset-confirmpass" required class="auth-input"
+                        placeholder="Confirm new password" minlength="6">
                 </div>
                 <button type="submit"
-                    class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-4 mt-2 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 border border-emerald-400/50 transition active:scale-[0.98] text-sm">Confirm
-                    Reset</button>
+                    class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-4 mt-2 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 border border-emerald-400/50 transition active:scale-[0.98] text-sm">Reset
+                    Password</button>
             </form>
         </div>
     </div>
@@ -557,16 +572,22 @@
             }
         }
 
-        // --- RESET PASSWORD LOGIC ---
+        // --- RESET PASSWORD LOGIC (3-STEP) ---
         const resetModal = document.getElementById('reset-modal');
         const resetContent = document.getElementById('reset-content');
         const closeModal = document.getElementById('close-modal');
         const step1 = document.getElementById('step1-form');
         const step2 = document.getElementById('step2-form');
+        const step3 = document.getElementById('step3-form');
         let resetEmail = "";
+        let resetOtp = "";
 
         resetLink.onclick = () => {
             resetModal.classList.remove('hidden');
+            // Reset all steps
+            step1.classList.remove('hidden');
+            step2.classList.add('hidden');
+            step3.classList.add('hidden');
             setTimeout(() => {
                 resetModal.classList.remove('opacity-0');
                 resetContent.classList.remove('scale-95');
@@ -586,6 +607,7 @@
             if (e.target === resetModal) closeResetModal();
         });
 
+        // STEP 1: Send OTP to email
         step1.onsubmit = async (e) => {
             e.preventDefault();
             resetEmail = document.getElementById('reset-email').value.trim();
@@ -603,50 +625,73 @@
             btn.innerHTML = '<span class="animate-spin text-xl">⏳</span> Sending...';
             btn.disabled = true;
 
-            const getApiUrl = (path) => path;
-
             try {
-                const res = await fetch(getApiUrl('/api/auth/forgot-password'), {
+                const res = await fetch('/api/auth/forgot-password', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: resetEmail })
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    toast.success(data.message || 'OTP sent to your email!');
+                    toast.success('4-digit OTP sent to your email!');
                     step1.classList.add('hidden');
                     step2.classList.remove('hidden');
+                    document.getElementById('reset-title').innerText = 'Verify Code';
+                    document.getElementById('reset-subtitle').innerText = `Code sent to ${resetEmail}`;
                 } else {
                     msg.innerText = data.error || 'Failed to send OTP';
                     msg.className = "text-xs font-bold text-center mt-2 text-red-400 block";
                 }
             } catch (err) {
-                console.error('Reset Error:', err);
                 toast.error('Connection Error: ' + err.message);
             }
             finally { btn.innerText = originalText; btn.disabled = false; }
         };
 
+        // STEP 2: Verify OTP
         step2.onsubmit = async (e) => {
             e.preventDefault();
-            const otp = document.getElementById('reset-otp').value;
+            resetOtp = document.getElementById('reset-otp').value.trim();
+            if (resetOtp.length !== 4) {
+                toast.error('Please enter a valid 4-digit code');
+                return;
+            }
+            // Move to step 3 (password entry)
+            step2.classList.add('hidden');
+            step3.classList.remove('hidden');
+            document.getElementById('reset-title').innerText = 'New Password';
+            document.getElementById('reset-subtitle').innerText = 'Create a strong new password';
+        };
+
+        // STEP 3: Reset password with OTP
+        step3.onsubmit = async (e) => {
+            e.preventDefault();
             const newPassword = document.getElementById('reset-newpass').value;
-            const btn = step2.querySelector('button');
+            const confirmPassword = document.getElementById('reset-confirmpass').value;
+            const btn = step3.querySelector('button');
+
+            if (newPassword !== confirmPassword) {
+                toast.error('Passwords do not match!');
+                return;
+            }
+            if (newPassword.length < 6) {
+                toast.error('Password must be at least 6 characters');
+                return;
+            }
+
             const originalText = btn.innerText;
             btn.innerHTML = '<span class="animate-spin text-xl">⏳</span> Resetting...';
             btn.disabled = true;
 
-            const getApiUrl = (path) => path;
-
             try {
-                const res = await fetch(getApiUrl('/api/auth/reset-password'), {
+                const res = await fetch('/api/auth/reset-password', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: resetEmail, otp, newPassword })
+                    body: JSON.stringify({ email: resetEmail, otp: resetOtp, newPassword })
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    toast.success(data.message || 'Password reset! Please login.');
+                    toast.success('Password reset successful! Please login.');
                     setTimeout(() => window.location.reload(), 1500);
-                } else { toast.error(data.error || 'Reset failed'); }
+                } else { toast.error(data.error || 'Invalid or expired OTP'); }
             } catch (err) { toast.error('Network error. Please try again.'); }
             finally { btn.innerText = originalText; btn.disabled = false; }
         };

@@ -76,7 +76,20 @@ async function migrate() {
     // Add missing columns to transactions
     const txCols = [
         ["seller_id", "INT DEFAULT 0"],
-        ["quantity", "INT DEFAULT 0"]
+        ["quantity", "INT DEFAULT 0"],
+        ["commission_rate", "DECIMAL(5,4) DEFAULT 0"],
+        ["commission_amount", "DECIMAL(10,2) DEFAULT 0"],
+        ["net_farmer_amount", "DECIMAL(12,2) DEFAULT 0"],
+        ["escrow_status", "ENUM('held', 'released', 'disputed', 'refunded') DEFAULT 'held'"],
+        ["order_id", "VARCHAR(100) UNIQUE"],
+        ["buyer_kyc_verified", "TINYINT(1) DEFAULT 0"],
+        ["seller_kyc_verified", "TINYINT(1) DEFAULT 0"],
+        ["payment_method", "VARCHAR(50)"],
+        ["payment_status", "ENUM('pending', 'completed', 'failed') DEFAULT 'pending'"],
+        ["shipment_id", "INT DEFAULT NULL"],
+        ["delivery_confirmed_at", "TIMESTAMP NULL DEFAULT NULL"],
+        ["razorpay_payment_id", "VARCHAR(255) DEFAULT NULL"],
+        ["crop_name", "VARCHAR(255) DEFAULT NULL"]
     ];
     for (const [col, def] of txCols) {
         try {
@@ -114,6 +127,53 @@ async function migrate() {
         console.log("✅ satellite_scans table ready");
     } catch (e) {
         console.log("ℹ️  satellite_scans:", e.message);
+    }
+    // 4. Ensure kyc_verification_logs table for audit trail
+    try {
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS kyc_verification_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                admin_id INT,
+                action VARCHAR(100),
+                reason TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log("✅ kyc_verification_logs table ready");
+    } catch (e) { console.log("ℹ️  kyc_verification_logs:", e.message); }
+
+    // 5. Ensure platform_commission_ledger table
+    try {
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS platform_commission_ledger (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                transaction_id INT,
+                order_id VARCHAR(100),
+                total_charged DECIMAL(12,2),
+                commission_amount DECIMAL(10,2),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log("✅ platform_commission_ledger table ready");
+    } catch (e) { console.log("ℹ️  ledger:", e.message); }
+
+    // 6. Add status column to users
+    try {
+        await db.execute("ALTER TABLE users ADD COLUMN status ENUM('active','banned','suspended') DEFAULT 'active'");
+        console.log("✅ users.status column added");
+    } catch (e) {
+        if (e.message.includes('Duplicate')) console.log("⏭️  users.status already exists");
+        else console.log("ℹ️  users.status:", e.message);
+    }
+
+    // 7. Add wallet_balance to users
+    try {
+        await db.execute("ALTER TABLE users ADD COLUMN wallet_balance DECIMAL(12,2) DEFAULT 0");
+        console.log("✅ users.wallet_balance column added");
+    } catch (e) {
+        if (e.message.includes('Duplicate')) console.log("⏭️  users.wallet_balance already exists");
+        else console.log("ℹ️  wallet:", e.message);
     }
 
     console.log("\n✅ Migration complete!");

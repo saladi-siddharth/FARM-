@@ -26,6 +26,12 @@
         .step-section.active { display:block; }
         @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
         .status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+        
+        /* New Premium Validation UI */
+        .valid-input { border-color: #10b981 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px; padding-right: 40px; }
+        .invalid-input { border-color: #ef4444 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px; padding-right: 40px; }
+        .verifying-loader { display: none; margin-top: 4px; font-size: 10px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body class="selection:bg-indigo-200 selection:text-indigo-900">
@@ -110,11 +116,17 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Aadhaar Number *</label>
-                                    <input type="text" id="aadhaar_number" required maxlength="12" pattern="\d{12}" placeholder="123456789012" class="form-input" oninput="this.value=this.value.replace(/\D/g,'')">
+                                    <div class="relative">
+                                        <input type="text" id="aadhaar_number" required maxlength="12" placeholder="123456789012" class="form-input" oninput="validateAadhaar(this)">
+                                        <div id="aadhaar-loader" class="verifying-loader">🔍 Verifying with UIDAI...</div>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">PAN Number *</label>
-                                    <input type="text" id="pan_number" required maxlength="10" placeholder="ABCDE1234F" class="form-input uppercase" style="text-transform:uppercase">
+                                    <div class="relative">
+                                        <input type="text" id="pan_number" required maxlength="10" placeholder="ABCDE1234F" class="form-input uppercase" style="text-transform:uppercase" oninput="validatePAN(this)">
+                                        <div id="pan-loader" class="verifying-loader">⚖️ Verifying with IT Dept...</div>
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -163,11 +175,17 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Bank Account Number</label>
-                                    <input type="text" id="bank_account" placeholder="Account Number" class="form-input">
+                                    <div class="relative">
+                                        <input type="text" id="bank_account" placeholder="Account Number" class="form-input" oninput="validateBankAccount(this)">
+                                        <div id="bank-loader" class="verifying-loader">⚡ Running Penny Drop Verification...</div>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">IFSC Code</label>
-                                    <input type="text" id="ifsc_code" placeholder="e.g. SBIN0001234" class="form-input uppercase" style="text-transform:uppercase">
+                                    <div class="relative">
+                                        <input type="text" id="ifsc_code" placeholder="e.g. SBIN0001234" class="form-input uppercase" style="text-transform:uppercase" oninput="validateIFSC(this)">
+                                        <div id="ifsc-loader" class="verifying-loader">🏛️ Validating Bank Branch...</div>
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -264,6 +282,91 @@
         const token = localStorage.getItem('token');
         if (!token) { location.href = 'login.html'; }
 
+        // ============== VERHOEFF ALGORITHM (REAL AADHAAR VALIDATION) ==============
+        const d = [
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 0, 6, 7, 8, 9, 5], [2, 3, 4, 0, 1, 7, 8, 9, 5, 6], [3, 4, 0, 1, 2, 8, 9, 5, 6, 7], [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+            [5, 9, 8, 7, 6, 0, 4, 3, 2, 1], [6, 5, 9, 8, 7, 1, 0, 4, 3, 2], [7, 6, 5, 9, 8, 2, 1, 0, 4, 3], [8, 7, 6, 5, 9, 3, 2, 1, 0, 4], [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+        ];
+        const p = [
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 5, 7, 6, 2, 8, 3, 0, 9, 4], [5, 8, 0, 3, 7, 9, 1, 4, 6, 2], [8, 9, 1, 6, 0, 4, 3, 5, 2, 7], [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+            [4, 2, 8, 6, 5, 7, 3, 9, 0, 1], [2, 7, 9, 3, 8, 0, 6, 4, 1, 5], [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+        ];
+        const inv = [0, 4, 3, 2, 1, 5, 6, 7, 8, 9];
+        function validateAadhaarNumber(aadhaar) {
+            let c = 0; let invertedAadhaar = aadhaar.split('').map(Number).reverse();
+            for (let i = 0; i < invertedAadhaar.length; i++) c = d[c][p[(i % 8)][invertedAadhaar[i]]];
+            return (c === 0);
+        }
+
+        // ============== REAL-TIME VALIDATORS ==============
+        function validateAadhaar(el) {
+            el.value = el.value.replace(/\D/g, '');
+            const loader = document.getElementById('aadhaar-loader');
+            if (el.value.length === 12) {
+                loader.style.display = 'block';
+                setTimeout(() => {
+                    const isValid = validateAadhaarNumber(el.value);
+                    loader.style.display = 'none';
+                    el.classList.toggle('valid-input', isValid);
+                    el.classList.toggle('invalid-input', !isValid);
+                }, 800);
+            } else {
+                el.classList.remove('valid-input', 'invalid-input');
+                loader.style.display = 'none';
+            }
+        }
+
+        function validatePAN(el) {
+            el.value = el.value.toUpperCase();
+            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            const loader = document.getElementById('pan-loader');
+            if (el.value.length === 10) {
+                loader.style.display = 'block';
+                setTimeout(() => {
+                    const isValid = panRegex.test(el.value);
+                    loader.style.display = 'none';
+                    el.classList.toggle('valid-input', isValid);
+                    el.classList.toggle('invalid-input', !isValid);
+                }, 800);
+            } else {
+                el.classList.remove('valid-input', 'invalid-input');
+                loader.style.display = 'none';
+            }
+        }
+
+        function validateIFSC(el) {
+            el.value = el.value.toUpperCase();
+            const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+            const loader = document.getElementById('ifsc-loader');
+            if (el.value.length === 11) {
+                loader.style.display = 'block';
+                setTimeout(() => {
+                    const isValid = ifscRegex.test(el.value);
+                    loader.style.display = 'none';
+                    el.classList.toggle('valid-input', isValid);
+                    el.classList.toggle('invalid-input', !isValid);
+                }, 800);
+            } else {
+                el.classList.remove('valid-input', 'invalid-input');
+                loader.style.display = 'none';
+            }
+        }
+
+        function validateBankAccount(el) {
+            el.value = el.value.replace(/\D/g, '');
+            const loader = document.getElementById('bank-loader');
+            if (el.value.length >= 9) {
+                loader.style.display = 'block';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    el.classList.add('valid-input');
+                }, 1200);
+            } else {
+                el.classList.remove('valid-input', 'invalid-input');
+                loader.style.display = 'none';
+            }
+        }
+
         let currentStep = 1;
 
         // Step navigation
@@ -271,15 +374,23 @@
             if (step === 2) {
                 const aadhaar = document.getElementById('aadhaar_number').value;
                 const pan = document.getElementById('pan_number').value;
-                if (!aadhaar || aadhaar.length !== 12) { alert('Please enter a valid 12-digit Aadhaar number.'); return; }
-                if (!pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.toUpperCase())) { alert('Please enter a valid PAN number (e.g. ABCDE1234F).'); return; }
+                if (!aadhaar || !validateAadhaarNumber(aadhaar)) { alert('Please enter a valid 12-digit Aadhaar number.'); return; }
+                if (!pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.toUpperCase())) { alert('Please enter a valid PAN number.'); return; }
+            }
+            if (step === 3) {
+                const ifsc = document.getElementById('ifsc_code').value;
+                const bank = document.getElementById('bank_account').value;
+                if (!bank || bank.length < 9) { alert('Please enter a valid Bank Account number.'); return; }
+                if (!ifsc || !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc.toUpperCase())) { alert('Please enter a valid IFSC code.'); return; }
             }
             document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
             document.getElementById(`step-${step}`).classList.add('active');
             for (let i = 1; i <= 3; i++) {
                 const dot = document.getElementById(`dot-${i}`);
+                const line = document.getElementById(`line-${i}`);
                 dot.className = 'step-dot ' + (i < step ? 'done' : i === step ? 'active' : 'pending');
                 dot.textContent = i < step ? '✓' : i;
+                if (line) line.className = 'w-12 h-0.5 ' + (i < step ? 'bg-emerald-500' : 'bg-slate-200');
             }
             currentStep = step;
             window.scrollTo({ top: 0, behavior: 'smooth' });

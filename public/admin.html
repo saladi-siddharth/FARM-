@@ -27,13 +27,15 @@
             width: 260px;
             background: white;
             border-right: 1px solid #e2e8f0;
-            min-height: 100vh;
+            height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
             bottom: 0;
             z-index: 40;
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-link {
@@ -106,13 +108,174 @@
                 margin-left: 0;
             }
         }
+        .admin-login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .admin-login-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.05);
+        }
+        .admin-login-box {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+        }
+        .admin-login-box h2 {
+            color: white;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .admin-login-box p.subtitle {
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+        .admin-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .admin-input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(129,140,248,0.2);
+        }
+        .admin-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        .admin-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99,102,241,0.4);
+        }
+        .admin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .admin-error {
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 12px;
+            min-height: 18px;
+        }
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239,68,68,0.15);
+            color: #f87171;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(239,68,68,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
 <body>
+    <!-- ADMIN LOGIN OVERLAY -->
+    <div class="admin-login-overlay" id="admin-login-overlay">
+        <!-- Animated particles -->
+        <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+            <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.15),transparent);top:-50px;right:-50px;animation:float 8s ease-in-out infinite"></div>
+            <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.1),transparent);bottom:10%;left:5%;animation:float 10s ease-in-out infinite reverse"></div>
+            <div style="position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(236,72,153,0.08),transparent);top:40%;right:20%;animation:float 12s ease-in-out infinite"></div>
+        </div>
+        <style>
+            @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.1)}}
+            @keyframes pulse-ring{0%{transform:scale(0.8);opacity:0.5}50%{transform:scale(1.2);opacity:0}100%{transform:scale(0.8);opacity:0.5}}
+            @keyframes scan{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
+            .input-group{position:relative}.input-group .icon-left{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:16px;opacity:0.4;pointer-events:none}
+            .input-group .admin-input{padding-left:44px}
+        </style>
+        <div class="admin-login-box" style="position:relative;overflow:hidden">
+            <!-- Scanning line effect -->
+            <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,0.6),transparent);animation:scan 3s ease-in-out infinite;pointer-events:none"></div>
+            
+            <!-- Shield icon -->
+            <div style="text-align:center;margin-bottom:24px">
+                <div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));border:1px solid rgba(99,102,241,0.2);position:relative">
+                    <span style="font-size:32px">🛡️</span>
+                    <div style="position:absolute;inset:-4px;border-radius:24px;border:2px solid rgba(99,102,241,0.2);animation:pulse-ring 2s ease-in-out infinite"></div>
+                </div>
+            </div>
+            
+            <div class="admin-badge" style="display:flex;justify-content:center">🔐 RESTRICTED ACCESS</div>
+            <h2 style="text-align:center">Admin Control Center</h2>
+            <p class="subtitle" style="text-align:center">Farm Central — Principal Engineer Access Only</p>
+            
+            <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
+                <div class="input-group">
+                    <span class="icon-left">👤</span>
+                    <input type="text" class="admin-input" id="admin-username" placeholder="Admin Username" autocomplete="off" required>
+                </div>
+                <div class="input-group">
+                    <span class="icon-left">🔑</span>
+                    <input type="password" class="admin-input" id="admin-password" placeholder="Admin Password" required>
+                </div>
+                <div class="input-group">
+                    <span class="icon-left">🔐</span>
+                    <input type="text" class="admin-input" id="admin-secret" placeholder="Secret Access Key" autocomplete="off" required>
+                </div>
+                <button type="submit" class="admin-btn" id="admin-login-btn">🛡️ AUTHENTICATE</button>
+                <p class="admin-error" id="admin-error"></p>
+            </form>
+            
+            <p style="text-align:center;margin-top:20px;font-size:11px;color:rgba(255,255,255,0.2);font-weight:600">
+                🔒 AES-256 Encrypted · JWT Auth · Audit Logged
+            </p>
+        </div>
+    </div>
+
+    <!-- DASHBOARD (hidden until authenticated) -->
+    <div id="admin-dashboard" style="display:none">
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-        <div class="p-6 border-b border-slate-100">
+        <div class="p-5 border-b border-slate-100 flex-shrink-0">
             <a href="dashboard.html" class="flex items-center gap-3">
                 <img src="logo.png" alt="Logo" class="w-9 h-9 object-contain">
                 <div>
@@ -122,40 +285,54 @@
             </a>
         </div>
 
-        <nav class="py-4 space-y-1">
+        <nav class="py-3 space-y-0.5 flex-1 overflow-y-auto" style="scrollbar-width:thin">
+            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Main</p>
             <div class="sidebar-link active" onclick="showSection('overview')">
                 <span class="icon">📊</span> Overview
             </div>
             <div class="sidebar-link" onclick="showSection('users')">
                 <span class="icon">👥</span> Users
             </div>
+            <div class="sidebar-link" onclick="showSection('transactions')">
+                <span class="icon">💰</span> Transactions
+            </div>
+
+            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4 mb-1">Verification</p>
             <div class="sidebar-link" onclick="showSection('kyc')">
                 <span class="icon">📋</span> KYC Approvals
             </div>
             <div class="sidebar-link" onclick="showSection('listings')">
                 <span class="icon">📦</span> Trade Listings
             </div>
+
+            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4 mb-1">Operations</p>
             <div class="sidebar-link" onclick="showSection('disputes')">
                 <span class="icon">⚖️</span> Disputes
             </div>
             <div class="sidebar-link" onclick="showSection('payouts')">
-                <span class="icon">💸</span> Payout Requests
+                <span class="icon">💸</span> Payouts
             </div>
             <div class="sidebar-link" onclick="showSection('scans')">
                 <span class="icon">🛰️</span> Satellite Scans
             </div>
-            <div class="sidebar-link" onclick="showSection('community')">
-                <span class="icon">💬</span> Community Posts
+
+            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4 mb-1">System</p>
+            <div class="sidebar-link" onclick="showSection('audit')">
+                <span class="icon">📜</span> Audit Logs
             </div>
             <div class="sidebar-link" onclick="showSection('settings')">
                 <span class="icon">⚙️</span> Settings
             </div>
         </nav>
 
-        <div class="absolute bottom-4 left-0 right-0 px-6">
+        <div class="p-4 border-t border-slate-100 flex-shrink-0 space-y-2">
             <button onclick="location.href='dashboard.html'"
-                class="w-full py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition flex items-center justify-center gap-2">
+                class="w-full py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-100 transition flex items-center justify-center gap-2">
                 ← Back to Dashboard
+            </button>
+            <button onclick="adminLogout()"
+                class="w-full py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 font-semibold text-xs hover:bg-red-100 transition flex items-center justify-center gap-2">
+                🔒 Logout Admin
             </button>
         </div>
     </aside>
@@ -188,81 +365,61 @@
 
             <!-- Stat Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                <div class="stat-card">
+                <div class="stat-card" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#a7f3d0">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Total Users</span>
-                        <span
-                            class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-lg border border-emerald-100">👥</span>
+                        <span class="text-xs font-black text-emerald-500 uppercase tracking-widest">Total Users</span>
+                        <span class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-lg shadow-lg shadow-emerald-200">👥</span>
                     </div>
-                    <p class="text-3xl font-black text-slate-900" id="stat-users">--</p>
-                    <p class="text-xs text-emerald-600 font-semibold mt-1">↗ +12% this month</p>
+                    <p class="text-4xl font-black text-emerald-900" id="stat-users">--</p>
+                    <div class="w-full h-1 rounded bg-emerald-200 mt-3"><div class="h-1 rounded bg-emerald-500 w-3/4" style="transition:width 1s"></div></div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Trade Listings</span>
-                        <span
-                            class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-lg border border-indigo-100">📦</span>
+                        <span class="text-xs font-black text-indigo-500 uppercase tracking-widest">Trade Listings</span>
+                        <span class="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-lg shadow-lg shadow-indigo-200">📦</span>
                     </div>
-                    <p class="text-3xl font-black text-slate-900" id="stat-listings">--</p>
-                    <p class="text-xs text-indigo-600 font-semibold mt-1">↗ +8% this week</p>
+                    <p class="text-4xl font-black text-indigo-900" id="stat-listings">--</p>
+                    <div class="w-full h-1 rounded bg-indigo-200 mt-3"><div class="h-1 rounded bg-indigo-500 w-1/2" style="transition:width 1s"></div></div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" style="background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border-color:#99f6e4">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Sat. Scans</span>
-                        <span
-                            class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-lg border border-teal-100">🛰️</span>
+                        <span class="text-xs font-black text-teal-500 uppercase tracking-widest">Sat. Scans</span>
+                        <span class="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center text-lg shadow-lg shadow-teal-200">🛰️</span>
                     </div>
-                    <p class="text-3xl font-black text-slate-900" id="stat-scans">--</p>
-                    <p class="text-xs text-teal-600 font-semibold mt-1">↗ +25% this week</p>
+                    <p class="text-4xl font-black text-teal-900" id="stat-scans">--</p>
+                    <div class="w-full h-1 rounded bg-teal-200 mt-3"><div class="h-1 rounded bg-teal-500 w-2/3" style="transition:width 1s"></div></div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Revenue</span>
-                        <span
-                            class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-lg border border-amber-100">💰</span>
+                        <span class="text-xs font-black text-amber-500 uppercase tracking-widest">Revenue</span>
+                        <span class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-lg shadow-lg shadow-amber-200">💰</span>
                     </div>
-                    <p class="text-3xl font-black text-slate-900">$12.4K</p>
-                    <p class="text-xs text-amber-600 font-semibold mt-1">↗ +18% this month</p>
+                    <p class="text-4xl font-black text-amber-900" id="stat-revenue">₹0</p>
+                    <p class="text-[10px] text-amber-600 font-bold mt-2 uppercase tracking-wider">Platform Commission 5%</p>
                 </div>
             </div>
 
-            <!-- Recent Activity -->
+            <!-- Recent Activity (Audit Logs) -->
             <div class="bg-white rounded-2xl border border-slate-200 p-6">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Activity</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Admin Activity</h3>
                 <div class="space-y-3" id="activity-feed">
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
-                        <span
-                            class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center text-sm border border-emerald-100">✅</span>
-                        <div class="flex-1">
-                            <p class="text-sm font-semibold text-slate-700">New user registered via Google</p>
-                            <p class="text-xs text-slate-400">2 minutes ago</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
-                        <span
-                            class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-sm border border-indigo-100">📦</span>
-                        <div class="flex-1">
-                            <p class="text-sm font-semibold text-slate-700">New trade listing: Organic Wheat (500kg)</p>
-                            <p class="text-xs text-slate-400">15 minutes ago</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
-                        <span
-                            class="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center text-sm border border-teal-100">🛰️</span>
-                        <div class="flex-1">
-                            <p class="text-sm font-semibold text-slate-700">Satellite scan completed at (20.59, 78.96)
-                            </p>
-                            <p class="text-xs text-slate-400">32 minutes ago</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-50">
-                        <span
-                            class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-sm border border-purple-100">🤖</span>
-                        <div class="flex-1">
-                            <p class="text-sm font-semibold text-slate-700">AI Crop Doctor diagnosed leaf blight</p>
-                            <p class="text-xs text-slate-400">1 hour ago</p>
-                        </div>
-                    </div>
+                    <p class="text-sm text-slate-400 text-center py-6">Loading audit logs...</p>
+                </div>
+            </div>
+
+            <!-- Quick Stats Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-6">
+                <div class="stat-card text-center">
+                    <p class="text-3xl font-black text-indigo-600" id="stat-trades">0</p>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Total Trades</p>
+                </div>
+                <div class="stat-card text-center">
+                    <p class="text-3xl font-black text-emerald-600" id="stat-volume">₹0</p>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Trade Volume</p>
+                </div>
+                <div class="stat-card text-center">
+                    <p class="text-3xl font-black text-purple-600" id="stat-escrow">₹0</p>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">In Escrow</p>
                 </div>
             </div>
         </section>
@@ -288,11 +445,11 @@
                             <tr class="bg-slate-50 text-left">
                                 <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">User
                                 </th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Email
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Contact
                                 </th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Joined
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">KYC
                                 </th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Provider
+                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Status
                                 </th>
                                 <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions
                                 </th>
@@ -462,15 +619,46 @@
             </div>
         </section>
 
-        <!-- COMMUNITY SECTION -->
-        <section id="section-community" class="hidden">
+        <!-- COMMUNITY → replaced by TRANSACTIONS SECTION -->
+        <section id="section-transactions" class="hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Transaction Ledger</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1">Full escrow and payment history</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-slate-50 text-left">
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Crop</th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Buyer → Seller</th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Commission</th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Escrow</th>
+                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Payment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table">
+                            <tr><td colspan="7" class="px-4 py-10 text-center text-slate-400 text-sm">Loading transactions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- AUDIT LOGS SECTION -->
+        <section id="section-audit" class="hidden">
             <div class="mb-8">
-                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Community Posts</h2>
-                <p class="text-sm text-slate-400 font-medium mt-1">Moderate community discussions and posts</p>
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Audit Logs</h2>
+                <p class="text-sm text-slate-400 font-medium mt-1">Complete admin action history — immutable trail</p>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200 p-6">
-                <p class="text-sm text-slate-500">Community moderation tools coming soon. Monitor user posts, flag
-                    inappropriate content, and manage discussions.</p>
+                <div class="space-y-3" id="audit-feed">
+                    <p class="text-sm text-slate-400 text-center py-6">Loading audit logs...</p>
+                </div>
             </div>
         </section>
 
@@ -525,11 +713,73 @@
             </div>
         </section>
     </main>
+    </div><!-- /admin-dashboard -->
 
     <script src="js/toast.js"></script>
     <script>
-        const token = localStorage.getItem('token');
-        if (!token) location.href = 'login.html';
+        let token = localStorage.getItem('admin_token');
+
+        // Check if already authenticated
+        if (token) {
+            showDashboard();
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('admin-login-btn');
+            const errEl = document.getElementById('admin-error');
+            errEl.textContent = '';
+            btn.disabled = true;
+            btn.textContent = '🔄 Verifying...';
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('admin-username').value,
+                        password: document.getElementById('admin-password').value,
+                        secret_key: document.getElementById('admin-secret').value
+                    })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errEl.textContent = data.error || 'Authentication failed';
+                    btn.disabled = false;
+                    btn.textContent = '🛡️ AUTHENTICATE';
+                    return;
+                }
+
+                // Store admin token separately
+                token = data.token;
+                localStorage.setItem('admin_token', token);
+                localStorage.setItem('token', token);
+                showDashboard();
+            } catch (err) {
+                errEl.textContent = 'Network error — server unreachable';
+                btn.disabled = false;
+                btn.textContent = '🛡️ AUTHENTICATE';
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('admin-login-overlay').classList.add('hidden');
+            document.getElementById('admin-dashboard').style.display = 'block';
+            // Trigger initial loads
+            loadStats();
+            loadAuditLogs();
+            loadUsers();
+            loadListings();
+            loadKYC();
+            loadDisputes();
+            loadPayouts();
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('admin_token');
+            location.reload();
+        }
 
         // Update time
         function updateTime() {
@@ -539,59 +789,78 @@
         updateTime();
         setInterval(updateTime, 1000);
 
-        // Section switching
+        // Section switching with auto-load
         function showSection(name) {
             document.querySelectorAll('[id^="section-"]').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`section-${name}`).classList.remove('hidden');
+            const el = document.getElementById(`section-${name}`);
+            if (el) el.classList.remove('hidden');
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            // Close mobile sidebar
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
             document.getElementById('sidebar').classList.remove('open');
+            // Auto-load data
+            if (name === 'overview') { loadStats(); loadAuditLogs(); }
+            if (name === 'users') loadUsers();
+            if (name === 'kyc') loadKYC();
+            if (name === 'listings') loadListings();
+            if (name === 'transactions') loadTransactions();
+            if (name === 'disputes') loadDisputes();
+            if (name === 'payouts') loadPayouts();
+            if (name === 'audit') loadAuditLogs();
         }
 
-        // Fetch users
+        // ====== STATS ======
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/admin/stats', { headers: { 'Authorization': token } });
+                const data = await res.json();
+                const s = data.summary || data;
+                document.getElementById('stat-users').textContent = (s.users || 0).toLocaleString();
+                document.getElementById('stat-listings').textContent = (s.listings || 0).toLocaleString();
+                document.getElementById('stat-scans').textContent = (s.scans || 0).toLocaleString();
+                document.getElementById('stat-revenue').textContent = '₹' + Number(s.total_revenue || 0).toLocaleString();
+                const te = document.getElementById('stat-trades'); if(te) te.textContent = (s.total_trades || 0).toLocaleString();
+                const ve = document.getElementById('stat-volume'); if(ve) ve.textContent = '₹' + Number(s.total_volume || 0).toLocaleString();
+            } catch(e) { console.error('Stats:', e); }
+        }
+
+        // ====== USERS ======
         async function loadUsers() {
             try {
                 const res = await fetch('/api/admin/users', { headers: { 'Authorization': token } });
                 if (!res.ok) throw new Error();
                 const users = await res.json();
-                document.getElementById('stat-users').textContent = users.length;
+                window._allUsers = users;
                 renderUsers(users);
-            } catch (e) {
-                // Dummy data
-                const dummy = [
-                    { username: 'John Farmer', email: 'john@farm.com', created_at: '2026-01-15', google_id: null },
-                    { username: 'Priya Singh', email: 'priya@agri.in', created_at: '2026-02-10', google_id: 'ggl123' },
-                    { username: 'Raj Kumar', email: 'raj@fields.com', created_at: '2026-02-28', google_id: null },
-                ];
-                document.getElementById('stat-users').textContent = dummy.length;
-                renderUsers(dummy);
-            }
+            } catch (e) { toast.error('Failed to load users'); }
         }
 
         function renderUsers(users) {
             const tbody = document.getElementById('users-table');
-            window._allUsers = users;
             tbody.innerHTML = users.map(u => `
-                <tr class="table-row border-t border-slate-100">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center text-sm font-bold text-emerald-700 border border-emerald-100">${(u.username || 'U')[0].toUpperCase()}</div>
-                            <span class="font-semibold text-sm text-slate-700">${u.username || 'Unknown'}</span>
+                <tr class="table-row border-t border-slate-100 cursor-pointer" onclick="viewUser(${u.id})">
+                    <td class="px-6 py-4"><div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-700 border border-slate-200">${(u.username||'U')[0].toUpperCase()}</div>
+                        <div><p class="font-bold text-sm text-slate-700">${u.username||'Unknown'}</p><p class="text-[10px] text-slate-400 font-bold">#${u.id} • ${u.role||'user'}</p></div>
+                    </div></td>
+                    <td class="px-6 py-4"><p class="text-sm text-slate-600">${u.email}</p><p class="text-[10px] text-slate-400">${u.phone_number||'—'}</p></td>
+                    <td class="px-6 py-4"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${u.kyc_status==='verified'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-amber-50 text-amber-600 border-amber-100'}">${u.kyc_status||'none'}</span></td>
+                    <td class="px-6 py-4"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${u.status==='banned'?'bg-red-50 text-red-600 border-red-100':'bg-blue-50 text-blue-600 border-blue-100'}">${u.status||'active'}</span></td>
+                    <td class="px-6 py-4" onclick="event.stopPropagation()">
+                        <div class="flex gap-2">
+                            <button onclick="toggleBan(${u.id},'${u.status==='banned'?'active':'banned'}')" class="text-xs font-bold ${u.status==='banned'?'text-emerald-500':'text-rose-500'} hover:underline">${u.status==='banned'?'Unban':'Ban'}</button>
+                            <button onclick="deleteUser(${u.id})" class="text-xs font-bold text-red-400 hover:text-red-600">Delete</button>
                         </div>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-slate-500">${u.email}</td>
-                    <td class="px-6 py-4 text-sm text-slate-400">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '--'}</td>
-                    <td class="px-6 py-4">
-                        <span class="text-xs font-bold px-2 py-1 rounded-lg ${u.google_id ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-50 text-slate-500 border border-slate-200'}">
-                            ${u.google_id ? '🔵 Google' : '📧 Email'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <button class="text-xs font-bold text-slate-400 hover:text-red-500 transition">Ban</button>
                     </td>
                 </tr>
             `).join('');
+        }
+
+        async function toggleBan(id, status) {
+            if (!confirm(`Set user #${id} to ${status}?`)) return;
+            try {
+                await fetch(`/api/admin/users/status/${id}`, { method:'POST', headers:{'Authorization':token,'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+                toast.success('Updated'); loadUsers();
+            } catch(e) { toast.error('Failed'); }
         }
 
         function filterUsers() {
@@ -608,27 +877,20 @@
                 const res = await fetch('/api/trade/listings', { headers: { 'Authorization': token } });
                 if (!res.ok) throw new Error();
                 const listings = await res.json();
-                document.getElementById('stat-listings').textContent = listings.length;
                 renderListings(listings);
-            } catch (e) {
-                const dummy = [
-                    { crop: 'Organic Wheat', seller: 'John Farms', qty: 5000, price: 0.35, location: 'Midwest' },
-                    { crop: 'Sweet Corn', seller: 'Green Valley', qty: 2000, price: 0.50, location: 'South' },
-                ];
-                document.getElementById('stat-listings').textContent = dummy.length;
-                renderListings(dummy);
-            }
+            } catch (e) { console.error('Listings:', e); }
         }
 
         function renderListings(listings) {
             const tbody = document.getElementById('listings-table');
+            if(!listings.length) { tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-10 text-center text-slate-400 text-sm">No listings yet</td></tr>'; return; }
             tbody.innerHTML = listings.map(l => `
                 <tr class="table-row border-t border-slate-100">
-                    <td class="px-4 py-4 font-semibold text-sm text-slate-700">${l.crop}</td>
-                    <td class="px-4 py-4 text-sm text-slate-500">${l.seller}</td>
-                    <td class="px-4 py-4 text-sm text-slate-500">${Number(l.qty).toLocaleString()} kg</td>
-                    <td class="px-4 py-4 text-sm font-bold text-emerald-600">$${Number(l.price).toFixed(2)}</td>
-                    <td class="px-4 py-4 text-sm text-slate-400">${l.location}</td>
+                    <td class="px-4 py-4 font-semibold text-sm text-slate-700">${l.crop||l.crop_name||'—'}</td>
+                    <td class="px-4 py-4 text-sm text-slate-500">${l.seller||l.seller_name||'—'}</td>
+                    <td class="px-4 py-4 text-sm text-slate-500">${Number(l.qty||l.quantity||0).toLocaleString()} kg</td>
+                    <td class="px-4 py-4 text-sm font-bold text-emerald-600">₹${Number(l.price||l.price_per_unit||0).toLocaleString()}</td>
+                    <td class="px-4 py-4 text-sm text-slate-400">${l.location||'—'}</td>
                     <td class="px-4 py-4">
                         <button class="text-xs font-bold text-red-400 hover:text-red-600 transition">Remove</button>
                     </td>
@@ -636,9 +898,41 @@
             `).join('');
         }
 
-        // Stats mock
-        document.getElementById('stat-scans').textContent = '47';
-        document.getElementById('scan-total').textContent = '47';
+        // ====== AUDIT LOGS ======
+        async function loadAuditLogs() {
+            try {
+                const res = await fetch('/api/admin/audit-logs', { headers: { 'Authorization': token } });
+                const logs = await res.json();
+                const html = logs.length ? logs.map(l => `
+                    <div class="flex items-center gap-4 p-3 rounded-xl bg-white border border-slate-100">
+                        <div class="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center text-lg border border-slate-100">${l.action?.includes('approved')?'✅':l.action?.includes('reject')?'❌':l.action?.includes('ban')?'🚫':'📝'}</div>
+                        <div class="flex-1"><p class="text-sm font-bold text-slate-700"><span class="text-indigo-600">@${l.admin_name||'System'}</span> ${(l.action||'').replace(/_/g,' ')} <span class="text-slate-900">${l.target_name||'User #'+l.user_id}</span></p>
+                        <p class="text-[10px] text-slate-400">${new Date(l.created_at).toLocaleString()} • ${l.reason||''}</p></div>
+                    </div>`).join('') : '<p class="text-sm text-slate-400 text-center py-6">No logs yet</p>';
+                const f1 = document.getElementById('activity-feed'); if(f1) f1.innerHTML = html;
+                const f2 = document.getElementById('audit-feed'); if(f2) f2.innerHTML = html;
+            } catch(e) { console.error('Audit:', e); }
+        }
+
+        // ====== TRANSACTIONS ======
+        async function loadTransactions() {
+            try {
+                const res = await fetch('/api/admin/transactions', { headers: { 'Authorization': token } });
+                const txns = await res.json();
+                const tbody = document.getElementById('transactions-table');
+                if(!txns.length) { tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-10 text-center text-slate-400 text-sm">No transactions yet</td></tr>'; return; }
+                tbody.innerHTML = txns.map(t => `
+                    <tr class="table-row border-t border-slate-100">
+                        <td class="px-4 py-3"><p class="text-[10px] font-black text-indigo-600 uppercase">${t.order_id||'—'}</p></td>
+                        <td class="px-4 py-3 text-sm font-bold text-slate-700">${t.crop_name||'—'}</td>
+                        <td class="px-4 py-3 text-xs text-slate-500">${t.buyer_name||'#'+t.buyer_id} → ${t.seller_name||'#'+t.seller_id}</td>
+                        <td class="px-4 py-3 text-sm font-black text-emerald-600">₹${Number(t.total_amount||0).toLocaleString()}</td>
+                        <td class="px-4 py-3 text-xs text-amber-600 font-bold">₹${Number(t.commission_amount||0).toLocaleString()}</td>
+                        <td class="px-4 py-3"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${t.escrow_status==='held'?'bg-amber-50 text-amber-600 border-amber-100':t.escrow_status==='released'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-red-50 text-red-600 border-red-100'}">${t.escrow_status||'—'}</span></td>
+                        <td class="px-4 py-3"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${t.payment_status==='completed'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-slate-50 text-slate-500 border-slate-200'}">${t.payment_method||'—'} • ${t.payment_status||'—'}</span></td>
+                    </tr>`).join('');
+            } catch(e) { console.error('Txns:', e); }
+        }
 
         // Fetch KYC
         async function loadKYC() {
@@ -823,11 +1117,61 @@
             } catch(e) { toast.error('Network error'); }
         }
 
-        loadUsers();
-        loadListings();
-        loadKYC();
-        loadDisputes();
-        loadPayouts();
+        // ====== USER DETAIL MODAL ======
+        async function viewUser(id) {
+            try {
+                const res = await fetch(`/api/admin/users/${id}`, { headers: { 'Authorization': token } });
+                const data = await res.json();
+                const u = data.user;
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+                modal.style.background = 'rgba(0,0,0,0.5)';
+                modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+                modal.innerHTML = `<div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8" onclick="event.stopPropagation()">
+                    <div class="flex justify-between items-start mb-6"><div>
+                        <h2 class="text-2xl font-black text-slate-900">${u.username}</h2>
+                        <p class="text-sm text-slate-400">#${u.id} • ${u.email} • ${u.phone_number||'No phone'}</p>
+                    </div><button onclick="this.closest('.fixed').remove()" class="text-2xl text-slate-400 hover:text-red-500">×</button></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-slate-800">${u.role||'user'}</p><p class="text-[10px] text-slate-400 font-bold uppercase">Role</p></div>
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black ${u.status==='banned'?'text-red-600':'text-emerald-600'}">${u.status||'active'}</p><p class="text-[10px] text-slate-400 font-bold uppercase">Status</p></div>
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-indigo-600">${u.kyc_status||'none'}</p><p class="text-[10px] text-slate-400 font-bold uppercase">KYC</p></div>
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-amber-600">₹${Number(u.wallet_balance||0).toLocaleString()}</p><p class="text-[10px] text-slate-400 font-bold uppercase">Wallet</p></div>
+                    </div>
+                    <div class="space-y-4">
+                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">Transactions (${data.transactions.length})</h3>${data.transactions.length?data.transactions.slice(0,5).map(t=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+( t.order_id||'—')+' • ₹'+Number(t.total_amount||0).toLocaleString()+' • '+(t.escrow_status||'—')+'</p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
+                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">Inventory (${data.inventory.length})</h3>${data.inventory.length?data.inventory.slice(0,5).map(i=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(i.name||'—')+' • '+i.quantity+' units</p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
+                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">KYC Documents (${data.kyc.length})</h3>${data.kyc.length?data.kyc.map(k=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(k.document_type||'—')+' • <a href="'+(k.file_url||'#')+'" target="_blank" class="text-blue-500 underline">View</a></p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
+                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">Disputes (${data.disputes.length})</h3>${data.disputes.length?data.disputes.map(d=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(d.reason||'—')+' • '+(d.status||'—')+'</p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
+                    </div>
+                    <div class="flex gap-3 mt-6 pt-4 border-t border-slate-100">
+                        <select id="role-select-${u.id}" class="text-xs border rounded-lg px-3 py-2"><option value="farmer">Farmer</option><option value="customer">Customer</option><option value="both">Both</option><option value="admin">Admin</option></select>
+                        <button onclick="changeRole(${u.id})" class="text-xs font-bold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Change Role</button>
+                        <button onclick="toggleBan(${u.id},'${u.status==='banned'?'active':'banned'}');this.closest('.fixed').remove()" class="text-xs font-bold ${u.status==='banned'?'bg-emerald-600':'bg-red-600'} text-white px-4 py-2 rounded-lg">${u.status==='banned'?'Unban':'Ban'}</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(modal);
+            } catch(e) { toast.error('Failed to load user data'); console.error(e); }
+        }
+
+        async function changeRole(id) {
+            const role = document.getElementById('role-select-'+id).value;
+            try {
+                await fetch(`/api/admin/users/role/${id}`, { method:'POST', headers:{'Authorization':token,'Content-Type':'application/json'}, body:JSON.stringify({role}) });
+                toast.success('Role updated to '+role); loadUsers();
+            } catch(e) { toast.error('Failed'); }
+        }
+
+        async function deleteUser(id) {
+            if(!confirm('⚠️ PERMANENTLY delete user #'+id+'? This cannot be undone.')) return;
+            if(!confirm('Are you absolutely sure?')) return;
+            try {
+                await fetch(`/api/admin/users/${id}`, { method:'DELETE', headers:{'Authorization':token} });
+                toast.success('User deleted'); loadUsers();
+            } catch(e) { toast.error('Failed'); }
+        }
+
+
     </script>
 </body>
 

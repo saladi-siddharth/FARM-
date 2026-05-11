@@ -308,6 +308,24 @@
                 </div>
             </div>
 
+            <!-- Danger Zone: Delete Account -->
+            <div class="glass-premium p-8 rounded-[2rem] border border-rose-500/20 shadow-lg mt-6">
+                <h3 class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-6 flex items-center gap-3">
+                    <span class="p-1.5 bg-rose-500/10 rounded-lg border border-rose-500/20">⚠️</span>
+                    Danger Zone
+                </h3>
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <p class="font-bold text-slate-200 text-lg">Delete Account</p>
+                        <p class="text-xs text-slate-500 mt-1 font-medium">Permanently remove your account and all data. This action cannot be undone.</p>
+                    </div>
+                    <button onclick="deleteAccount()"
+                        class="px-6 py-2.5 bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-black tracking-widest text-xs rounded-xl shadow-lg shadow-rose-500/20 active:scale-95 transition-all w-full sm:w-auto">
+                        🗑️ DELETE ACCOUNT
+                    </button>
+                </div>
+            </div>
+
             <!-- Logout -->
             <button onclick="logout()"
                 class="w-full bg-gradient-to-r from-rose-500/10 to-red-600/10 border border-rose-500/20 hover:from-rose-500/20 hover:to-red-600/20 text-rose-400 font-black tracking-widest uppercase py-5 rounded-[1.5rem] flex items-center justify-center gap-3 transition shadow-lg group hover:shadow-rose-500/10 hover-scale mt-8">
@@ -414,26 +432,37 @@
         async function emailWeeklyReport() {
             const token = localStorage.getItem('token');
             if (!token) return toast.error("Please login first");
-            
             const btn = document.querySelector('button[onclick="emailWeeklyReport()"]');
             const originalText = btn.innerHTML;
             btn.innerHTML = `<span class="animate-spin text-lg inline-block">⏳</span>`;
-            
             try {
-                const res = await fetch('/api/reports/email-weekly', {
+                const res = await fetch('/api/reports/email-weekly', { headers: { 'Authorization': token } });
+                const data = await res.json();
+                if (res.ok) toast.success(data.message || "Report emailed!");
+                else toast.error(data.error || "Failed.");
+            } catch (e) { toast.error("Network error."); }
+            finally { btn.innerHTML = originalText; }
+        }
+
+        async function deleteAccount() {
+            if (!confirm('⚠️ Are you sure you want to DELETE your account?\n\nThis will permanently remove:\n• Your profile & login\n• All transactions\n• KYC documents\n• Inventory & expenses\n• Trade listings\n\nThis action CANNOT be undone.')) return;
+            if (!confirm('FINAL WARNING: Type YES below to confirm permanent deletion.')) return;
+            const confirmText = prompt('Type DELETE to confirm:');
+            if (confirmText !== 'DELETE') { toast.error('Deletion cancelled'); return; }
+            try {
+                const res = await fetch('/api/auth/delete-account', {
+                    method: 'DELETE',
                     headers: { 'Authorization': token }
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    toast.success(data.message || "Report emailed successfully!");
+                    alert('Your account has been permanently deleted. Goodbye!');
+                    localStorage.clear();
+                    location.href = 'index.html';
                 } else {
-                    toast.error(data.error || "Failed to email report.");
+                    toast.error(data.error || 'Failed to delete account');
                 }
-            } catch (e) {
-                toast.error("Network error.");
-            } finally {
-                btn.innerHTML = originalText;
-            }
+            } catch (e) { toast.error('Network error'); }
         }
     </script>
     <script src="js/language-manager.js"></script>
