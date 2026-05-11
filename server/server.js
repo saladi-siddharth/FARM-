@@ -40,7 +40,15 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve Static Files
+// Serve Static Files with Cache Control
+app.use((req, res, next) => {
+    if (req.url.endsWith('.html') || req.url === '/') {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+    }
+    next();
+});
 app.use(express.static(path.join(__dirname, '../public')));
 
 // --- DATABASE AUTO-MIGRATION (for Render/Production) ---

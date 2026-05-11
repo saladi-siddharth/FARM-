@@ -1,4 +1,4 @@
-const CACHE_NAME = 'farm-central-v1';
+const CACHE_NAME = 'farm-central-v2';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -19,6 +19,7 @@ const ASSETS_TO_CACHE = [
 
 // Install Event - Cache assets
 self.addEventListener('install', (event) => {
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -35,30 +36,46 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
+                        console.log('Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
-// Fetch Event - Serve from cache if offline, otherwise network
+// Fetch Event
 self.addEventListener('fetch', (event) => {
     // Only intercept GET requests for HTTP/HTTPS
     if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
 
-    // For API requests, try network first, then cache
-    if (event.request.url.includes('/api/')) {
+    const url = new URL(event.request.url);
+
+    // 1. API requests or HTML pages: Network-First strategy
+    // We want the latest version of data and pages if online
+    if (url.pathname.includes('/api/') || url.pathname.endsWith('.html') || url.pathname === '/') {
         event.respondWith(
-            fetch(event.request).catch(() => {
-                return caches.match(event.request);
-            })
+            fetch(event.request)
+                .then((response) => {
+                    // Cache the fresh version
+                    if (response && response.status === 200 && response.type === 'basic') {
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    // Fallback to cache if offline
+                    return caches.match(event.request);
+                })
         );
         return;
     }
 
-    // For static assets, try cache first, then network
+    // 2. Static assets (CSS, JS, Images): Cache-First strategy
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
@@ -66,12 +83,10 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 }
                 return fetch(event.request).then((networkResponse) => {
-                    // Don't cache if not a valid response
                     if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
                         return networkResponse;
                     }
                     
-                    // Clone response to cache it and serve it
                     const responseToCache = networkResponse.clone();
                     caches.open(CACHE_NAME)
                         .then((cache) => {
@@ -79,11 +94,6 @@ self.addEventListener('fetch', (event) => {
                         });
                         
                     return networkResponse;
-                }).catch(() => {
-                    // If both cache and network fail (offline), fallback to index/dashboard
-                    if (event.request.url.includes('.html')) {
-                        return caches.match('/dashboard.html');
-                    }
                 });
             })
     );

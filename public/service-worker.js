@@ -1,4 +1,4 @@
-const CACHE_NAME = 'farm-central-v4';
+const CACHE_NAME = 'farm-central-v5';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -32,7 +32,7 @@ const ASSETS_TO_CACHE = [
     '/js/smart-dashboard.js'
 ];
 
-// API URLs to cache for offline use (Network-first, then cache)
+// API URLs to cache for offline use
 const API_CACHE_NAME = 'farm-central-api-v1';
 
 self.addEventListener('install', event => {
@@ -46,63 +46,6 @@ self.addEventListener('install', event => {
     );
 });
 
-self.addEventListener('fetch', event => {
-    if (event.request.method !== 'GET') return;
-
-    const url = new URL(event.request.url);
-
-    // API requests: Network-first strategy (try network, fall back to cache)
-    if (url.pathname.startsWith('/api/')) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    // Clone and cache successful API responses
-                    if (response.ok) {
-                        const cloned = response.clone();
-                        caches.open(API_CACHE_NAME).then(cache => {
-                            cache.put(event.request, cloned);
-                        });
-                    }
-                    return response;
-                })
-                .catch(() => {
-                    // Network failed — try cache
-                    return caches.match(event.request).then(cached => {
-                        if (cached) return cached;
-                        // Return empty JSON response for offline
-                        return new Response(JSON.stringify({ offline: true, error: 'You are offline' }), {
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-                    });
-                })
-        );
-        return;
-    }
-
-    // Skip cross-origin requests
-    if (!url.origin.startsWith(self.location.origin)) return;
-
-    // Static assets: Cache-first strategy
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) return response;
-
-                return fetch(event.request).then(response => {
-                    if (!response || response.status !== 200 || response.type !== 'basic') {
-                        return response;
-                    }
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, responseToCache);
-                    });
-                    return response;
-                });
-            })
-    );
-});
-
-// Clean up old caches
 self.addEventListener('activate', event => {
     const cacheWhitelist = [CACHE_NAME, API_CACHE_NAME];
     event.waitUntil(
@@ -116,5 +59,54 @@ self.addEventListener('activate', event => {
                 })
             );
         }).then(() => self.clients.claim()) // Take control of all pages immediately
+    );
+});
+
+self.addEventListener('fetch', event => {
+    if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
+
+    const url = new URL(event.request.url);
+
+    // 1. API requests or HTML pages: Network-First strategy
+    // We want the latest version of data and pages if online
+    if (url.pathname.includes('/api/') || url.pathname.endsWith('.html') || url.pathname === '/') {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    // Clone and cache successful responses
+                    if (response && response.status === 200 && response.type === 'basic') {
+                        const responseToCache = response.clone();
+                        const targetCache = url.pathname.includes('/api/') ? API_CACHE_NAME : CACHE_NAME;
+                        caches.open(targetCache).then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    // Fallback to cache if offline
+                    return caches.match(event.request);
+                })
+        );
+        return;
+    }
+
+    // 2. Static assets (CSS, JS, Images): Cache-First strategy
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                if (response) return response;
+
+                return fetch(event.request).then(networkResponse => {
+                    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                        return networkResponse;
+                    }
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, responseToCache);
+                    });
+                    return networkResponse;
+                });
+            })
     );
 });
