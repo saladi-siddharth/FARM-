@@ -552,6 +552,8 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('username', data.username || 'Farmer');
                     localStorage.setItem('email', data.email || '');
+                    localStorage.setItem('role', data.role || 'farmer');
+                    if (data.role === 'admin') localStorage.setItem('admin_token', data.token);
                     
                     // Show success toast
                     toast.success(`Welcome back, ${data.username || 'Farmer'}!`);
@@ -754,6 +756,8 @@
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('username', data.username || 'Farmer');
                         localStorage.setItem('email', data.email || '');
+                        localStorage.setItem('role', data.role || 'farmer');
+                        if (data.role === 'admin') localStorage.setItem('admin_token', data.token);
                         toast.success(`Login successful! Welcome back, ${data.username || 'Farmer'}.`);
                         document.body.style.opacity = '0';
                         document.body.style.transition = 'opacity 0.5s ease';

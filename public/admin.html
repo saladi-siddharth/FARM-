@@ -943,7 +943,7 @@
                 const res = await fetch('/api/kyc/admin/pending', { headers: { 'Authorization': token } });
                 if (!res.ok) throw new Error();
                 const kyc = await res.json();
-                renderKYC(kyc);
+                renderKYC(kyc.applications || kyc);
             } catch (e) {
                 document.getElementById('kyc-table').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Error loading or no pending KYC applications.</td></tr>';
             }

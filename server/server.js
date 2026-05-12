@@ -51,6 +51,13 @@ app.use((req, res, next) => {
 });
 app.use(express.static(path.join(__dirname, '../public')));
 
+// --- FRIENDLY URL REWRITES ---
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../public/admin.html')));
+app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../public/dashboard.html')));
+app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, '../public/profile.html')));
+app.get('/market', (req, res) => res.sendFile(path.join(__dirname, '../public/market.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../public/login.html')));
+
 // --- DATABASE AUTO-MIGRATION (for Render/Production) ---
 const setupDatabase = async () => {
     try {

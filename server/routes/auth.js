@@ -96,7 +96,7 @@ router.post('/signin', authLimiter, validate(schemas.signin), async (req, res) =
             `Hello ${user.username}, a successful login was recorded on ${new Date().toLocaleString()}.`
         ).catch(e => console.log("Email error:", e.message));
 
-        res.json({ token, username: user.username, email: user.email });
+        res.json({ token, username: user.username, email: user.email, role: user.role });
     } catch (err) {
         console.error("Login Error:", err.message);
         res.status(500).json({ error: "Server error during signin" });
@@ -246,7 +246,7 @@ router.post('/firebase-google', async (req, res) => {
             `Hello ${user.username || displayName}, you signed in via Google on ${new Date().toLocaleString()}.`
         ).catch(e => console.log("Email error:", e.message));
 
-        res.json({ token, username: user.username || displayName, email });
+        res.json({ token, username: user.username || displayName, email, role: user.role });
     } catch (err) {
         console.error("Firebase Google Auth Error:", err.message);
         if (err.code === 'ER_DUP_ENTRY') {

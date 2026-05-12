@@ -133,7 +133,6 @@
             divider.style.cssText = 'height:1px;background:rgba(255,255,255,0.08);margin:0 0 12px 0;';
             panel.appendChild(divider);
 
-            // Menu items
             const menuItems = [
                 { icon: '🏠', text: 'Home', href: 'index.html' },
                 { icon: '🚀', text: 'Dashboard', href: 'dashboard.html', action: 'enterDashboard' },
@@ -144,6 +143,11 @@
                 { icon: '💰', text: 'Expenses', href: 'expenses.html' },
                 { icon: '🤝', text: 'Trade Hub', href: 'trading.html' },
             ];
+
+            const role = localStorage.getItem('role');
+            if (role === 'admin') {
+                menuItems.push({ icon: '🛡️', text: 'Admin Control', href: 'admin.html' });
+            }
 
             menuItems.forEach(item => {
                 const a = document.createElement('a');

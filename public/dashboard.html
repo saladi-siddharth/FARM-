@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Farm Central | Smart Hub</title>
+    <title>Dashboard | Farm Central</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7007280990614643"
+     crossorigin="anonymous"></script>
     <meta name="description" content="Farm Central Dashboard — Your agricultural command center">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -123,6 +125,10 @@
                 <button onclick="window.location.href='profile.html'"
                     class="btn-premium px-5 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 transition font-bold text-emerald-400 text-sm border border-emerald-500/30 flex items-center gap-2">
                     👤 <span class="hidden sm:inline">Profile</span>
+                </button>
+                <button id="admin-btn" onclick="window.location.href='admin.html'"
+                    class="hidden btn-premium px-5 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition font-bold text-red-400 text-sm border border-red-500/30 flex items-center gap-2">
+                    🛡️ <span class="hidden sm:inline">Admin</span>
                 </button>
                 <button onclick="logout()"
                     class="btn-premium px-5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold hover:bg-rose-500 hover:text-white transition flex items-center gap-2 text-sm shadow-[0_0_15px_rgba(244,63,94,0.1)]">
@@ -458,6 +464,10 @@
             window.location.href = 'login.html';
         }
         document.getElementById('farmer-name').innerText = localStorage.getItem('username') || 'Farmer';
+        if (localStorage.getItem('role') === 'admin') {
+            const adminBtn = document.getElementById('admin-btn');
+            if (adminBtn) adminBtn.classList.remove('hidden');
+        }
 
         // Set global chart defaults for dark theme
         Chart.defaults.color = '#94a3b8';
