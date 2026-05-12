@@ -1,67 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dispute Resolution Center | Trade Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Dispute Resolution | Farm Central</title>
+    <meta name="description" content="File and track trade disputes securely on Farm Central.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7007280990614643" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="css/premium-theme.css" rel="stylesheet">
     <style>
-        body { font-family: 'Outfit', sans-serif; background: #f8fafc; }
+        body { background:#090e17; color:#f8fafc; font-family:'Inter',sans-serif; overflow-x:hidden; margin:0; }
+        h1,h2,h3,.brand-font { font-family:'Outfit',sans-serif; }
+        .bg-orb { position:fixed; border-radius:50%; filter:blur(120px); z-index:-1; opacity:0.15; animation:float 15s ease-in-out infinite alternate; pointer-events:none; }
+        .orb-1 { width:50vw; height:50vw; background:#ef4444; top:-10vh; right:-10vw; }
+        .orb-2 { width:40vw; height:40vw; background:#8b5cf6; bottom:-20vh; left:-10vw; animation-delay:-5s; }
+        select option { background:#0f172a; color:#f8fafc; }
+        .dispute-card { transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .dispute-card:hover { transform:translateY(-2px); box-shadow:0 10px 25px -5px rgba(0,0,0,0.5),0 0 15px rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.3); }
     </style>
 </head>
+<body class="selection:bg-rose-500/30 selection:text-rose-200">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
 
-<body class="selection:bg-indigo-200 selection:text-indigo-900 pb-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 md:mt-20 relative z-10 fade-in-up pb-20">
 
-    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-        <div class="flex items-center gap-4">
-            <button onclick="window.history.back()" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition">←</button>
-            <h1 class="text-xl font-black text-slate-800">Dispute Center</h1>
-        </div>
-    </nav>
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div class="flex items-center gap-4">
+                <button onclick="window.history.back()" class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition hover-lift shadow-lg">←</button>
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-400 tracking-tight brand-font">Dispute Center</h1>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Escrow-Protected Resolution</p>
+                </div>
+            </div>
+            <button onclick="window.location.href='trading.html'" class="btn-premium px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition font-bold text-slate-300 text-sm border border-white/10 flex items-center gap-2 shadow-md">🤝 Trade Hub</button>
+        </header>
 
-    <main class="max-w-4xl mx-auto px-6 py-10">
-        
-        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
-            <div class="text-3xl">⚖️</div>
+        <!-- Info Banner -->
+        <div class="glass-premium p-6 rounded-2xl mb-8 flex items-start gap-4 border-l-4 border-l-rose-500 bg-gradient-to-r from-rose-500/5 to-transparent">
+            <div class="text-3xl flex-shrink-0">⚖️</div>
             <div>
-                <h3 class="font-bold text-rose-800">Report an Issue</h3>
-                <p class="text-sm text-rose-700 mt-1">If there is an issue with your order (e.g. goods not received, quality mismatch), you can file a dispute. Funds in escrow will be frozen until resolution.</p>
+                <h3 class="font-bold text-white text-sm">Report an Issue</h3>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">If there is an issue with your order (e.g. goods not received, quality mismatch), file a dispute. Funds in escrow will be frozen until resolution by admin.</p>
             </div>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-10">
-            <h2 class="font-bold text-slate-800 mb-6 text-lg border-b border-slate-100 pb-4">File a New Dispute</h2>
-            <form id="dispute-form" onsubmit="submitDispute(event)">
-                <div class="mb-5">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Transaction ID</label>
-                    <input type="text" id="txn-id" required placeholder="e.g. 45" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 outline-none transition">
+        <!-- File Dispute Form -->
+        <div class="glass-premium p-6 md:p-8 rounded-[2rem] border border-white/5 mb-10 shadow-2xl relative overflow-hidden group">
+            <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-rose-500/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-rose-500/20 transition duration-500"></div>
+            <h2 class="text-xl font-bold text-white brand-font mb-6 flex items-center gap-2 relative z-10">
+                <span class="p-1.5 bg-rose-500/20 rounded-lg text-rose-400 border border-rose-500/30 text-sm">📋</span> File a New Dispute
+            </h2>
+            <form id="dispute-form" onsubmit="submitDispute(event)" class="space-y-5 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 mb-2 block uppercase tracking-widest">Transaction ID</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">#️⃣</span>
+                            <input type="text" id="txn-id" required placeholder="e.g. 45" class="w-full pl-9 pr-3 py-3.5 bg-black/40 text-white rounded-xl border border-white/10 outline-none focus:border-rose-500/50 shadow-inner text-sm font-medium transition placeholder-slate-600">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 mb-2 block uppercase tracking-widest">Reason</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">⚠️</span>
+                            <select id="reason" required class="w-full pl-9 pr-3 py-3.5 bg-black/40 text-slate-200 rounded-xl border border-white/10 outline-none focus:border-rose-500/50 shadow-inner text-sm font-medium transition cursor-pointer appearance-none">
+                                <option value="not_received">Goods not received</option>
+                                <option value="quality_mismatch">Quality mismatch</option>
+                                <option value="quantity_shortage">Quantity shortage</option>
+                                <option value="delayed">Delivery delayed</option>
+                                <option value="wrong_product">Wrong product delivered</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-5">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Reason</label>
-                    <select id="reason" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 outline-none transition">
-                        <option value="not_received">Goods not received</option>
-                        <option value="quality_mismatch">Quality mismatch</option>
-                        <option value="quantity_shortage">Quantity shortage</option>
-                        <option value="delayed">Delivery delayed</option>
-                        <option value="wrong_product">Wrong product delivered</option>
-                    </select>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 mb-2 block uppercase tracking-widest">Detailed Description</label>
+                    <textarea id="description" required rows="4" placeholder="Describe the issue in detail..." class="w-full px-4 py-3 bg-black/40 text-white rounded-xl border border-white/10 outline-none focus:border-rose-500/50 shadow-inner text-sm placeholder-slate-600 transition resize-none"></textarea>
                 </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Detailed Description</label>
-                    <textarea id="description" required rows="4" placeholder="Describe the issue in detail..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 outline-none transition resize-none"></textarea>
-                </div>
-                <button type="submit" id="submitBtn" class="w-full py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl transition shadow-lg shadow-rose-500/20">Submit Dispute</button>
+                <button type="submit" id="submitBtn" class="btn-premium w-full py-3.5 bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-500 hover:to-orange-400 text-white font-black rounded-xl transition shadow-lg shadow-rose-500/20 border border-rose-400/50 uppercase tracking-widest">Submit Dispute</button>
             </form>
         </div>
 
-        <h2 class="font-bold text-slate-800 mb-4 text-lg">My Active Disputes</h2>
-        <div id="disputes-list" class="space-y-4">
-            <p class="text-center text-sm text-slate-400 py-6">Loading disputes...</p>
+        <!-- Active Disputes -->
+        <div class="glass-premium p-6 md:p-8 rounded-[2rem] border border-white/5 shadow-2xl min-h-[300px]">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+                <h2 class="text-xl font-bold text-white brand-font flex items-center gap-2"><span>📂</span> My Active Disputes</h2>
+            </div>
+            <div id="disputes-list" class="space-y-4">
+                <div class="flex flex-col items-center justify-center py-12 text-slate-500 gap-3">
+                    <div class="w-8 h-8 border-4 border-slate-700 border-t-rose-500 rounded-full animate-spin"></div>
+                    <span class="text-xs font-bold uppercase tracking-widest">Loading disputes...</span>
+                </div>
+            </div>
         </div>
-
-    </main>
+    </div>
 
     <script src="js/toast.js"></script>
     <script>
@@ -71,69 +106,61 @@
         async function loadDisputes() {
             try {
                 const res = await fetch('/api/disputes/my', { headers: { 'Authorization': token } });
-                if(res.ok) {
-                    const data = await res.json();
-                    renderDisputes(data);
-                }
+                if(res.ok) renderDisputes(await res.json());
             } catch(e) {
-                document.getElementById('disputes-list').innerHTML = '<p class="text-center text-sm text-slate-400 py-6">Error loading disputes</p>';
+                document.getElementById('disputes-list').innerHTML = '<p class="text-center text-sm text-slate-500 py-8">Error loading disputes</p>';
             }
         }
 
         function renderDisputes(disputes) {
             const list = document.getElementById('disputes-list');
-            if(disputes.length === 0) {
-                list.innerHTML = '<div class="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-400"><p class="font-medium">No disputes found</p></div>';
+            if(!disputes.length) {
+                list.innerHTML = `<div class="flex flex-col items-center py-12 text-slate-500 gap-2 opacity-60">
+                    <div class="text-4xl mb-2">✅</div>
+                    <p class="text-sm font-bold uppercase tracking-widest">No active disputes</p>
+                    <p class="text-xs">Your trade history is clean.</p>
+                </div>`;
                 return;
             }
-            list.innerHTML = disputes.map(d => `
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 transition shadow-sm">
-                    <div class="flex justify-between items-start mb-3">
+            list.innerHTML = disputes.map((d, i) => {
+                const statusColors = { open:'bg-amber-500/10 text-amber-400 border-amber-500/20', resolved:'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', rejected:'bg-rose-500/10 text-rose-400 border-rose-500/20' };
+                const sc = statusColors[d.status] || statusColors.open;
+                return `
+                <div class="dispute-card glass-premium p-5 rounded-2xl border border-white/5 relative overflow-hidden" style="animation:fadeInUp 0.4s ${i*0.05}s forwards; opacity:0">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 ${d.status==='open'?'bg-amber-500':d.status==='resolved'?'bg-emerald-500':'bg-rose-500'}"></div>
+                    <div class="flex justify-between items-start mb-3 pl-2">
                         <div>
-                            <span class="text-xs font-bold text-slate-400">TXN #${d.transaction_id}</span>
-                            <h4 class="font-bold text-slate-800 text-lg">${d.crop_name || 'Order Issue'}</h4>
+                            <span class="text-[10px] font-bold text-slate-400 font-mono bg-black/30 px-2 py-0.5 rounded border border-white/5">TXN #${d.transaction_id}</span>
+                            <h4 class="font-bold text-white text-lg mt-1">${d.crop_name || 'Order Issue'}</h4>
                         </div>
-                        <span class="px-3 py-1 bg-amber-50 text-amber-600 text-xs font-bold rounded-lg border border-amber-100 uppercase tracking-wide">${d.status || 'Under Review'}</span>
+                        <span class="px-3 py-1 ${sc} text-[10px] font-black rounded-lg border uppercase tracking-wider">${d.status || 'Under Review'}</span>
                     </div>
-                    <p class="text-sm font-bold text-rose-600 mb-2">Reason: <span class="font-medium text-slate-700">${d.reason}</span></p>
-                    <p class="text-sm text-slate-500 line-clamp-2">${d.description}</p>
-                    <p class="text-xs text-slate-400 mt-4 font-medium">${new Date(d.created_at).toLocaleString()}</p>
-                </div>
-            `).join('');
+                    <p class="text-xs font-bold text-rose-400 mb-1 pl-2">Reason: <span class="font-medium text-slate-300">${d.reason}</span></p>
+                    <p class="text-sm text-slate-400 line-clamp-2 pl-2">${d.description}</p>
+                    <p class="text-[10px] text-slate-500 mt-3 font-bold pl-2">📅 ${new Date(d.created_at).toLocaleString()}</p>
+                </div>`;
+            }).join('');
         }
 
         async function submitDispute(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '⏳ Submitting...'; btn.disabled = true;
-
-            const payload = {
-                reason: document.getElementById('reason').value,
-                description: document.getElementById('description').value
-            };
-            const txnId = document.getElementById('txn-id').value;
-
             try {
-                const res = await fetch(`/api/disputes/${txnId}`, {
+                const res = await fetch(`/api/disputes/${document.getElementById('txn-id').value}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ reason: document.getElementById('reason').value, description: document.getElementById('description').value })
                 });
                 const data = await res.json();
-                if(res.ok) {
-                    toast.success('Dispute filed successfully.');
-                    document.getElementById('dispute-form').reset();
-                    loadDisputes();
-                } else {
-                    toast.error(data.error || 'Failed to file dispute');
-                }
-            } catch(err) {
-                toast.error('Network error');
-            }
+                if(res.ok) { toast.success('Dispute filed successfully.'); document.getElementById('dispute-form').reset(); loadDisputes(); }
+                else toast.error(data.error || 'Failed to file dispute');
+            } catch(err) { toast.error('Network error'); }
             btn.innerHTML = 'Submit Dispute'; btn.disabled = false;
         }
 
         loadDisputes();
     </script>
+    <script src="js/mobile-nav.js"></script>
 </body>
 </html>

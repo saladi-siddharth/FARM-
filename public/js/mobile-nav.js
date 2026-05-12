@@ -217,4 +217,16 @@
             });
         }
     }
+
+    // ─── Auto-inject Command Palette & PWA on every page ───
+    function injectGlobalScript(src) {
+        if (!document.querySelector(`script[src="${src}"]`)) {
+            const s = document.createElement('script');
+            s.src = src;
+            s.defer = true;
+            document.body.appendChild(s);
+        }
+    }
+    injectGlobalScript('js/command-palette.js');
+    injectGlobalScript('js/pwa-init.js');
 })();

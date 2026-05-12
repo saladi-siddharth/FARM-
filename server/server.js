@@ -22,6 +22,25 @@ app.use(helmet({
 app.use(cors());
 app.use(compression());
 
+// ─── In-Memory Rate Limiter (no Redis dependency) ───
+const rateLimitStore = new Map();
+const rateLimit = (maxReqs = 100, windowMs = 60000) => (req, res, next) => {
+    const key = req.ip;
+    const now = Date.now();
+    const entry = rateLimitStore.get(key);
+    if (!entry || now - entry.start > windowMs) {
+        rateLimitStore.set(key, { count: 1, start: now });
+        return next();
+    }
+    if (entry.count >= maxReqs) {
+        return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+    }
+    entry.count++;
+    next();
+};
+// Apply rate limiting to API routes (100 requests/minute per IP)
+app.use('/api/', rateLimit(100, 60000));
+
 // Request Logger (Simple Morgan alternative)
 app.use((req, res, next) => {
     const start = Date.now();
@@ -197,18 +216,33 @@ io.on('connection', (socket) => {
     });
 });
 
+// ─── 404 Handler — Serve custom 404 page ───
+app.use((req, res, next) => {
+    if (req.accepts('html')) {
+        return res.status(404).sendFile(path.join(__dirname, '../public/404.html'));
+    }
+    res.status(404).json({ error: 'Not found' });
+});
+
 // Error Handling Middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    res.status(500).json({ error: 'Internal server error', message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message });
 });
 
-// Health Check
+// Health Check — Enhanced with uptime + memory stats
 app.get('/health', async (req, res) => {
     try {
         const db = require('./config/db');
         await db.execute('SELECT 1');
-        res.json({ status: 'OK', db: 'Connected', time: new Date() });
+        const mem = process.memoryUsage();
+        res.json({
+            status: 'OK',
+            db: 'Connected',
+            uptime: Math.floor(process.uptime()) + 's',
+            memory: { heapUsed: (mem.heapUsed / 1024 / 1024).toFixed(1) + 'MB', rss: (mem.rss / 1024 / 1024).toFixed(1) + 'MB' },
+            time: new Date()
+        });
     } catch (err) {
         res.status(500).json({ status: 'Error', db: err.message });
     }
