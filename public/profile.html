@@ -15,12 +15,33 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
             background: #090e17;
-            color: #f8fafc;
+            color: var(--text-body);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             margin: 0;
@@ -119,7 +140,7 @@
                     🛡️
                 </button>
                 <button onclick="history.back()"
-                    class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition hover-lift shadow-lg">
+                    class="w-12 h-12 rounded-2xl bg-inverse/5 border border-border_color/10 flex items-center justify-center text-heading hover:bg-inverse/10 transition hover-lift shadow-lg">
                     ✕
                 </button>
             </div>
@@ -138,8 +159,8 @@
                 F
             </div>
             <div class="text-center sm:text-left z-10 flex-1">
-                <h2 class="text-3xl font-black text-white mb-1 tracking-tight" id="profile-name">Loading...</h2>
-                <p class="text-slate-400 text-sm mb-4 font-medium" id="profile-email">Connecting...</p>
+                <h2 class="text-3xl font-black text-heading mb-1 tracking-tight" id="profile-name">Loading...</h2>
+                <p class="text-muted text-sm mb-4 font-medium" id="profile-email">Connecting...</p>
                 <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
                     <span
                         class="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-emerald-500/30 shadow-inner flex items-center gap-1.5">
@@ -154,7 +175,7 @@
             </div>
 
             <button
-                class="absolute top-6 right-6 w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition hover-scale">
+                class="absolute top-6 right-6 w-10 h-10 rounded-xl bg-inverse/5 border border-border_color/10 flex items-center justify-center text-muted hover:text-heading transition hover-scale">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
@@ -168,7 +189,7 @@
 
             <!-- KYC Verification Section -->
             <div
-                class="glass-premium p-8 rounded-[2rem] border border-white/5 shadow-lg group hover:border-white/10 transition-colors">
+                class="glass-premium p-8 rounded-[2rem] border border-border_color/5 shadow-lg group hover:border-border_color/10 transition-colors">
                 <h3
                     class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-6 flex items-center gap-3">
                     <span class="p-1.5 bg-amber-500/10 rounded-lg border border-amber-500/20">📋</span>
@@ -178,10 +199,10 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
                         <p class="font-bold text-slate-200 text-lg" id="profile-kyc-status">Checking Status...</p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium" id="profile-kyc-desc">Identity verification is required to buy or sell.</p>
+                        <p class="text-xs text-muted mt-1 font-medium" id="profile-kyc-desc">Identity verification is required to buy or sell.</p>
                     </div>
                     <button onclick="location.href='kyc.html'" id="profile-kyc-btn"
-                        class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black tracking-widest text-xs rounded-xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all w-full sm:w-auto">
+                        class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-heading font-black tracking-widest text-xs rounded-xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all w-full sm:w-auto">
                         Complete KYC
                     </button>
                 </div>
@@ -189,7 +210,7 @@
 
             <!-- Preferences -->
             <div
-                class="glass-premium p-8 rounded-[2rem] border border-white/5 shadow-lg group hover:border-white/10 transition-colors">
+                class="glass-premium p-8 rounded-[2rem] border border-border_color/5 shadow-lg group hover:border-border_color/10 transition-colors">
                 <h3
                     class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-6 flex items-center gap-3">
                     <span class="p-1.5 bg-emerald-500/10 rounded-lg border border-emerald-500/20">⚙️</span>
@@ -201,10 +222,10 @@
                     <div>
                         <p class="font-bold text-slate-200 group-hover/item:text-emerald-400 transition-colors">Language
                         </p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium">Change app interface language</p>
+                        <p class="text-xs text-muted mt-1 font-medium">Change app interface language</p>
                     </div>
                     <select onchange="changeAppLanguage(this.value)"
-                        class="bg-black/40 border border-white/10 text-white text-sm font-bold rounded-xl focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500 block p-3 w-40 outline-none transition text-right">
+                        class="bg-black/40 border border-border_color/10 text-heading text-sm font-bold rounded-xl focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500 block p-3 w-40 outline-none transition text-right">
                         <option value="en" selected>English</option>
                         <option value="hi">Hindi (हिंदी)</option>
                         <option value="te">Telugu (తెలుగు)</option>
@@ -225,10 +246,10 @@
                     <div>
                         <p class="font-bold text-slate-200 group-hover/item:text-emerald-400 transition-colors">Currency
                         </p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium">Preferred market format</p>
+                        <p class="text-xs text-muted mt-1 font-medium">Preferred market format</p>
                     </div>
                     <select onchange="updateSetting('Currency', this.value)"
-                        class="bg-black/40 border border-white/10 text-white text-sm font-bold rounded-xl focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500 block p-3 w-32 outline-none transition text-right">
+                        class="bg-black/40 border border-border_color/10 text-heading text-sm font-bold rounded-xl focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500 block p-3 w-32 outline-none transition text-right">
                         <option value="INR" selected>INR (₹)</option>
                         <option value="USD">USD ($)</option>
                         <option value="EUR">EUR (€)</option>
@@ -240,7 +261,7 @@
                     <div>
                         <p class="font-bold text-slate-200 group-hover/item:text-emerald-400 transition-colors">Premium
                             Dark Mode</p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium">Glassmorphism aesthetics</p>
+                        <p class="text-xs text-muted mt-1 font-medium">Glassmorphism aesthetics</p>
                     </div>
                     <div
                         class="relative inline-block w-12 mr-0 align-middle select-none transition duration-200 ease-in flex-shrink-0">
@@ -248,14 +269,14 @@
                             class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[#090e17] transition-all duration-300"
                             checked onclick="toggleTheme()" />
                         <label for="theme-toggle"
-                            class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-700 cursor-pointer border border-white/5 transition-colors duration-300"></label>
+                            class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-700 cursor-pointer border border-border_color/5 transition-colors duration-300"></label>
                     </div>
                 </div>
             </div>
 
             <!-- Notifications -->
             <div
-                class="glass-premium p-8 rounded-[2rem] border border-white/5 shadow-lg group hover:border-white/10 transition-colors">
+                class="glass-premium p-8 rounded-[2rem] border border-border_color/5 shadow-lg group hover:border-border_color/10 transition-colors">
                 <h3 class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-6 flex items-center gap-3">
                     <span class="p-1.5 bg-blue-500/10 rounded-lg border border-blue-500/20">🔔</span>
                     Notifications
@@ -265,14 +286,14 @@
                     <div>
                         <p class="font-bold text-slate-200 group-hover/item:text-blue-400 transition-colors">Market
                             Alerts</p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium">Get push notifications for price drops</p>
+                        <p class="text-xs text-muted mt-1 font-medium">Get push notifications for price drops</p>
                     </div>
                     <div
                         class="relative inline-block w-12 mr-0 align-middle select-none transition duration-200 ease-in flex-shrink-0">
                         <input type="checkbox" checked id="notif-1"
                             class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[#090e17] transition-all duration-300" />
                         <label for="notif-1"
-                            class="toggle-label block overflow-hidden h-6 rounded-full bg-emerald-500 cursor-pointer border border-white/5 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-colors duration-300"></label>
+                            class="toggle-label block overflow-hidden h-6 rounded-full bg-emerald-500 cursor-pointer border border-border_color/5 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-colors duration-300"></label>
                     </div>
                 </div>
 
@@ -280,22 +301,22 @@
                     <div>
                         <p class="font-bold text-slate-200 group-hover/item:text-blue-400 transition-colors">Weekly
                             Reports</p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium">Receive email & SMS summaries</p>
+                        <p class="text-xs text-muted mt-1 font-medium">Receive email & SMS summaries</p>
                     </div>
                     <div
                         class="relative inline-block w-12 mr-0 align-middle select-none transition duration-200 ease-in flex-shrink-0">
                         <input type="checkbox" checked id="notif-2"
                             class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[#090e17] transition-all duration-300" />
                         <label for="notif-2"
-                            class="toggle-label block overflow-hidden h-6 rounded-full bg-emerald-500 cursor-pointer border border-white/5 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-colors duration-300"></label>
+                            class="toggle-label block overflow-hidden h-6 rounded-full bg-emerald-500 cursor-pointer border border-border_color/5 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-colors duration-300"></label>
                     </div>
                 </div>
-                <p class="text-[10px] text-slate-500 mt-4 italic">* Note: All platform alerts configured for SMTP are
+                <p class="text-[10px] text-muted mt-4 italic">* Note: All platform alerts configured for SMTP are
                     also dispatched via Twilio SMS for maximum reliability.</p>
             </div>
 
             <!-- More Options -->
-            <div class="glass-premium p-8 rounded-[2rem] border border-white/5 shadow-lg">
+            <div class="glass-premium p-8 rounded-[2rem] border border-border_color/5 shadow-lg">
                 <h3
                     class="text-[10px] font-black text-purple-500 uppercase tracking-widest mb-6 flex items-center gap-3">
                     <span class="p-1.5 bg-purple-500/10 rounded-lg border border-purple-500/20">🛡️</span>
@@ -305,15 +326,15 @@
                     <button onclick="downloadReport()" class="flex-1 bg-black/40 hover:bg-emerald-500/20 text-emerald-400 font-black tracking-widest text-xs py-4 rounded-xl border border-emerald-500/20 hover:border-emerald-400/50 transition-all shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                         📄 DOWNLOAD PDF
                     </button>
-                    <button onclick="emailWeeklyReport()" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-black tracking-widest text-xs py-4 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+                    <button onclick="emailWeeklyReport()" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-heading font-black tracking-widest text-xs py-4 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
                         📧 EMAIL WEEKLY REPORT
                     </button>
                 </div>
-                <div class="setting-item cursor-pointer hover:bg-white/5 transition px-4 -mx-4 rounded-xl group/item border-none pb-2 pt-2"
+                <div class="setting-item cursor-pointer hover:bg-inverse/5 transition px-4 -mx-4 rounded-xl group/item border-none pb-2 pt-2"
                     onclick="window.location.href='mailto:support@farmcentral.com'">
-                    <p class="font-bold text-slate-200 group-hover/item:text-white transition-colors">Support & Help</p>
+                    <p class="font-bold text-slate-200 group-hover/item:text-heading transition-colors">Support & Help</p>
                     <span
-                        class="text-slate-500 bg-black/40 w-8 h-8 rounded-lg flex items-center justify-center border border-white/5 group-hover/item:border-white/20 transition-colors">→</span>
+                        class="text-muted bg-black/40 w-8 h-8 rounded-lg flex items-center justify-center border border-border_color/5 group-hover/item:border-white/20 transition-colors">→</span>
                 </div>
             </div>
 
@@ -326,10 +347,10 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
                         <p class="font-bold text-slate-200 text-lg">Delete Account</p>
-                        <p class="text-xs text-slate-500 mt-1 font-medium">Permanently remove your account and all data. This action cannot be undone.</p>
+                        <p class="text-xs text-muted mt-1 font-medium">Permanently remove your account and all data. This action cannot be undone.</p>
                     </div>
                     <button onclick="deleteAccount()"
-                        class="px-6 py-2.5 bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-black tracking-widest text-xs rounded-xl shadow-lg shadow-rose-500/20 active:scale-95 transition-all w-full sm:w-auto">
+                        class="px-6 py-2.5 bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-heading font-black tracking-widest text-xs rounded-xl shadow-lg shadow-rose-500/20 active:scale-95 transition-all w-full sm:w-auto">
                         🗑️ DELETE ACCOUNT
                     </button>
                 </div>

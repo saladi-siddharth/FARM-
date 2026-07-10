@@ -14,13 +14,34 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
             background: #090e17;
-            color: #f8fafc;
+            color: var(--text-body);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             margin: 0;
@@ -168,7 +189,7 @@
         <header class="flex justify-between items-center mb-8 shrink-0 relative">
             <div class="flex items-center gap-4">
                 <button onclick="window.history.back()"
-                    class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition hover-lift shadow-lg">
+                    class="w-12 h-12 rounded-2xl bg-inverse/5 border border-border_color/10 flex items-center justify-center text-heading hover:bg-inverse/10 transition hover-lift shadow-lg">
                     ←
                 </button>
                 <div>
@@ -176,21 +197,21 @@
                         class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 tracking-tight brand-font flex items-center gap-3">
                         Crop Calendar
                     </h1>
-                    <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Plan
+                    <p class="text-[10px] md:text-xs text-muted font-bold uppercase tracking-widest mt-1">Plan
                         planting and harvesting seasons</p>
                 </div>
             </div>
 
             <button
                 onclick="document.getElementById('evtStart').value = new Date().toISOString().split('T')[0]; document.getElementById('eventModal').showModal();"
-                class="hidden sm:flex btn-premium bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white px-6 py-3.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 border border-emerald-400/50 hover-scale">
+                class="hidden sm:flex btn-premium bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-heading px-6 py-3.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 border border-emerald-400/50 hover-scale">
                 <span>➕ New Event</span>
             </button>
         </header>
 
         <!-- Main Calendar Container -->
         <div
-            class="glass-premium flex-1 rounded-[2rem] p-4 md:p-8 overflow-hidden shadow-2xl relative border border-white/5 flex flex-col group hover:border-emerald-500/20 transition-colors duration-500">
+            class="glass-premium flex-1 rounded-[2rem] p-4 md:p-8 overflow-hidden shadow-2xl relative border border-border_color/5 flex flex-col group hover:border-emerald-500/20 transition-colors duration-500">
             <!-- Decorative Glow -->
             <div
                 class="absolute -left-20 -top-20 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/20 transition duration-500">
@@ -201,7 +222,7 @@
             <!-- Mobile Add Button (Floating) -->
             <button
                 onclick="document.getElementById('evtStart').value = new Date().toISOString().split('T')[0]; document.getElementById('eventModal').showModal();"
-                class="sm:hidden absolute bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-2xl text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] border border-emerald-400/50 z-20">
+                class="sm:hidden absolute bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-2xl text-heading shadow-[0_0_20px_rgba(16,185,129,0.4)] border border-emerald-400/50 z-20">
                 +
             </button>
         </div>
@@ -209,18 +230,18 @@
 
     <!-- Smart Event Modal -->
     <dialog id="eventModal"
-        class="glass-premium rounded-[2rem] p-0 border border-white/10 shadow-2xl text-white max-w-md w-full m-auto overflow-hidden">
+        class="glass-premium rounded-[2rem] p-0 border border-border_color/10 shadow-2xl text-heading max-w-md w-full m-auto overflow-hidden">
 
         <div
-            class="h-20 bg-gradient-to-tr from-emerald-900/50 to-slate-900/50 relative border-b border-white/5 flex items-center px-6">
+            class="h-20 bg-gradient-to-tr from-emerald-900/50 to-slate-900/50 relative border-b border-border_color/5 flex items-center px-6">
             <div class="absolute inset-0 opacity-20"
                 style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
-            <h3 class="text-xl font-black text-white brand-font tracking-wide relative z-10 flex items-center gap-2">
+            <h3 class="text-xl font-black text-heading brand-font tracking-wide relative z-10 flex items-center gap-2">
                 <span class="p-1.5 bg-emerald-500/20 rounded-lg border border-emerald-500/30 text-emerald-400">📅</span>
                 New Farm Event
             </h3>
             <button type="button" onclick="eventModal.close()"
-                class="absolute top-6 right-6 text-slate-400 hover:text-white transition z-10">✕</button>
+                class="absolute top-6 right-6 text-muted hover:text-heading transition z-10">✕</button>
         </div>
 
         <form class="p-6 md:p-8 flex flex-col gap-6" onsubmit="saveEvent(event)">
@@ -228,14 +249,14 @@
             <!-- Crop Helper -->
             <div class="space-y-3">
                 <label
-                    class="text-[10px] text-slate-400 uppercase tracking-widest font-black flex items-center gap-1.5">
+                    class="text-[10px] text-muted uppercase tracking-widest font-black flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     Smart Crop Assistant
                 </label>
                 <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted">🔍</span>
                     <input list="cropValues" id="cropInput" placeholder="Type crop name (e.g. Rice)..."
-                        class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-white/10 outline-none text-white focus:border-emerald-500/50 transition shadow-inner placeholder-slate-500 text-sm font-medium"
+                        class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-border_color/10 outline-none text-heading focus:border-emerald-500/50 transition shadow-inner placeholder-slate-500 text-sm font-medium"
                         oninput="fetchCropDetails(this.value)">
                     <datalist id="cropValues">
                         <option value="Rice">
@@ -261,7 +282,7 @@
                             id="cdSeason">Season</span>
                     </div>
                     <div
-                        class="grid grid-cols-2 gap-3 text-xs text-slate-300 font-medium bg-black/20 p-3 rounded-lg border border-white/5">
+                        class="grid grid-cols-2 gap-3 text-xs text-body font-medium bg-black/20 p-3 rounded-lg border border-border_color/5">
                         <div class="flex items-center gap-2"><span>⏱</span> <span id="cdDuration">--</span></div>
                         <div class="flex items-center gap-2"><span>💧</span> <span id="cdWater">--</span></div>
                         <div class="flex items-center gap-2"><span>🌡</span> <span id="cdTemp">--</span></div>
@@ -271,29 +292,29 @@
                 </div>
             </div>
 
-            <div class="h-px bg-white/10 w-full my-2"></div>
+            <div class="h-px bg-inverse/10 w-full my-2"></div>
 
             <div class="space-y-4">
-                <label class="text-[10px] text-slate-400 uppercase tracking-widest font-black">Event Details</label>
+                <label class="text-[10px] text-muted uppercase tracking-widest font-black">Event Details</label>
 
                 <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">📝</span>
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted">📝</span>
                     <input type="text" id="evtTitle" placeholder="Event Title"
-                        class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-white/10 outline-none text-white focus:border-emerald-500/50 transition shadow-inner placeholder-slate-500 text-sm font-medium"
+                        class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-border_color/10 outline-none text-heading focus:border-emerald-500/50 transition shadow-inner placeholder-slate-500 text-sm font-medium"
                         required>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">📅</span>
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted">📅</span>
                         <input type="date" id="evtStart"
-                            class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-white/10 outline-none text-white focus:border-emerald-500/50 transition shadow-inner text-sm font-medium appearance-none cursor-pointer"
+                            class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-border_color/10 outline-none text-heading focus:border-emerald-500/50 transition shadow-inner text-sm font-medium appearance-none cursor-pointer"
                             required>
                     </div>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🎨</span>
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted">🎨</span>
                         <select id="evtColor"
-                            class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-white/10 outline-none text-white focus:border-emerald-500/50 transition shadow-inner text-sm font-medium cursor-pointer">
+                            class="w-full pl-9 pr-3 py-3.5 rounded-xl bg-black/40 border border-border_color/10 outline-none text-heading focus:border-emerald-500/50 transition shadow-inner text-sm font-medium cursor-pointer">
                             <option value="#10B981">Planting (Green)</option>
                             <option value="#F59E0B">Harvest (Orange)</option>
                             <option value="#3B82F6">Irrigation (Blue)</option>
@@ -305,7 +326,7 @@
             </div>
 
             <button type="submit" id="saveBtn"
-                class="btn-premium w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 border border-emerald-400/50 transition hover-scale mt-2">
+                class="btn-premium w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-heading py-4 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 border border-emerald-400/50 transition hover-scale mt-2">
                 Save Event
             </button>
         </form>
@@ -478,6 +499,42 @@
         }
     </script>
     <script src="js/mobile-nav.js"></script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

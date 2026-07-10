@@ -4,11 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather AI | Farm Central</title>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="css/premium-theme.css" rel="stylesheet">
     <style>
-        body { background: #090e17; color: #f8fafc; font-family: 'Outfit', sans-serif; overflow-x: hidden; margin: 0; }
+        body { background: #090e17; color: var(--text-body); font-family: 'Outfit', sans-serif; overflow-x: hidden; margin: 0; }
         .bg-orb { position: fixed; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.15; animation: float 15s ease-in-out infinite alternate; pointer-events: none; }
         .orb-1 { width: 40vw; height: 40vw; background: #3b82f6; top: -10vh; left: -10vw; }
         .orb-2 { width: 50vw; height: 50vw; background: #06b6d4; bottom: -20vh; right: -10vw; animation-delay: -5s; }
@@ -17,42 +38,42 @@
 </head>
 <body class="p-4 md:p-8 lg:p-12">
     <div class="bg-orb orb-1"></div><div class="bg-orb orb-2"></div>
-    <button onclick="window.history.back()" class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white shadow-lg hover:bg-white/10 transition">←</button>
+    <button onclick="window.history.back()" class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl bg-inverse/5 border border-border_color/10 flex items-center justify-center text-heading shadow-lg hover:bg-inverse/10 transition">←</button>
     <div class="max-w-5xl mx-auto pt-16 md:pt-10">
         <header class="flex flex-col md:flex-row justify-between items-center mb-12 pl-4 md:pl-12 gap-4">
             <div>
                 <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 tracking-tight">WEATHER AI</h1>
-                <p class="text-slate-400 font-medium text-lg mt-1">Hyper-local climate intelligence & yield risk</p>
+                <p class="text-muted font-medium text-lg mt-1">Hyper-local climate intelligence & yield risk</p>
             </div>
-            <button onclick="window.location.href='dashboard.html'" class="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-blue-500/10 transition shadow-lg">🏠 Dashboard</button>
+            <button onclick="window.location.href='dashboard.html'" class="px-6 py-3 rounded-2xl bg-inverse/5 border border-border_color/10 text-heading font-bold hover:bg-blue-500/10 transition shadow-lg">🏠 Dashboard</button>
         </header>
 
         <div class="glass-panel p-8 md:p-12 mb-8 relative overflow-hidden group border-t-4 border-t-blue-500">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition duration-700"></div>
             <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><span class="text-3xl">🌍</span> Live Satellite Prediction</h2>
             <div class="flex flex-col md:flex-row gap-4 mb-8">
-                <input type="text" id="loc" placeholder="Enter farm location (e.g. Pune, India)" class="flex-1 bg-slate-900/60 p-4 rounded-xl border border-white/10 outline-none text-lg focus:border-blue-500 transition placeholder:text-slate-500">
+                <input type="text" id="loc" placeholder="Enter farm location (e.g. Pune, India)" class="flex-1 bg-slate-900/60 p-4 rounded-xl border border-border_color/10 outline-none text-lg focus:border-blue-500 transition placeholder:text-muted">
                 <button onclick="predictWeather()" id="predBtn" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-blue-500/30">Predict Now</button>
             </div>
             
             <div id="result" class="hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Precipitation Chance</p>
+                    <div class="bg-inverse/5 p-6 rounded-2xl border border-border_color/10 text-center">
+                        <p class="text-[10px] font-bold text-muted uppercase tracking-widest">Precipitation Chance</p>
                         <p class="text-5xl font-black text-cyan-400 mt-2 mb-2" id="precip">--</p>
                     </div>
-                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Soil Moisture</p>
+                    <div class="bg-inverse/5 p-6 rounded-2xl border border-border_color/10 text-center">
+                        <p class="text-[10px] font-bold text-muted uppercase tracking-widest">Soil Moisture</p>
                         <p class="text-5xl font-black text-emerald-400 mt-2 mb-2" id="moisture">--</p>
                     </div>
-                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Yield Risk Factor</p>
+                    <div class="bg-inverse/5 p-6 rounded-2xl border border-border_color/10 text-center">
+                        <p class="text-[10px] font-bold text-muted uppercase tracking-widest">Yield Risk Factor</p>
                         <p class="text-5xl font-black text-rose-400 mt-2 mb-2" id="risk">--</p>
                     </div>
                 </div>
-                <div class="mt-8 bg-black/40 p-6 rounded-2xl border border-white/5">
-                    <h3 class="text-sm font-bold text-slate-300 mb-2">AI Recommendation</h3>
-                    <p id="ai-rec" class="text-slate-400 leading-relaxed">...</p>
+                <div class="mt-8 bg-black/40 p-6 rounded-2xl border border-border_color/5">
+                    <h3 class="text-sm font-bold text-body mb-2">AI Recommendation</h3>
+                    <p id="ai-rec" class="text-muted leading-relaxed">...</p>
                 </div>
             </div>
         </div>
@@ -73,5 +94,41 @@
             }, 1500);
         }
     </script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>

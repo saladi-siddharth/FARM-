@@ -14,12 +14,33 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
             background: #090e17;
-            color: #f8fafc;
+            color: var(--text-body);
             font-family: 'Outfit', sans-serif;
             overflow-x: hidden;
             margin: 0;
@@ -102,7 +123,7 @@
 
     <!-- Back Button -->
     <button onclick="window.history.back()"
-        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl btn-premium bg-white/5 border border-white/10 flex items-center justify-center text-white shadow-lg hover:shadow-white/10 hover-lift">
+        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl btn-premium bg-inverse/5 border border-border_color/10 flex items-center justify-center text-heading shadow-lg hover:shadow-white/10 hover-lift">
         ←
     </button>
 
@@ -114,10 +135,10 @@
                     <img src="logo.png" alt="Logo" class="w-12 h-12 object-contain">
                     AI CROP DOCTOR
                 </h1>
-                <p class="text-slate-400 font-medium text-lg mt-1">Advanced Plant Disease Diagnosis System</p>
+                <p class="text-muted font-medium text-lg mt-1">Advanced Plant Disease Diagnosis System</p>
             </div>
             <button onclick="window.location.href='dashboard.html'"
-                class="btn-premium px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold flex items-center gap-2 hover:bg-emerald-500/10 transition-colors shadow-lg">
+                class="btn-premium px-6 py-3 rounded-2xl bg-inverse/5 border border-border_color/10 text-heading font-bold flex items-center gap-2 hover:bg-emerald-500/10 transition-colors shadow-lg">
                 🏠 <span class="hidden sm:inline">Back to Dashboard</span>
             </button>
         </header>
@@ -127,7 +148,7 @@
             <!-- Upload Section -->
             <div
                 class="glass-premium p-8 rounded-[2rem] border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.05)] relative overflow-hidden group hover:border-emerald-500/40 transition-colors duration-500">
-                <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-3">
+                <h2 class="text-2xl font-bold mb-6 text-heading flex items-center gap-3">
                     <span
                         class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-400/20">📸</span>
                     Upload Sample
@@ -136,7 +157,7 @@
                 <!-- Camera option -->
                 <div class="flex gap-4 mb-6">
                     <button onclick="document.getElementById('cameraBtn').click()"
-                        class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 text-white transition hover-scale border border-blue-400/30">
+                        class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 text-heading transition hover-scale border border-blue-400/30">
                         <span class="text-xl">📷</span> Take Photo
                     </button>
                     <input type="file" id="cameraBtn" capture="environment" accept="image/*" class="hidden"
@@ -148,7 +169,7 @@
                     onclick="document.getElementById('fileIn').click()">
 
                     <div id="preview-area"
-                        class="hidden relative rounded-xl overflow-hidden mb-4 aspect-video bg-black/50 border border-white/10 shadow-inner">
+                        class="hidden relative rounded-xl overflow-hidden mb-4 aspect-video bg-black/50 border border-border_color/10 shadow-inner">
                         <img id="preview-img" class="w-full h-full object-contain">
                         <div id="scanner" class="scan-overlay hidden"></div>
 
@@ -166,17 +187,17 @@
 
                     <div id="upload-prompt" class="py-4">
                         <div
-                            class="w-16 h-16 rounded-full bg-white/5 mx-auto flex items-center justify-center text-3xl mb-4 border border-white/10 group-hover:scale-110 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all duration-300">
+                            class="w-16 h-16 rounded-full bg-inverse/5 mx-auto flex items-center justify-center text-3xl mb-4 border border-border_color/10 group-hover:scale-110 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all duration-300">
                             📤</div>
                         <p class="text-slate-200 font-bold text-lg mb-1">Select from Gallery</p>
-                        <p class="text-slate-500 text-sm">JPG, PNG, HEIC up to 10MB</p>
+                        <p class="text-muted text-sm">JPG, PNG, HEIC up to 10MB</p>
                     </div>
                 </div>
 
                 <input type="file" id="fileIn" class="hidden" accept="image/*" onchange="showPreview(this)">
 
                 <button onclick="analyzeCrop()" id="analyzeBtn" disabled
-                    class="w-full mt-6 btn-premium bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-white py-4 rounded-xl font-black uppercase tracking-widest transition shadow-[0_0_20px_rgba(16,185,129,0.2)] border border-emerald-400/50 flex flex-col items-center justify-center leading-tight">
+                    class="w-full mt-6 btn-premium bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-heading py-4 rounded-xl font-black uppercase tracking-widest transition shadow-[0_0_20px_rgba(16,185,129,0.2)] border border-emerald-400/50 flex flex-col items-center justify-center leading-tight">
                     <span>DIAGNOSE NOW</span>
                     <span id="analyze-subtext"
                         class="text-[10px] text-emerald-100/70 font-medium tracking-normal normal-case hidden">Initializing
@@ -199,11 +220,11 @@
                             <p class="text-xs text-cyan-400 font-bold tracking-widest uppercase font-mono" id="scan-id">
                                 ID: SCN-29384</p>
                         </div>
-                        <h2 class="text-3xl md:text-4xl font-black text-white leading-tight" id="disease-name">...</h2>
+                        <h2 class="text-3xl md:text-4xl font-black text-heading leading-tight" id="disease-name">...</h2>
                     </div>
                     <div
-                        class="bg-black/40 px-4 py-3 rounded-2xl border border-white/10 text-center shadow-inner backdrop-blur-md">
-                        <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-1">CONFIDENCE</p>
+                        class="bg-black/40 px-4 py-3 rounded-2xl border border-border_color/10 text-center shadow-inner backdrop-blur-md">
+                        <p class="text-[10px] text-muted font-bold tracking-widest uppercase mb-1">CONFIDENCE</p>
                         <p class="text-2xl font-black text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"
                             id="confidence-score">0%</p>
                     </div>
@@ -213,11 +234,11 @@
                     <!-- Dynamic Treatment Content -->
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-white/10 relative z-10">
-                    <h3 class="font-bold text-slate-400 mb-4 uppercase text-[10px] tracking-widest">Next Actions</h3>
+                <div class="mt-8 pt-6 border-t border-border_color/10 relative z-10">
+                    <h3 class="font-bold text-muted mb-4 uppercase text-[10px] tracking-widest">Next Actions</h3>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <button onclick="saveReport()" id="saveBtn"
-                            class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 hover-scale shadow-sm">
+                            class="flex-1 bg-inverse/5 hover:bg-inverse/10 border border-border_color/10 text-heading py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 hover-scale shadow-sm">
                             <span class="text-lg">💾</span> Save to History
                         </button>
                         <button onclick="sendSMSReport()" id="smsBtn"
@@ -225,7 +246,7 @@
                             <span class="text-lg">📱</span> Send SMS Report
                         </button>
                         <button onclick="location.href='reports.html'"
-                            class="flex-1 bg-black/40 hover:bg-black/60 border border-white/5 text-slate-300 hover:text-white py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 hover-scale shadow-inner">
+                            class="flex-1 bg-black/40 hover:bg-black/60 border border-border_color/5 text-body hover:text-heading py-3.5 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 hover-scale shadow-inner">
                             <span class="text-lg">📊</span> View Past Reports
                         </button>
                     </div>
@@ -234,37 +255,37 @@
 
             <!-- Empty State Right Side -->
             <div id="placeholder-card"
-                class="glass-premium p-8 rounded-[2rem] border border-white/5 flex flex-col items-center justify-center text-center h-full min-h-[500px] shadow-inner">
+                class="glass-premium p-8 rounded-[2rem] border border-border_color/5 flex flex-col items-center justify-center text-center h-full min-h-[500px] shadow-inner">
 
                 <div class="relative mb-8">
                     <div class="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full animate-pulse"></div>
                     <div
-                        class="w-24 h-24 rounded-3xl bg-black/40 border border-white/10 flex items-center justify-center text-5xl relative z-10 shadow-xl backdrop-blur-sm">
+                        class="w-24 h-24 rounded-3xl bg-black/40 border border-border_color/10 flex items-center justify-center text-5xl relative z-10 shadow-xl backdrop-blur-sm">
                         🔬
                     </div>
                 </div>
 
-                <h3 class="text-2xl font-black text-white mb-3">Ready for Analysis</h3>
-                <p class="text-slate-400 max-w-sm leading-relaxed text-sm">
+                <h3 class="text-2xl font-black text-heading mb-3">Ready for Analysis</h3>
+                <p class="text-muted max-w-sm leading-relaxed text-sm">
                     Upload a clear picture of an affected leaf. The AI Doctor uses advanced neural networks to detect
                     nitrogen deficiency, blight, pests, and more within seconds.
                 </p>
 
                 <div class="mt-8 grid grid-cols-2 gap-4 w-full max-w-sm">
                     <div
-                        class="bg-white/5 p-4 rounded-xl border border-white/5 flex flex-col items-center justify-center gap-2">
+                        class="bg-inverse/5 p-4 rounded-xl border border-border_color/5 flex flex-col items-center justify-center gap-2">
                         <span class="text-emerald-400 text-xl">⚡</span>
-                        <span class="text-xs font-bold text-slate-300">Instant Results</span>
+                        <span class="text-xs font-bold text-body">Instant Results</span>
                     </div>
                     <div
-                        class="bg-white/5 p-4 rounded-xl border border-white/5 flex flex-col items-center justify-center gap-2">
+                        class="bg-inverse/5 p-4 rounded-xl border border-border_color/5 flex flex-col items-center justify-center gap-2">
                         <span class="text-blue-400 text-xl">🎯</span>
-                        <span class="text-xs font-bold text-slate-300">98% Accuracy</span>
+                        <span class="text-xs font-bold text-body">98% Accuracy</span>
                     </div>
                 </div>
 
                 <button onclick="location.href='reports.html'"
-                    class="mt-8 text-slate-500 hover:text-white text-sm font-bold tracking-wide transition border-b border-transparent hover:border-white pb-0.5">
+                    class="mt-8 text-muted hover:text-heading text-sm font-bold tracking-wide transition border-b border-transparent hover:border-white pb-0.5">
                     View Past Reports →
                 </button>
             </div>
@@ -414,7 +435,7 @@
                         <span class="text-2xl">🌿</span>
                         <div>
                             <span class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Crop Identified</span>
-                            <p class="text-white font-bold">${data.crop_identified}</p>
+                            <p class="text-heading font-bold">${data.crop_identified}</p>
                         </div>
                         ${data.severity ? `<span class="ml-auto px-3 py-1 rounded-full text-xs font-black ${data.severity === 'Healthy' ? 'bg-emerald-500/20 text-emerald-400' :
                         data.severity === 'Mild' ? 'bg-yellow-500/20 text-yellow-400' :
@@ -423,13 +444,13 @@
                         }">${data.severity}</span>` : ''}
                     </div>` : ''}
                     
-                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5 shadow-inner">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">Detected Symptoms</p>
+                    <div class="bg-black/20 p-4 rounded-2xl border border-border_color/5 shadow-inner">
+                        <p class="text-xs text-muted font-bold uppercase tracking-widest mb-2">Detected Symptoms</p>
                         <p class="text-sm text-slate-200 leading-relaxed font-medium">${data.symptoms}</p>
                     </div>
                     
-                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5 shadow-inner">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">Root Cause</p>
+                    <div class="bg-black/20 p-4 rounded-2xl border border-border_color/5 shadow-inner">
+                        <p class="text-xs text-muted font-bold uppercase tracking-widest mb-2">Root Cause</p>
                         <p class="text-sm text-slate-200 leading-relaxed font-medium">${data.cause}</p>
                     </div>
                     
@@ -439,7 +460,7 @@
                             <h4 class="text-emerald-400 font-bold text-sm mb-3 flex items-center gap-2">
                                 <span class="p-1.5 bg-emerald-500/20 rounded-lg">🌱</span> Organic Cure
                             </h4>
-                            <ul class="list-none text-slate-300 text-sm space-y-2 relative z-10">
+                            <ul class="list-none text-body text-sm space-y-2 relative z-10">
                                 ${organicSteps.map(step => `<li class="flex items-start gap-2"><span class="text-emerald-500 flex-shrink-0 mt-0.5">•</span> <span>${step}</span></li>`).join('')}
                             </ul>
                         </div>
@@ -449,7 +470,7 @@
                             <h4 class="text-blue-400 font-bold text-sm mb-3 flex items-center gap-2">
                                 <span class="p-1.5 bg-blue-500/20 rounded-lg">🧪</span> Chemical Cure
                             </h4>
-                            <ul class="list-none text-slate-300 text-sm space-y-2 relative z-10">
+                            <ul class="list-none text-body text-sm space-y-2 relative z-10">
                                 ${chemicalSteps.map(step => `<li class="flex items-start gap-2"><span class="text-blue-500 flex-shrink-0 mt-0.5">•</span> <span>${step}</span></li>`).join('')}
                             </ul>
                         </div>
@@ -465,11 +486,11 @@
                         </div>
                     </div>` : ''}
 
-                    <div class="bg-slate-800/40 p-4 rounded-2xl border border-white/5 backdrop-blur-sm">
+                    <div class="bg-slate-800/40 p-4 rounded-2xl border border-border_color/5 backdrop-blur-sm">
                         <h4 class="text-slate-200 font-bold text-sm mb-2 flex items-center gap-2">
                             <span>🛡️</span> Future Prevention
                         </h4>
-                        <p class="text-slate-400 text-sm leading-relaxed">${data.prevention}</p>
+                        <p class="text-muted text-sm leading-relaxed">${data.prevention}</p>
                     </div>
                 </div>
             `;
@@ -512,14 +533,14 @@
 
                 if (res.ok) {
                     btn.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border-emerald-500/30');
-                    btn.classList.remove('bg-white/5', 'text-white', 'border-white/10');
+                    btn.classList.remove('bg-inverse/5', 'text-heading', 'border-border_color/10');
                     btn.innerHTML = `<span class="text-lg">✅</span> Saved Successfully`;
                     toast.success('Report saved to history.');
 
                     setTimeout(() => {
                         btn.innerHTML = `<span class="text-lg">💾</span> Save to History`;
                         btn.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'border-emerald-500/30');
-                        btn.classList.add('bg-white/5', 'text-white', 'border-white/10');
+                        btn.classList.add('bg-inverse/5', 'text-heading', 'border-border_color/10');
                         btn.disabled = false;
                     }, 3000);
                 } else {
@@ -574,6 +595,42 @@
     <script src="js/toast.js"></script>
     <script src="js/demo-toggle.js"></script>
     <script src="js/mobile-nav.js"></script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

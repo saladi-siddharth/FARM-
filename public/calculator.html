@@ -7,7 +7,28 @@
     <meta name="description" content="Calculate ROI, profit, and loss for your crops with the smart agricultural calculator.">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7007280990614643" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap"
@@ -16,7 +37,7 @@
     <style>
         body {
             background: #090e17;
-            color: #f8fafc;
+            color: var(--text-body);
             font-family: 'Outfit', 'Inter', sans-serif;
             overflow-x: hidden;
         }
@@ -83,13 +104,13 @@
 
     <!-- Back Button -->
     <button onclick="window.history.back()"
-        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl btn-premium bg-white/5 border border-white/10 flex items-center justify-center text-white shadow-lg hover:shadow-white/10 hover-lift">
+        class="fixed top-6 left-6 z-50 w-12 h-12 rounded-2xl btn-premium bg-inverse/5 border border-border_color/10 flex items-center justify-center text-heading shadow-lg hover:shadow-white/10 hover-lift">
         ←
     </button>
 
     <div class="max-w-7xl mx-auto md:pl-16 pt-16 md:pt-0 pb-20 fade-in-up">
         <header
-            class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white/5 p-6 rounded-[2rem] border border-white/5 backdrop-blur-md shadow-2xl">
+            class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-inverse/5 p-6 rounded-[2rem] border border-border_color/5 backdrop-blur-md shadow-2xl">
             <div class="flex items-center gap-4 text-center md:text-left">
                 <div
                     class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl shadow-lg shadow-blue-500/30">
@@ -100,7 +121,7 @@
                         class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500 tracking-tighter">
                         ROI ESTIMATOR
                     </h1>
-                    <p class="text-slate-400 font-medium text-sm mt-0.5 uppercase tracking-wider">Projected Profit &
+                    <p class="text-muted font-medium text-sm mt-0.5 uppercase tracking-wider">Projected Profit &
                         Loss Calculator</p>
                 </div>
             </div>
@@ -110,14 +131,14 @@
             <!-- INPUT FORM -->
             <div
                 class="glass-premium p-8 md:p-10 rounded-[2.5rem] border-t-4 border-t-blue-500 h-full shadow-[0_10px_40px_rgba(59,130,246,0.1)]">
-                <h3 class="text-2xl font-black mb-8 flex items-center gap-3 tracking-tight text-white">
+                <h3 class="text-2xl font-black mb-8 flex items-center gap-3 tracking-tight text-heading">
                     <span class="p-2 bg-blue-500/20 rounded-xl text-blue-400 border border-blue-500/20">⚙️</span>
                     Configuration
                 </h3>
 
                 <form id="calcForm" class="space-y-6">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Select
+                        <label class="block text-xs font-bold text-muted uppercase tracking-widest mb-2">Select
                             Crop</label>
                         <div class="relative">
                             <select id="crop" class="input-field cursor-pointer appearance-none">
@@ -129,7 +150,7 @@
                                 <option value="potato">Potato 🥔</option>
                             </select>
                             <div
-                                class="pointer-events-none absolute inset-y-0 right-4 flex items-center px-2 text-slate-400">
+                                class="pointer-events-none absolute inset-y-0 right-4 flex items-center px-2 text-muted">
                                 ▼
                             </div>
                         </div>
@@ -137,23 +158,23 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Land
+                            <label class="block text-xs font-bold text-muted uppercase tracking-widest mb-2">Land
                                 Size (Acres)</label>
                             <input type="number" id="area" value="5" class="input-field" min="0.1" step="0.1">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Target
+                            <label class="block text-xs font-bold text-muted uppercase tracking-widest mb-2">Target
                                 Yield (Qtl/Acre)</label>
                             <input type="number" id="yield" value="20" class="input-field" min="1" step="0.1">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Est. Cost
+                        <label class="block text-xs font-bold text-muted uppercase tracking-widest mb-2">Est. Cost
                             of Cultivation (₹/Acre)</label>
                         <input type="number" id="cost" value="15000" class="input-field font-mono text-lg"
                             placeholder="Seeds, Labor, Fertilizer...">
-                        <p class="text-xs text-slate-500 mt-2 font-medium">Includes seeds, labor, fertilizer, machinery,
+                        <p class="text-xs text-muted mt-2 font-medium">Includes seeds, labor, fertilizer, machinery,
                             and water.</p>
                     </div>
 
@@ -173,20 +194,20 @@
                 </div>
 
                 <div class="relative z-10">
-                    <h3 class="text-2xl font-black text-white mb-1 tracking-tight">Projected Outcome</h3>
-                    <p class="text-sm font-bold text-slate-500 mb-8 uppercase tracking-widest">Based on live index
+                    <h3 class="text-2xl font-black text-heading mb-1 tracking-tight">Projected Outcome</h3>
+                    <p class="text-sm font-bold text-muted mb-8 uppercase tracking-widest">Based on live index
                         prices</p>
 
                     <div class="grid grid-cols-2 gap-4 md:gap-6 mb-8">
                         <div
-                            class="bg-black/30 p-5 rounded-2xl border border-white/5 hover:border-green-500/30 transition">
-                            <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-1 font-bold">Total Revenue
+                            class="bg-black/30 p-5 rounded-2xl border border-border_color/5 hover:border-green-500/30 transition">
+                            <p class="text-[10px] text-muted uppercase tracking-widest mb-1 font-bold">Total Revenue
                             </p>
                             <p class="text-3xl font-black text-green-400" id="res-revenue">₹0</p>
                         </div>
                         <div
-                            class="bg-black/30 p-5 rounded-2xl border border-white/5 hover:border-red-500/30 transition">
-                            <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-1 font-bold">Total Cost
+                            class="bg-black/30 p-5 rounded-2xl border border-border_color/5 hover:border-red-500/30 transition">
+                            <p class="text-[10px] text-muted uppercase tracking-widest mb-1 font-bold">Total Cost
                             </p>
                             <p class="text-3xl font-black text-red-400 tracking-tight" id="res-cost">₹0</p>
                         </div>
@@ -203,9 +224,9 @@
                             <p id="profit-label"
                                 class="text-xs font-bold text-blue-300 uppercase tracking-widest mb-2 bg-blue-500/10 inline-block px-3 py-1 rounded-full border border-blue-500/20">
                                 Net Profit</p>
-                            <h2 class="text-6xl font-black text-white drop-shadow-lg tracking-tighter my-2"
+                            <h2 class="text-6xl font-black text-heading drop-shadow-lg tracking-tighter my-2"
                                 id="res-profit">₹0</h2>
-                            <p class="text-sm text-blue-300 mt-3 font-bold uppercase tracking-widest bg-black/30 inline-block px-4 py-1.5 rounded-lg border border-white/10"
+                            <p class="text-sm text-blue-300 mt-3 font-bold uppercase tracking-widest bg-black/30 inline-block px-4 py-1.5 rounded-lg border border-border_color/10"
                                 id="res-roi">ROI: 0%</p>
                         </div>
                     </div>
@@ -218,12 +239,12 @@
 
             <!-- Placeholder -->
             <div id="placeholder"
-                class="glass-premium p-10 rounded-[2.5rem] flex flex-col items-center justify-center text-slate-500 h-full opacity-60 border-2 border-dashed border-slate-700/50 bg-slate-900/40">
+                class="glass-premium p-10 rounded-[2.5rem] flex flex-col items-center justify-center text-muted h-full opacity-60 border-2 border-dashed border-slate-700/50 bg-slate-900/40">
                 <div
-                    class="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-5xl mb-6 shadow-inner border border-white/5">
+                    class="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-5xl mb-6 shadow-inner border border-border_color/5">
                     🔮</div>
-                <h3 class="text-xl font-bold text-white mb-2">Awaiting Parameters</h3>
-                <p class="font-light text-slate-400 text-center max-w-sm">Enter the land size, yield, and cost
+                <h3 class="text-xl font-bold text-heading mb-2">Awaiting Parameters</h3>
+                <p class="font-light text-muted text-center max-w-sm">Enter the land size, yield, and cost
                     configuration to generate a detailed ROI projection.</p>
             </div>
         </div>
@@ -362,6 +383,42 @@
     </script>
     <script src="js/toast.js"></script>
     <script src="js/mobile-nav.js"></script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

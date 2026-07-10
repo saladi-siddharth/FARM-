@@ -12,7 +12,28 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="css/mobile-animations.css" rel="stylesheet">
@@ -25,7 +46,7 @@
         body {
             margin: 0;
             background: #090e17;
-            color: #f8fafc;
+            color: var(--text-body);
             font-family: 'Outfit', 'Inter', sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
@@ -101,10 +122,10 @@
 
         <!-- HEADER -->
         <header
-            class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-white/5 p-6 rounded-[2rem] border border-white/5 backdrop-blur-md shadow-2xl">
+            class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 bg-inverse/5 p-6 rounded-[2rem] border border-border_color/5 backdrop-blur-md shadow-2xl">
             <div class="text-center md:text-left flex items-center gap-4">
                 <div
-                    class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center shadow-lg border border-white/10 group-hover:scale-105 transition">
+                    class="w-14 h-14 rounded-2xl bg-inverse/5 flex items-center justify-center shadow-lg border border-border_color/10 group-hover:scale-105 transition">
                     <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain">
                 </div>
                 <div>
@@ -112,14 +133,14 @@
                         class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 tracking-tighter">
                         FARM CENTRAL
                     </h1>
-                    <p class="text-slate-400 font-medium text-sm mt-0.5 uppercase tracking-wider">Welcome back, <span
+                    <p class="text-muted font-medium text-sm mt-0.5 uppercase tracking-wider">Welcome back, <span
                             id="farmer-name" class="text-emerald-400 font-bold">Farmer</span></p>
                 </div>
             </div>
 
             <div class="flex gap-3">
                 <button onclick="window.location.href='index.html'"
-                    class="btn-premium px-5 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700 transition font-bold text-slate-300 text-sm border border-slate-600/50 flex items-center gap-2">
+                    class="btn-premium px-5 py-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700 transition font-bold text-body text-sm border border-slate-600/50 flex items-center gap-2">
                     🏠 <span class="hidden sm:inline">Home</span>
                 </button>
                 <button onclick="window.location.href='profile.html'"
@@ -131,7 +152,7 @@
                     🛡️ <span class="hidden sm:inline">Admin</span>
                 </button>
                 <button onclick="logout()"
-                    class="btn-premium px-5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold hover:bg-rose-500 hover:text-white transition flex items-center gap-2 text-sm shadow-[0_0_15px_rgba(244,63,94,0.1)]">
+                    class="btn-premium px-5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold hover:bg-rose-500 hover:text-heading transition flex items-center gap-2 text-sm shadow-[0_0_15px_rgba(244,63,94,0.1)]">
                     🛑 <span class="hidden sm:inline">Logout</span>
                 </button>
             </div>
@@ -148,7 +169,7 @@
                 <div id="weather-icon"
                     class="text-7xl animate-pulse filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">🌤️</div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Field Conditions</h2>
+                    <h2 class="text-2xl md:text-3xl font-bold text-heading tracking-tight">Field Conditions</h2>
                     <p id="weather-desc" class="text-cyan-400 text-sm uppercase tracking-widest mt-2 font-bold">
                         Loading...</p>
                 </div>
@@ -158,7 +179,7 @@
                     class="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 tracking-tighter">
                     --°C</p>
                 <div
-                    class="flex gap-4 text-sm font-bold text-slate-400 mt-2 justify-center md:justify-end uppercase tracking-wider">
+                    class="flex gap-4 text-sm font-bold text-muted mt-2 justify-center md:justify-end uppercase tracking-wider">
                     <span id="weather-wind" class="bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">Wind:
                         --</span>
                 </div>
@@ -170,7 +191,7 @@
         <!-- QUICK ACTIONS GRID -->
         <div class="mb-14 relative z-10">
             <div class="flex items-center justify-between mb-8">
-                <h3 class="text-2xl font-black text-white flex items-center gap-3 tracking-tight"
+                <h3 class="text-2xl font-black text-heading flex items-center gap-3 tracking-tight"
                     data-i18n="quick_actions_header">
                     <span class="p-2 bg-blue-500/20 rounded-xl text-blue-400 border border-blue-500/20">🚀</span>
                     Command Center
@@ -187,7 +208,7 @@
                         class="bg-blue-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(59,130,246,0.3)] border border-blue-500/30">
                         📦</div>
                     <div>
-                        <h3 class="font-bold text-lg text-blue-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-blue-100 group-hover:text-heading transition"
                             data-i18n="inventory">Inventory</h3>
                         <p class="text-[11px] text-blue-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="manage_stocks">Manage Stocks</p>
@@ -202,7 +223,7 @@
                         class="bg-indigo-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(99,102,241,0.3)] border border-indigo-500/30">
                         🛰️</div>
                     <div>
-                        <h3 class="font-bold text-lg text-indigo-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-indigo-100 group-hover:text-heading transition"
                             data-i18n="space_scanner">Space Scanner</h3>
                         <p class="text-[11px] text-indigo-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="satellite_analysis">AI Analysis</p>
@@ -218,7 +239,7 @@
                         class="bg-emerald-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-emerald-500/30">
                         📝</div>
                     <div>
-                        <h3 class="font-bold text-lg text-emerald-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-emerald-100 group-hover:text-heading transition"
                             data-i18n="tasks">Tasks</h3>
                         <p class="text-[11px] text-emerald-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="jobs_title">To-Do List</p>
@@ -234,7 +255,7 @@
                         class="bg-orange-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(249,115,22,0.3)] border border-orange-500/30">
                         📈</div>
                     <div>
-                        <h3 class="font-bold text-lg text-orange-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-orange-100 group-hover:text-heading transition"
                             data-i18n="market">Market Data</h3>
                         <p class="text-[11px] text-orange-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="live_prices">Live Prices</p>
@@ -249,7 +270,7 @@
                         class="bg-cyan-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(6,182,212,0.3)] border border-cyan-500/30">
                         🧮</div>
                     <div>
-                        <h3 class="font-bold text-lg text-cyan-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-cyan-100 group-hover:text-heading transition"
                             data-i18n="calculator">ROI Calc</h3>
                         <p class="text-[11px] text-cyan-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="profit_estimator">Profit Estimator</p>
@@ -264,7 +285,7 @@
                         class="bg-pink-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(236,72,153,0.3)] border border-pink-500/30">
                         👥</div>
                     <div>
-                        <h3 class="font-bold text-lg text-pink-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-pink-100 group-hover:text-heading transition"
                             data-i18n="community">Community</h3>
                         <p class="text-[11px] text-pink-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="public_forum">Public Forum</p>
@@ -279,7 +300,7 @@
                         class="bg-yellow-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(234,179,8,0.3)] border border-yellow-500/30">
                         💰</div>
                     <div>
-                        <h3 class="font-bold text-lg text-yellow-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-yellow-100 group-hover:text-heading transition"
                             data-i18n="expenses">Expenses</h3>
                         <p class="text-[11px] text-yellow-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="manager">Manager</p>
@@ -294,7 +315,7 @@
                         class="bg-red-500/20 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition shadow-[0_0_15px_rgba(239,68,68,0.3)] border border-red-500/30">
                         🤝</div>
                     <div>
-                        <h3 class="font-bold text-lg text-red-100 group-hover:text-white transition"
+                        <h3 class="font-bold text-lg text-red-100 group-hover:text-heading transition"
                             data-i18n="trade_hub">Trade Hub</h3>
                         <p class="text-[11px] text-red-400/80 uppercase tracking-widest font-semibold mt-1"
                             data-i18n="buy_sell">Buy & Sell</p>
@@ -304,7 +325,7 @@
             </div>
         </div>
         <!-- STATISTICS METRICS -->
-        <h3 class="text-2xl font-black text-white mb-6 tracking-tight flex items-center gap-3">
+        <h3 class="text-2xl font-black text-heading mb-6 tracking-tight flex items-center gap-3">
             <span class="p-2 bg-purple-500/20 rounded-xl text-purple-400 border border-purple-500/20">📊</span> Live
             Metrics
         </h3>
@@ -314,8 +335,8 @@
                 class="glass-premium p-8 rounded-3xl border-t-4 border-t-emerald-500 hover-lift relative overflow-hidden group">
                 <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">📦
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Inventory Value</h3>
-                <p id="stat-assets" class="text-4xl md:text-5xl font-black text-white tracking-tight">₹0</p>
+                <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3">Inventory Value</h3>
+                <p id="stat-assets" class="text-4xl md:text-5xl font-black text-heading tracking-tight">₹0</p>
                 <div class="mt-4 flex items-center gap-2">
                     <span
                         class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">Asset
@@ -328,9 +349,9 @@
                 onclick="location.href='satellite.html'">
                 <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">🛰️
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Satellite Scans</h3>
+                <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3">Satellite Scans</h3>
                 <p id="stat-scans"
-                    class="text-4xl md:text-5xl font-black text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-indigo-500 drop-shadow-sm">
+                    class="text-4xl md:text-5xl font-black text-heading tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-indigo-500 drop-shadow-sm">
                     0</p>
                 <div class="mt-4 flex items-center gap-2">
                     <span
@@ -344,8 +365,8 @@
                 class="glass-premium p-8 rounded-3xl border-t-4 border-t-blue-500 hover-lift relative overflow-hidden group">
                 <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">📝
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Pending Jobs</h3>
-                <p id="stat-tasks" class="text-4xl md:text-5xl font-black text-white tracking-tight">0</p>
+                <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3">Pending Jobs</h3>
+                <p id="stat-tasks" class="text-4xl md:text-5xl font-black text-heading tracking-tight">0</p>
                 <div class="mt-4 flex items-center gap-2">
                     <span
                         class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">Action
@@ -358,8 +379,8 @@
                 class="glass-premium p-8 rounded-3xl border-t-4 border-t-pink-500 hover-lift relative overflow-hidden group cursor-pointer">
                 <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">💬
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Inbox</h3>
-                <p id="stat-msgs" class="text-4xl md:text-5xl font-black text-white tracking-tight">0</p>
+                <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3">Inbox</h3>
+                <p id="stat-msgs" class="text-4xl md:text-5xl font-black text-heading tracking-tight">0</p>
                 <div class="mt-4 flex items-center gap-2">
                     <span
                         class="px-2 py-1 bg-pink-500/20 text-pink-400 rounded text-[10px] font-bold uppercase tracking-wider border border-pink-500/20">Unread
@@ -372,11 +393,11 @@
                 class="glass-premium p-8 rounded-3xl border-t-4 border-t-yellow-500 hover-lift relative overflow-hidden group cursor-pointer">
                 <div class="absolute -right-6 -bottom-6 p-4 opacity-5 group-hover:opacity-10 transition text-9xl">💸
                 </div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <h3 class="text-xs font-bold text-muted uppercase tracking-widest mb-3 flex items-center gap-2">
                     Total Expenses
                 </h3>
                 <p id="stat-expenses"
-                    class="text-4xl md:text-5xl font-black text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 drop-shadow-sm">
+                    class="text-4xl md:text-5xl font-black text-heading tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 drop-shadow-sm">
                     ₹0</p>
                 <div class="mt-4 flex items-center gap-2">
                     <span id="stat-expenses-badge"
@@ -390,16 +411,16 @@
 
         </div>
         <!-- CHARTS SECTION -->
-        <h3 class="text-2xl font-black text-white mb-6 tracking-tight flex items-center gap-3">
+        <h3 class="text-2xl font-black text-heading mb-6 tracking-tight flex items-center gap-3">
             <span class="p-2 bg-yellow-500/20 rounded-xl text-yellow-400 border border-yellow-500/20">📈</span> Data
             Analytics
         </h3>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
             <!-- Expenses -->
             <div
-                class="glass-premium p-8 rounded-[2rem] border border-white/5 flex flex-col hover:border-yellow-500/30 transition shadow-xl">
+                class="glass-premium p-8 rounded-[2rem] border border-border_color/5 flex flex-col hover:border-yellow-500/30 transition shadow-xl">
                 <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-xl font-bold text-white flex items-center">
+                    <h3 class="text-xl font-bold text-heading flex items-center">
                         <span
                             class="bg-yellow-500/20 text-yellow-400 p-2.5 rounded-xl mr-3 border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]">💰</span>
                         Expense Breakdown
@@ -412,9 +433,9 @@
 
             <!-- Inventory Analytics -->
             <div
-                class="glass-premium p-8 rounded-[2rem] border border-white/5 flex flex-col hover:border-emerald-500/30 transition shadow-xl">
+                class="glass-premium p-8 rounded-[2rem] border border-border_color/5 flex flex-col hover:border-emerald-500/30 transition shadow-xl">
                 <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-xl font-bold text-white flex items-center">
+                    <h3 class="text-xl font-bold text-heading flex items-center">
                         <span
                             class="bg-emerald-500/20 text-emerald-400 p-2.5 rounded-xl mr-3 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">📦</span>
                         Stock Distribution
@@ -434,13 +455,13 @@
             </div>
 
             <div class="relative z-10 text-center md:text-left">
-                <h3 class="text-3xl font-black text-white mb-3 tracking-tight">📄 Official Reports</h3>
+                <h3 class="text-3xl font-black text-heading mb-3 tracking-tight">📄 Official Reports</h3>
                 <p class="text-indigo-200 text-lg max-w-xl font-light">Generate bank-ready financial statements and
                     yield documents instantly with one click.</p>
             </div>
 
             <button onclick="downloadReport()"
-                class="btn-premium relative z-10 w-full md:w-auto bg-gradient-to-r from-indigo-500 to-blue-600 text-white px-10 py-5 rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition flex items-center justify-center gap-3 text-lg border border-indigo-400/50">
+                class="btn-premium relative z-10 w-full md:w-auto bg-gradient-to-r from-indigo-500 to-blue-600 text-heading px-10 py-5 rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition flex items-center justify-center gap-3 text-lg border border-indigo-400/50">
                 <span class="text-xl">⬇️</span> <span data-i18n="download_pdf">Download PDF</span>
             </button>
         </div>
@@ -649,7 +670,7 @@
 
         socket.on('live-activity', (data) => {
             const el = document.createElement('div');
-            el.className = 'glass-premium px-5 py-3 rounded-xl border border-white/10 shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-500 bg-[#090e17]/80 backdrop-blur-xl';
+            el.className = 'glass-premium px-5 py-3 rounded-xl border border-border_color/10 shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-500 bg-surface/80 backdrop-blur-xl';
             
             const icon = data.type === 'trade' ? '🤝' : '🎉';
             const color = data.type === 'trade' ? 'text-emerald-400' : 'text-blue-400';
@@ -657,7 +678,7 @@
             el.innerHTML = `
                 <div class="text-2xl">${icon}</div>
                 <div>
-                    <p class="text-sm font-bold text-white">${data.message}</p>
+                    <p class="text-sm font-bold text-heading">${data.message}</p>
                     <p class="text-[10px] ${color} font-bold uppercase tracking-widest mt-0.5">Live • Verified</p>
                 </div>
             `;
@@ -676,6 +697,42 @@
             }, 6000);
         });
     </script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

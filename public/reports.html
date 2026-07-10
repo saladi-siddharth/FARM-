@@ -14,12 +14,33 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
             background: #090e17;
-            color: #f8fafc;
+            color: var(--text-body);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             margin: 0;
@@ -86,7 +107,7 @@
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
             <div class="flex items-center gap-4">
                 <button onclick="window.history.back()"
-                    class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition hover-lift shadow-lg">
+                    class="w-12 h-12 rounded-2xl bg-inverse/5 border border-border_color/10 flex items-center justify-center text-heading hover:bg-inverse/10 transition hover-lift shadow-lg">
                     ←
                 </button>
                 <div>
@@ -94,28 +115,28 @@
                         class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400 tracking-tight brand-font flex items-center gap-3">
                         Medical Reports
                     </h1>
-                    <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">AI Crop
+                    <p class="text-[10px] md:text-xs text-muted font-bold uppercase tracking-widest mt-1">AI Crop
                         Doctor History</p>
                 </div>
             </div>
 
             <button onclick="location.href='doctor.html'"
-                class="w-full md:w-auto btn-premium bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white px-6 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 border border-emerald-400/50 hover-scale">
+                class="w-full md:w-auto btn-premium bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-heading px-6 py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 border border-emerald-400/50 hover-scale">
                 <span class="text-xl">🩺</span>
                 <span>New Diagnosis</span>
             </button>
         </header>
 
         <!-- Reports List -->
-        <div class="glass-premium p-6 md:p-8 rounded-[2rem] border border-white/5 shadow-2xl relative min-h-[60vh]">
+        <div class="glass-premium p-6 md:p-8 rounded-[2rem] border border-border_color/5 shadow-2xl relative min-h-[60vh]">
             <h2
-                class="text-xl font-bold text-white brand-font mb-6 flex items-center gap-2 border-b border-white/5 pb-4">
+                class="text-xl font-bold text-heading brand-font mb-6 flex items-center gap-2 border-b border-border_color/5 pb-4">
                 <span>📂</span> Scan History
             </h2>
 
             <div id="reports-list" class="space-y-4">
                 <!-- Loading State -->
-                <div class="flex flex-col items-center justify-center py-20 text-slate-500 gap-4">
+                <div class="flex flex-col items-center justify-center py-20 text-muted gap-4">
                     <div class="w-10 h-10 border-4 border-slate-700 border-t-cyan-500 rounded-full animate-spin"></div>
                     <span class="text-xs font-bold uppercase tracking-widest text-cyan-400">Loading Database</span>
                 </div>
@@ -162,7 +183,7 @@
 
             if (!reports || reports.length === 0) {
                 container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-16 text-slate-500 gap-3 opacity-60">
+                    <div class="flex flex-col items-center justify-center py-16 text-muted gap-3 opacity-60">
                         <div class="text-4xl mb-2">🌿</div>
                         <p class="text-sm font-bold uppercase tracking-widest">No history found</p>
                         <p class="text-xs">Your past diagnoses will appear here.</p>
@@ -180,28 +201,28 @@
                 const tagBg = isHealthy ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-orange-500/10 text-orange-400 border-orange-500/20';
 
                 return `
-                <div class="report-card glass-premium p-6 rounded-2xl border border-white/5 flex flex-col md:flex-row justify-between md:items-center gap-6 animate-[fade-in-up_0.5s_forwards] opacity-0 shadow-md relative overflow-hidden" style="animation-delay: ${delay}s">
+                <div class="report-card glass-premium p-6 rounded-2xl border border-border_color/5 flex flex-col md:flex-row justify-between md:items-center gap-6 animate-[fade-in-up_0.5s_forwards] opacity-0 shadow-md relative overflow-hidden" style="animation-delay: ${delay}s">
                     
                     <div class="absolute left-0 top-0 bottom-0 w-1 ${isHealthy ? 'bg-emerald-500' : 'bg-orange-500'}"></div>
                     
                     <div class="flex-1 pl-2">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-black/40 px-2.5 py-1 rounded shadow-inner border border-white/5 flex items-center gap-2">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-muted bg-black/40 px-2.5 py-1 rounded shadow-inner border border-border_color/5 flex items-center gap-2">
                                 📅 ${new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
-                            <span class="text-[10px] font-bold font-mono tracking-widest bg-white/5 text-cyan-300 px-2 py-1 rounded border border-cyan-500/20 shadow-sm">${r.scan_id || 'ID-UNKNOWN'}</span>
+                            <span class="text-[10px] font-bold font-mono tracking-widest bg-inverse/5 text-cyan-300 px-2 py-1 rounded border border-cyan-500/20 shadow-sm">${r.scan_id || 'ID-UNKNOWN'}</span>
                         </div>
                         
                         <h3 class="text-2xl font-black ${titleColor} mb-2 tracking-tight">${r.diagnosis}</h3>
                         
-                        <div class="bg-black/30 p-3 rounded-xl border border-white/5 shadow-inner">
-                            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Prescribed Action</p>
+                        <div class="bg-black/30 p-3 rounded-xl border border-border_color/5 shadow-inner">
+                            <p class="text-xs text-muted font-bold uppercase tracking-widest mb-1">Prescribed Action</p>
                             <p class="text-sm text-slate-200 font-medium leading-relaxed">${r.treatment || 'No treatment necessary.'}</p>
                         </div>
                     </div>
                     
-                    <div class="shrink-0 flex flex-row md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-white/5 md:pl-6">
-                         ${r.image_url ? `<a href="${r.image_url}" target="_blank" class="flex-1 md:flex-none text-center px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl text-sm font-bold hover:bg-white/10 transition shadow-sm hover-scale flex items-center justify-center gap-2"><span class="text-lg">📷</span> Image</a>` : ''}
+                    <div class="shrink-0 flex flex-row md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-border_color/5 md:pl-6">
+                         ${r.image_url ? `<a href="${r.image_url}" target="_blank" class="flex-1 md:flex-none text-center px-4 py-3 bg-inverse/5 border border-border_color/10 text-heading rounded-xl text-sm font-bold hover:bg-inverse/10 transition shadow-sm hover-scale flex items-center justify-center gap-2"><span class="text-lg">📷</span> Image</a>` : ''}
                          <button onclick="downloadPdf(${r.id || Date.now()})" class="flex-[2] md:flex-none px-4 py-3 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 rounded-xl text-sm font-bold hover:bg-cyan-500/20 hover:text-cyan-300 transition shadow-sm hover-scale flex items-center justify-center gap-2">
                             <span class="text-lg">📄</span> Download PDF
                          </button>
@@ -231,6 +252,42 @@
         loadReports();
     </script>
     <script src="js/mobile-nav.js"></script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

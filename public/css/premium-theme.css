@@ -1,4 +1,42 @@
-/* Premium Theme CSS for Farm Central */
+
+:root {
+    --bg-base: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-card: #f1f5f9;
+    --text-heading: #0f172a;
+    --text-body: #334155;
+    --text-muted: #64748b;
+    --border-color: rgba(0, 0, 0, 1); /* will use /10 opacity in tailwind classes */
+    --inverse-color: rgba(0, 0, 0, 1);
+    --grid-color: rgba(0, 0, 0, 0.05);
+    
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-shadow: rgba(0, 0, 0, 0.05);
+    --glass-hover-bg: rgba(255, 255, 255, 0.9);
+    --glass-hover-border: rgba(0, 0, 0, 0.15);
+    --glass-hover-shadow: rgba(0, 0, 0, 0.1);
+}
+
+html.dark {
+    --bg-base: #050505;
+    --bg-surface: #090e17;
+    --bg-card: #0f172a;
+    --text-heading: #ffffff;
+    --text-body: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: rgba(255, 255, 255, 1);
+    --inverse-color: rgba(255, 255, 255, 1);
+    --grid-color: rgba(255, 255, 255, 0.03);
+    
+    --glass-bg: rgba(15, 23, 42, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-shadow: rgba(0, 0, 0, 0.5);
+    --glass-hover-bg: rgba(15, 23, 42, 0.6);
+    --glass-hover-border: rgba(255, 255, 255, 0.15);
+    --glass-hover-shadow: rgba(0, 0, 0, 0.7);
+}
+\n/* Premium Theme CSS for Farm Central */
 
 /* Global Smooth Scrolling & Fonts */
 html {
@@ -12,18 +50,18 @@ body {
 
 /* Glassmorphism Utilities */
 .glass-premium {
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--glass-bg);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 var(--glass-shadow);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-premium:hover {
-    background: rgba(15, 23, 42, 0.6);
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.7);
+    background: var(--glass-hover-bg);
+    border-color: var(--glass-hover-border);
+    box-shadow: 0 12px 48px 0 var(--glass-hover-shadow);
     transform: translateY(-4px);
 }
 
@@ -72,7 +110,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #0f172a; 
+    background: var(--bg-card); 
 }
 
 ::-webkit-scrollbar-thumb {

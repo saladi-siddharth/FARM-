@@ -11,7 +11,28 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -287,7 +308,7 @@
         </div>
 
         <nav class="py-3 space-y-0.5 flex-1 overflow-y-auto" style="scrollbar-width:thin">
-            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Main</p>
+            <p class="px-6 text-[9px] font-black text-body uppercase tracking-widest mb-1">Main</p>
             <div class="sidebar-link active" onclick="showSection('overview')">
                 <span class="icon">📊</span> Overview
             </div>
@@ -298,7 +319,7 @@
                 <span class="icon">💰</span> Transactions
             </div>
 
-            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4 mb-1">Verification</p>
+            <p class="px-6 text-[9px] font-black text-body uppercase tracking-widest mt-4 mb-1">Verification</p>
             <div class="sidebar-link" onclick="showSection('kyc')">
                 <span class="icon">📋</span> KYC Approvals
             </div>
@@ -306,7 +327,7 @@
                 <span class="icon">📦</span> Trade Listings
             </div>
 
-            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4 mb-1">Operations</p>
+            <p class="px-6 text-[9px] font-black text-body uppercase tracking-widest mt-4 mb-1">Operations</p>
             <div class="sidebar-link" onclick="showSection('disputes')">
                 <span class="icon">⚖️</span> Disputes
             </div>
@@ -317,7 +338,7 @@
                 <span class="icon">🛰️</span> Satellite Scans
             </div>
 
-            <p class="px-6 text-[9px] font-black text-slate-300 uppercase tracking-widest mt-4 mb-1">System</p>
+            <p class="px-6 text-[9px] font-black text-body uppercase tracking-widest mt-4 mb-1">System</p>
             <div class="sidebar-link" onclick="showSection('audit')">
                 <span class="icon">📜</span> Audit Logs
             </div>
@@ -356,10 +377,10 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard Overview</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1">Platform analytics and management</p>
+                    <p class="text-sm text-muted font-medium mt-1">Platform analytics and management</p>
                 </div>
                 <div
-                    class="text-sm text-slate-400 font-medium bg-white border border-slate-200 px-4 py-2 rounded-xl hidden sm:block">
+                    class="text-sm text-muted font-medium bg-white border border-slate-200 px-4 py-2 rounded-xl hidden sm:block">
                     🕐 <span id="admin-time"></span>
                 </div>
             </div>
@@ -404,7 +425,7 @@
             <div class="bg-white rounded-2xl border border-slate-200 p-6">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Admin Activity</h3>
                 <div class="space-y-3" id="activity-feed">
-                    <p class="text-sm text-slate-400 text-center py-6">Loading audit logs...</p>
+                    <p class="text-sm text-muted text-center py-6">Loading audit logs...</p>
                 </div>
             </div>
 
@@ -412,15 +433,15 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-6">
                 <div class="stat-card text-center">
                     <p class="text-3xl font-black text-indigo-600" id="stat-trades">0</p>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Total Trades</p>
+                    <p class="text-xs text-muted font-bold uppercase tracking-wider mt-1">Total Trades</p>
                 </div>
                 <div class="stat-card text-center">
                     <p class="text-3xl font-black text-emerald-600" id="stat-volume">₹0</p>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Trade Volume</p>
+                    <p class="text-xs text-muted font-bold uppercase tracking-wider mt-1">Trade Volume</p>
                 </div>
                 <div class="stat-card text-center">
                     <p class="text-3xl font-black text-purple-600" id="stat-escrow">₹0</p>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">In Escrow</p>
+                    <p class="text-xs text-muted font-bold uppercase tracking-wider mt-1">In Escrow</p>
                 </div>
             </div>
         </section>
@@ -430,7 +451,7 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight">User Management</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1">View, search, and manage all registered users</p>
+                    <p class="text-sm text-muted font-medium mt-1">View, search, and manage all registered users</p>
                 </div>
             </div>
 
@@ -444,21 +465,21 @@
                     <table class="w-full">
                         <thead>
                             <tr class="bg-slate-50 text-left">
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">User
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">User
                                 </th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Contact
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Contact
                                 </th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">KYC
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">KYC
                                 </th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Status
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Status
                                 </th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Actions
                                 </th>
                             </tr>
                         </thead>
                         <tbody id="users-table">
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading users...
+                                <td colspan="5" class="px-6 py-10 text-center text-muted text-sm">Loading users...
                                 </td>
                             </tr>
                         </tbody>
@@ -474,7 +495,7 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight">KYC Approvals</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1">Review pending KYC documents</p>
+                    <p class="text-sm text-muted font-medium mt-1">Review pending KYC documents</p>
                 </div>
             </div>
 
@@ -483,16 +504,16 @@
                     <table class="w-full">
                         <thead>
                             <tr class="bg-slate-50 text-left">
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">User ID</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Aadhaar</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">PAN</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Submitted At</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">User ID</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Aadhaar</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">PAN</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Submitted At</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="kyc-table">
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading KYC applications...</td>
+                                <td colspan="5" class="px-6 py-10 text-center text-muted text-sm">Loading KYC applications...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -505,7 +526,7 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight">Trade Listings</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1">Manage marketplace listings</p>
+                    <p class="text-sm text-muted font-medium mt-1">Manage marketplace listings</p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200 p-6">
@@ -513,22 +534,22 @@
                     <table class="w-full">
                         <thead>
                             <tr class="bg-slate-50 text-left">
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Crop
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Crop
                                 </th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Seller
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Seller
                                 </th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Qty</th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Price
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Qty</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Price
                                 </th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Location
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Location
                                 </th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Actions
                                 </th>
                             </tr>
                         </thead>
                         <tbody id="listings-table">
                             <tr>
-                                <td colspan="6" class="px-4 py-10 text-center text-slate-400 text-sm">Loading
+                                <td colspan="6" class="px-4 py-10 text-center text-muted text-sm">Loading
                                     listings...</td>
                             </tr>
                         </tbody>
@@ -542,7 +563,7 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight">Dispute Resolution</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1">Review and resolve transaction disputes</p>
+                    <p class="text-sm text-muted font-medium mt-1">Review and resolve transaction disputes</p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
@@ -550,15 +571,15 @@
                     <table class="w-full">
                         <thead>
                             <tr class="bg-slate-50 text-left">
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Crop / ID</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Parties</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Reason</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Crop / ID</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Parties</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Reason</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="disputes-table">
-                            <tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading disputes...</td></tr>
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">Loading disputes...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -570,7 +591,7 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight">Payout Requests</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1">Manage farmer withdrawal requests</p>
+                    <p class="text-sm text-muted font-medium mt-1">Manage farmer withdrawal requests</p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
@@ -578,15 +599,15 @@
                     <table class="w-full">
                         <thead>
                             <tr class="bg-slate-50 text-left">
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Farmer</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Method</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Details</th>
-                                <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Farmer</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Method</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Details</th>
+                                <th class="px-6 py-3 text-xs font-bold text-muted uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="payouts-table-admin">
-                            <tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Loading payouts...</td></tr>
+                            <tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">Loading payouts...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -597,11 +618,11 @@
         <section id="section-scans" class="hidden">
             <div class="mb-8">
                 <h2 class="text-3xl font-black text-slate-900 tracking-tight">Satellite Scans</h2>
-                <p class="text-sm text-slate-400 font-medium mt-1">View all satellite farm health scans performed by
+                <p class="text-sm text-muted font-medium mt-1">View all satellite farm health scans performed by
                     users</p>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200 p-6">
-                <p class="text-sm text-slate-500">Satellite scan data from the database will appear here. This section
+                <p class="text-sm text-muted">Satellite scan data from the database will appear here. This section
                     monitors all NASA POWER API usage and NDVI analysis results across the platform.</p>
                 <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center">
@@ -625,7 +646,7 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight">Transaction Ledger</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1">Full escrow and payment history</p>
+                    <p class="text-sm text-muted font-medium mt-1">Full escrow and payment history</p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
@@ -633,17 +654,17 @@
                     <table class="w-full">
                         <thead>
                             <tr class="bg-slate-50 text-left">
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Crop</th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Buyer → Seller</th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Commission</th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Escrow</th>
-                                <th class="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Payment</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Order ID</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Crop</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Buyer → Seller</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Amount</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Commission</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Escrow</th>
+                                <th class="px-4 py-3 text-xs font-bold text-muted uppercase tracking-wider">Payment</th>
                             </tr>
                         </thead>
                         <tbody id="transactions-table">
-                            <tr><td colspan="7" class="px-4 py-10 text-center text-slate-400 text-sm">Loading transactions...</td></tr>
+                            <tr><td colspan="7" class="px-4 py-10 text-center text-muted text-sm">Loading transactions...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -654,11 +675,11 @@
         <section id="section-audit" class="hidden">
             <div class="mb-8">
                 <h2 class="text-3xl font-black text-slate-900 tracking-tight">Audit Logs</h2>
-                <p class="text-sm text-slate-400 font-medium mt-1">Complete admin action history — immutable trail</p>
+                <p class="text-sm text-muted font-medium mt-1">Complete admin action history — immutable trail</p>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200 p-6">
                 <div class="space-y-3" id="audit-feed">
-                    <p class="text-sm text-slate-400 text-center py-6">Loading audit logs...</p>
+                    <p class="text-sm text-muted text-center py-6">Loading audit logs...</p>
                 </div>
             </div>
         </section>
@@ -667,7 +688,7 @@
         <section id="section-settings" class="hidden">
             <div class="mb-8">
                 <h2 class="text-3xl font-black text-slate-900 tracking-tight">Platform Settings</h2>
-                <p class="text-sm text-slate-400 font-medium mt-1">Configure platform features and integrations</p>
+                <p class="text-sm text-muted font-medium mt-1">Configure platform features and integrations</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-white rounded-2xl border border-slate-200 p-6">
@@ -706,7 +727,7 @@
                         </div>
                         <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                             <span class="text-sm font-medium text-slate-600">Tables</span>
-                            <span class="text-xs font-bold text-slate-500">users, satellite_scans, expenses,
+                            <span class="text-xs font-bold text-muted">users, satellite_scans, expenses,
                                 trade_listings</span>
                         </div>
                     </div>
@@ -841,9 +862,9 @@
                 <tr class="table-row border-t border-slate-100 cursor-pointer" onclick="viewUser(${u.id})">
                     <td class="px-6 py-4"><div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-700 border border-slate-200">${(u.username||'U')[0].toUpperCase()}</div>
-                        <div><p class="font-bold text-sm text-slate-700">${u.username||'Unknown'}</p><p class="text-[10px] text-slate-400 font-bold">#${u.id} • ${u.role||'user'}</p></div>
+                        <div><p class="font-bold text-sm text-slate-700">${u.username||'Unknown'}</p><p class="text-[10px] text-muted font-bold">#${u.id} • ${u.role||'user'}</p></div>
                     </div></td>
-                    <td class="px-6 py-4"><p class="text-sm text-slate-600">${u.email}</p><p class="text-[10px] text-slate-400">${u.phone_number||'—'}</p></td>
+                    <td class="px-6 py-4"><p class="text-sm text-slate-600">${u.email}</p><p class="text-[10px] text-muted">${u.phone_number||'—'}</p></td>
                     <td class="px-6 py-4"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${u.kyc_status==='verified'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-amber-50 text-amber-600 border-amber-100'}">${u.kyc_status||'none'}</span></td>
                     <td class="px-6 py-4"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${u.status==='banned'?'bg-red-50 text-red-600 border-red-100':'bg-blue-50 text-blue-600 border-blue-100'}">${u.status||'active'}</span></td>
                     <td class="px-6 py-4" onclick="event.stopPropagation()">
@@ -884,14 +905,14 @@
 
         function renderListings(listings) {
             const tbody = document.getElementById('listings-table');
-            if(!listings.length) { tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-10 text-center text-slate-400 text-sm">No listings yet</td></tr>'; return; }
+            if(!listings.length) { tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-10 text-center text-muted text-sm">No listings yet</td></tr>'; return; }
             tbody.innerHTML = listings.map(l => `
                 <tr class="table-row border-t border-slate-100">
                     <td class="px-4 py-4 font-semibold text-sm text-slate-700">${l.crop||l.crop_name||'—'}</td>
-                    <td class="px-4 py-4 text-sm text-slate-500">${l.seller||l.seller_name||'—'}</td>
-                    <td class="px-4 py-4 text-sm text-slate-500">${Number(l.qty||l.quantity||0).toLocaleString()} kg</td>
+                    <td class="px-4 py-4 text-sm text-muted">${l.seller||l.seller_name||'—'}</td>
+                    <td class="px-4 py-4 text-sm text-muted">${Number(l.qty||l.quantity||0).toLocaleString()} kg</td>
                     <td class="px-4 py-4 text-sm font-bold text-emerald-600">₹${Number(l.price||l.price_per_unit||0).toLocaleString()}</td>
-                    <td class="px-4 py-4 text-sm text-slate-400">${l.location||'—'}</td>
+                    <td class="px-4 py-4 text-sm text-muted">${l.location||'—'}</td>
                     <td class="px-4 py-4">
                         <button class="text-xs font-bold text-red-400 hover:text-red-600 transition">Remove</button>
                     </td>
@@ -908,8 +929,8 @@
                     <div class="flex items-center gap-4 p-3 rounded-xl bg-white border border-slate-100">
                         <div class="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center text-lg border border-slate-100">${l.action?.includes('approved')?'✅':l.action?.includes('reject')?'❌':l.action?.includes('ban')?'🚫':'📝'}</div>
                         <div class="flex-1"><p class="text-sm font-bold text-slate-700"><span class="text-indigo-600">@${l.admin_name||'System'}</span> ${(l.action||'').replace(/_/g,' ')} <span class="text-slate-900">${l.target_name||'User #'+l.user_id}</span></p>
-                        <p class="text-[10px] text-slate-400">${new Date(l.created_at).toLocaleString()} • ${l.reason||''}</p></div>
-                    </div>`).join('') : '<p class="text-sm text-slate-400 text-center py-6">No logs yet</p>';
+                        <p class="text-[10px] text-muted">${new Date(l.created_at).toLocaleString()} • ${l.reason||''}</p></div>
+                    </div>`).join('') : '<p class="text-sm text-muted text-center py-6">No logs yet</p>';
                 const f1 = document.getElementById('activity-feed'); if(f1) f1.innerHTML = html;
                 const f2 = document.getElementById('audit-feed'); if(f2) f2.innerHTML = html;
             } catch(e) { console.error('Audit:', e); }
@@ -921,16 +942,16 @@
                 const res = await fetch('/api/admin/transactions', { headers: { 'Authorization': token } });
                 const txns = await res.json();
                 const tbody = document.getElementById('transactions-table');
-                if(!txns.length) { tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-10 text-center text-slate-400 text-sm">No transactions yet</td></tr>'; return; }
+                if(!txns.length) { tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-10 text-center text-muted text-sm">No transactions yet</td></tr>'; return; }
                 tbody.innerHTML = txns.map(t => `
                     <tr class="table-row border-t border-slate-100">
                         <td class="px-4 py-3"><p class="text-[10px] font-black text-indigo-600 uppercase">${t.order_id||'—'}</p></td>
                         <td class="px-4 py-3 text-sm font-bold text-slate-700">${t.crop_name||'—'}</td>
-                        <td class="px-4 py-3 text-xs text-slate-500">${t.buyer_name||'#'+t.buyer_id} → ${t.seller_name||'#'+t.seller_id}</td>
+                        <td class="px-4 py-3 text-xs text-muted">${t.buyer_name||'#'+t.buyer_id} → ${t.seller_name||'#'+t.seller_id}</td>
                         <td class="px-4 py-3 text-sm font-black text-emerald-600">₹${Number(t.total_amount||0).toLocaleString()}</td>
                         <td class="px-4 py-3 text-xs text-amber-600 font-bold">₹${Number(t.commission_amount||0).toLocaleString()}</td>
                         <td class="px-4 py-3"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${t.escrow_status==='held'?'bg-amber-50 text-amber-600 border-amber-100':t.escrow_status==='released'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-red-50 text-red-600 border-red-100'}">${t.escrow_status||'—'}</span></td>
-                        <td class="px-4 py-3"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${t.payment_status==='completed'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-slate-50 text-slate-500 border-slate-200'}">${t.payment_method||'—'} • ${t.payment_status||'—'}</span></td>
+                        <td class="px-4 py-3"><span class="text-[10px] font-black px-2 py-0.5 rounded-lg border uppercase ${t.payment_status==='completed'?'bg-emerald-50 text-emerald-600 border-emerald-100':'bg-slate-50 text-muted border-slate-200'}">${t.payment_method||'—'} • ${t.payment_status||'—'}</span></td>
                     </tr>`).join('');
             } catch(e) { console.error('Txns:', e); }
         }
@@ -946,22 +967,22 @@
                 const kyc = await res.json();
                 renderKYC(kyc.applications || kyc);
             } catch (e) {
-                document.getElementById('kyc-table').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Error loading or no pending KYC applications.</td></tr>';
+                document.getElementById('kyc-table').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">Error loading or no pending KYC applications.</td></tr>';
             }
         }
 
         function renderKYC(kycApps) {
             const tbody = document.getElementById('kyc-table');
             if(kycApps.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">No pending KYC applications.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">No pending KYC applications.</td></tr>';
                 return;
             }
             tbody.innerHTML = kycApps.map(k => `
                 <tr class="table-row border-t border-slate-100">
                     <td class="px-6 py-4 font-semibold text-sm text-slate-700">${k.user_id}</td>
                     <td class="px-6 py-4 text-sm text-blue-500"><a href="${k.document_url || '#'}" target="_blank">View Aadhaar</a></td>
-                    <td class="px-6 py-4 text-sm text-slate-500">${k.document_type}</td>
-                    <td class="px-6 py-4 text-sm text-slate-400">${new Date(k.created_at).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 text-sm text-muted">${k.document_type}</td>
+                    <td class="px-6 py-4 text-sm text-muted">${new Date(k.created_at).toLocaleDateString()}</td>
                     <td class="px-6 py-4 flex gap-2">
                         <button onclick="approveKYC(${k.user_id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 font-bold rounded-md hover:bg-emerald-100 text-xs">Approve</button>
                         <button onclick="rejectKYC(${k.user_id})" class="px-3 py-1 bg-rose-50 text-rose-600 font-bold rounded-md hover:bg-rose-100 text-xs">Reject</button>
@@ -1001,29 +1022,29 @@
                 const disputes = await res.json();
                 renderDisputes(disputes);
             } catch (e) {
-                document.getElementById('disputes-table').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Error loading disputes.</td></tr>';
+                document.getElementById('disputes-table').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">Error loading disputes.</td></tr>';
             }
         }
 
         function renderDisputes(disputes) {
             const tbody = document.getElementById('disputes-table');
             if(disputes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">No active disputes.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">No active disputes.</td></tr>';
                 return;
             }
             tbody.innerHTML = disputes.map(d => `
                 <tr class="table-row border-t border-slate-100">
                     <td class="px-6 py-4">
                         <p class="font-bold text-sm text-slate-700">${d.crop_name}</p>
-                        <p class="text-[10px] text-slate-400 uppercase font-bold">TXN #${d.transaction_id}</p>
+                        <p class="text-[10px] text-muted uppercase font-bold">TXN #${d.transaction_id}</p>
                     </td>
                     <td class="px-6 py-4">
                         <p class="text-xs font-bold text-slate-600">By: ${d.filer_name}</p>
-                        <p class="text-xs text-slate-400">Against: ${d.against_name}</p>
+                        <p class="text-xs text-muted">Against: ${d.against_name}</p>
                     </td>
-                    <td class="px-6 py-4 text-xs text-slate-500 max-w-xs truncate" title="${d.description}">${d.reason}: ${d.description}</td>
+                    <td class="px-6 py-4 text-xs text-muted max-w-xs truncate" title="${d.description}">${d.reason}: ${d.description}</td>
                     <td class="px-6 py-4">
-                        <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border uppercase ${d.status === 'open' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-slate-50 text-slate-500 border-slate-200'}">${d.status}</span>
+                        <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border uppercase ${d.status === 'open' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-slate-50 text-muted border-slate-200'}">${d.status}</span>
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex gap-2">
@@ -1057,27 +1078,27 @@
                 const payouts = await res.json();
                 renderPayoutsAdmin(payouts);
             } catch (e) {
-                document.getElementById('payouts-table-admin').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">Error loading payouts.</td></tr>';
+                document.getElementById('payouts-table-admin').innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">Error loading payouts.</td></tr>';
             }
         }
 
         function renderPayoutsAdmin(payouts) {
             const tbody = document.getElementById('payouts-table-admin');
             if(payouts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">No pending payout requests.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-muted text-sm">No pending payout requests.</td></tr>';
                 return;
             }
             tbody.innerHTML = payouts.map(p => `
                 <tr class="table-row border-t border-slate-100">
                     <td class="px-6 py-4">
                         <p class="font-bold text-sm text-slate-700">${p.username}</p>
-                        <p class="text-[10px] text-slate-400">${p.email}</p>
+                        <p class="text-[10px] text-muted">${p.email}</p>
                     </td>
                     <td class="px-6 py-4 text-sm font-black text-emerald-600">₹${Number(p.amount).toLocaleString()}</td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase">${p.payout_method}</span>
                     </td>
-                    <td class="px-6 py-4 text-xs text-slate-500">
+                    <td class="px-6 py-4 text-xs text-muted">
                         ${p.payout_method === 'upi' ? `UPI: ${p.upi_id}` : `Bank: ${p.bank_account}<br>IFSC: ${p.ifsc_code}`}
                     </td>
                     <td class="px-6 py-4">
@@ -1131,24 +1152,24 @@
                 modal.innerHTML = `<div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8" onclick="event.stopPropagation()">
                     <div class="flex justify-between items-start mb-6"><div>
                         <h2 class="text-2xl font-black text-slate-900">${u.username}</h2>
-                        <p class="text-sm text-slate-400">#${u.id} • ${u.email} • ${u.phone_number||'No phone'}</p>
-                    </div><button onclick="this.closest('.fixed').remove()" class="text-2xl text-slate-400 hover:text-red-500">×</button></div>
+                        <p class="text-sm text-muted">#${u.id} • ${u.email} • ${u.phone_number||'No phone'}</p>
+                    </div><button onclick="this.closest('.fixed').remove()" class="text-2xl text-muted hover:text-red-500">×</button></div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-slate-800">${u.role||'user'}</p><p class="text-[10px] text-slate-400 font-bold uppercase">Role</p></div>
-                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black ${u.status==='banned'?'text-red-600':'text-emerald-600'}">${u.status||'active'}</p><p class="text-[10px] text-slate-400 font-bold uppercase">Status</p></div>
-                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-indigo-600">${u.kyc_status||'none'}</p><p class="text-[10px] text-slate-400 font-bold uppercase">KYC</p></div>
-                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-amber-600">₹${Number(u.wallet_balance||0).toLocaleString()}</p><p class="text-[10px] text-slate-400 font-bold uppercase">Wallet</p></div>
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-slate-800">${u.role||'user'}</p><p class="text-[10px] text-muted font-bold uppercase">Role</p></div>
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black ${u.status==='banned'?'text-red-600':'text-emerald-600'}">${u.status||'active'}</p><p class="text-[10px] text-muted font-bold uppercase">Status</p></div>
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-indigo-600">${u.kyc_status||'none'}</p><p class="text-[10px] text-muted font-bold uppercase">KYC</p></div>
+                        <div class="bg-slate-50 rounded-xl p-3 text-center"><p class="text-lg font-black text-amber-600">₹${Number(u.wallet_balance||0).toLocaleString()}</p><p class="text-[10px] text-muted font-bold uppercase">Wallet</p></div>
                     </div>
                     <div class="space-y-4">
-                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">Transactions (${data.transactions.length})</h3>${data.transactions.length?data.transactions.slice(0,5).map(t=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+( t.order_id||'—')+' • ₹'+Number(t.total_amount||0).toLocaleString()+' • '+(t.escrow_status||'—')+'</p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
-                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">Inventory (${data.inventory.length})</h3>${data.inventory.length?data.inventory.slice(0,5).map(i=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(i.name||'—')+' • '+i.quantity+' units</p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
-                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">KYC Documents (${data.kyc.length})</h3>${data.kyc.length?data.kyc.map(k=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(k.document_type||'—')+' • <a href="'+(k.file_url||'#')+'" target="_blank" class="text-blue-500 underline">View</a></p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
-                        <div><h3 class="text-xs font-black text-slate-400 uppercase mb-2">Disputes (${data.disputes.length})</h3>${data.disputes.length?data.disputes.map(d=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(d.reason||'—')+' • '+(d.status||'—')+'</p>').join(''):'<p class="text-xs text-slate-400">None</p>'}</div>
+                        <div><h3 class="text-xs font-black text-muted uppercase mb-2">Transactions (${data.transactions.length})</h3>${data.transactions.length?data.transactions.slice(0,5).map(t=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+( t.order_id||'—')+' • ₹'+Number(t.total_amount||0).toLocaleString()+' • '+(t.escrow_status||'—')+'</p>').join(''):'<p class="text-xs text-muted">None</p>'}</div>
+                        <div><h3 class="text-xs font-black text-muted uppercase mb-2">Inventory (${data.inventory.length})</h3>${data.inventory.length?data.inventory.slice(0,5).map(i=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(i.name||'—')+' • '+i.quantity+' units</p>').join(''):'<p class="text-xs text-muted">None</p>'}</div>
+                        <div><h3 class="text-xs font-black text-muted uppercase mb-2">KYC Documents (${data.kyc.length})</h3>${data.kyc.length?data.kyc.map(k=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(k.document_type||'—')+' • <a href="'+(k.file_url||'#')+'" target="_blank" class="text-blue-500 underline">View</a></p>').join(''):'<p class="text-xs text-muted">None</p>'}</div>
+                        <div><h3 class="text-xs font-black text-muted uppercase mb-2">Disputes (${data.disputes.length})</h3>${data.disputes.length?data.disputes.map(d=>'<p class="text-xs text-slate-600 py-1 border-b border-slate-50">'+(d.reason||'—')+' • '+(d.status||'—')+'</p>').join(''):'<p class="text-xs text-muted">None</p>'}</div>
                     </div>
                     <div class="flex gap-3 mt-6 pt-4 border-t border-slate-100">
                         <select id="role-select-${u.id}" class="text-xs border rounded-lg px-3 py-2"><option value="farmer">Farmer</option><option value="customer">Customer</option><option value="both">Both</option><option value="admin">Admin</option></select>
-                        <button onclick="changeRole(${u.id})" class="text-xs font-bold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Change Role</button>
-                        <button onclick="toggleBan(${u.id},'${u.status==='banned'?'active':'banned'}');this.closest('.fixed').remove()" class="text-xs font-bold ${u.status==='banned'?'bg-emerald-600':'bg-red-600'} text-white px-4 py-2 rounded-lg">${u.status==='banned'?'Unban':'Ban'}</button>
+                        <button onclick="changeRole(${u.id})" class="text-xs font-bold bg-indigo-600 text-heading px-4 py-2 rounded-lg hover:bg-indigo-700">Change Role</button>
+                        <button onclick="toggleBan(${u.id},'${u.status==='banned'?'active':'banned'}');this.closest('.fixed').remove()" class="text-xs font-bold ${u.status==='banned'?'bg-emerald-600':'bg-red-600'} text-heading px-4 py-2 rounded-lg">${u.status==='banned'?'Unban':'Ban'}</button>
                     </div>
                 </div>`;
                 document.body.appendChild(modal);
@@ -1174,6 +1195,42 @@
 
 
     </script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

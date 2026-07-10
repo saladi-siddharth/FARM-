@@ -12,13 +12,34 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
         rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script src="/socket.io/socket.io.js"></script>
     <link href="css/premium-theme.css" rel="stylesheet">
     <style>
         body {
             background: #090e17;
-            color: #f8fafc;
+            color: var(--text-body);
             height: 100vh;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
@@ -178,7 +199,7 @@
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-3">
                     <div
-                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-emerald-400/50">
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-heading shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-emerald-400/50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
@@ -192,7 +213,7 @@
 
                 <div class="flex gap-2 items-center">
                     <button onclick="localStorage.clear(); location.href='index.html'"
-                        class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-400 transition border border-rose-500/20"
+                        class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500 hover:text-heading text-rose-400 transition border border-rose-500/20"
                         title="Logout">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -210,21 +231,21 @@
             <!-- Search -->
             <div class="relative group mt-2">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 text-slate-500 group-focus-within:text-emerald-500 transition" fill="none"
+                    <svg class="h-4 w-4 text-muted group-focus-within:text-emerald-500 transition" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
                 <input type="text" id="userSearch" placeholder="Search farmers..."
-                    class="w-full bg-black/40 text-sm text-white pl-11 pr-4 py-3 rounded-xl border border-white/5 outline-none focus:border-emerald-500/50 focus:bg-slate-900 focus:ring-1 focus:ring-emerald-500/20 transition placeholder-slate-500"
+                    class="w-full bg-black/40 text-sm text-heading pl-11 pr-4 py-3 rounded-xl border border-border_color/5 outline-none focus:border-emerald-500/50 focus:bg-slate-900 focus:ring-1 focus:ring-emerald-500/20 transition placeholder-slate-500"
                     oninput="searchUsers(this.value)">
             </div>
         </div>
 
         <!-- Recent Chats List -->
         <div id="conversationsList" class="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar pb-6">
-            <div class="flex flex-col items-center justify-center h-40 text-slate-500 gap-2">
+            <div class="flex flex-col items-center justify-center h-40 text-muted gap-2">
                 <div class="w-6 h-6 border-2 border-slate-600 border-t-emerald-500 rounded-full animate-spin"></div>
                 <span class="text-xs font-bold uppercase tracking-widest">Loading network...</span>
             </div>
@@ -236,21 +257,21 @@
 
         <!-- Header -->
         <div id="chat-header"
-            class="h-20 px-6 flex justify-between items-center glass-header z-10 sticky top-0 border-b border-white/5 shadow-md">
+            class="h-20 px-6 flex justify-between items-center glass-header z-10 sticky top-0 border-b border-border_color/5 shadow-md">
             <div class="flex items-center gap-4 md:gap-6">
                 <!-- Back Button inside header -->
                 <button onclick="location.href='dashboard.html'"
-                    class="flex items-center justify-center w-10 h-10 md:w-auto md:px-4 md:py-2 text-slate-300 hover:text-emerald-400 bg-slate-800/80 hover:bg-slate-700 rounded-xl transition border border-white/10 shadow-sm"
+                    class="flex items-center justify-center w-10 h-10 md:w-auto md:px-4 md:py-2 text-body hover:text-emerald-400 bg-slate-800/80 hover:bg-slate-700 rounded-xl transition border border-border_color/10 shadow-sm"
                     title="Back to Dashboard">
                     <span class="text-lg leading-none">←</span>
                     <span class="hidden md:inline font-bold ml-2 text-sm">Dashboard</span>
                 </button>
 
                 <button onclick="toggleSidebar()"
-                    class="md:hidden text-slate-300 hover:text-white w-10 h-10 flex items-center justify-center transition bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-white/10 shadow-sm">☰</button>
+                    class="md:hidden text-body hover:text-heading w-10 h-10 flex items-center justify-center transition bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-border_color/10 shadow-sm">☰</button>
 
                 <div id="header-avatar"
-                    class="hidden w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg border border-white/20">
+                    class="hidden w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-heading shadow-lg border border-white/20">
                     ?</div>
                 <div>
                     <h3 id="chat-name" class="text-xl font-black text-slate-100 tracking-tight brand-font">Select a Chat
@@ -267,7 +288,7 @@
             <!-- Call Actions -->
             <div id="call-actions" class="hidden flex gap-3">
                 <button onclick="startCall('voice')"
-                    class="w-10 h-10 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition border border-white/10 shadow-lg hover:shadow-slate-700/50"
+                    class="w-10 h-10 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition border border-border_color/10 shadow-lg hover:shadow-slate-700/50"
                     title="Voice Call">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -276,7 +297,7 @@
                     </svg>
                 </button>
                 <button onclick="startCall('video')"
-                    class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-400 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center transition border border-blue-400/50"
+                    class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-400 text-heading shadow-lg shadow-blue-500/30 flex items-center justify-center transition border border-blue-400/50"
                     title="Video Call">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -289,21 +310,21 @@
 
         <!-- Messages Area -->
         <div id="msgContainer" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 flex flex-col scroll-smooth">
-            <div class="flex-1 flex flex-col items-center justify-center select-none text-slate-500/40">
+            <div class="flex-1 flex flex-col items-center justify-center select-none text-muted/40">
                 <div
-                    class="w-24 h-24 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center mb-6 shadow-inner">
+                    class="w-24 h-24 rounded-3xl bg-inverse/5 border border-border_color/5 flex items-center justify-center mb-6 shadow-inner">
                     <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
                     </svg>
                 </div>
-                <p class="text-2xl font-black brand-font text-slate-400 tracking-tight">Farm Chat</p>
+                <p class="text-2xl font-black brand-font text-muted tracking-tight">Farm Chat</p>
                 <p class="text-sm font-bold uppercase tracking-widest mt-2">Select a contact to begin</p>
             </div>
         </div>
 
         <!-- Smart Replies -->
         <div id="smart-replies"
-            class="px-6 py-3 flex gap-3 overflow-x-auto hidden bg-black/40 backdrop-blur-md border-t border-white/5 no-scrollbar">
+            class="px-6 py-3 flex gap-3 overflow-x-auto hidden bg-black/40 backdrop-blur-md border-t border-border_color/5 no-scrollbar">
         </div>
 
         <!-- Input Dock -->
@@ -317,13 +338,13 @@
                         class="text-sm font-bold text-indigo-300 font-mono truncate max-w-[200px]">image.png</span>
                 </div>
                 <button onclick="clearAttachment()"
-                    class="text-rose-400 hover:text-white hover:bg-rose-500 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border border-rose-500/30 transition">REMOVE</button>
+                    class="text-rose-400 hover:text-heading hover:bg-rose-500 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border border-rose-500/30 transition">REMOVE</button>
             </div>
 
             <form id="chatForm" class="flex items-center gap-3 max-w-6xl mx-auto relative">
                 <!-- Attach Button -->
                 <label
-                    class="flex-shrink-0 w-12 h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700 cursor-pointer text-slate-400 hover:text-emerald-400 transition flex items-center justify-center border border-white/5 shadow-inner">
+                    class="flex-shrink-0 w-12 h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700 cursor-pointer text-muted hover:text-emerald-400 transition flex items-center justify-center border border-border_color/5 shadow-inner">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
@@ -335,7 +356,7 @@
 
                 <!-- Voice Msg Button -->
                 <button type="button" id="recordBtn"
-                    class="flex-shrink-0 w-12 h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-rose-400 transition flex items-center justify-center border border-white/5 shadow-inner"
+                    class="flex-shrink-0 w-12 h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-muted hover:text-rose-400 transition flex items-center justify-center border border-border_color/5 shadow-inner"
                     onclick="toggleRecording()">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -346,11 +367,11 @@
 
                 <div class="flex-1 relative">
                     <input type="text" id="msgInput" disabled placeholder="Type a message..." autocomplete="off"
-                        class="w-full bg-black/40 text-white pl-6 pr-4 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/50 transition border border-white/5 focus:border-emerald-500/30 placeholder-slate-500 shadow-inner">
+                        class="w-full bg-black/40 text-heading pl-6 pr-4 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/50 transition border border-border_color/5 focus:border-emerald-500/30 placeholder-slate-500 shadow-inner">
                 </div>
 
                 <button type="submit" id="sendBtn" disabled
-                    class="btn-premium flex-shrink-0 w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-2xl font-bold transition shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center border border-emerald-400/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="btn-premium flex-shrink-0 w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-heading rounded-2xl font-bold transition shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center border border-emerald-400/50 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-6 h-6 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
@@ -361,11 +382,11 @@
 
         <!-- Recording Overlay -->
         <div id="recording-ui"
-            class="hidden absolute bottom-28 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-rose-600 to-red-600 text-white px-6 py-3 rounded-full shadow-[0_0_30px_rgba(225,29,72,0.4)] animate-pulse flex items-center gap-4 z-50 border border-rose-400/50">
+            class="hidden absolute bottom-28 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-rose-600 to-red-600 text-heading px-6 py-3 rounded-full shadow-[0_0_30px_rgba(225,29,72,0.4)] animate-pulse flex items-center gap-4 z-50 border border-rose-400/50">
             <div class="w-3 h-3 bg-white rounded-full"></div>
             <span class="font-black tracking-widest text-sm">RECORDING...</span>
             <button onclick="cancelRecording()"
-                class="ml-2 text-[10px] font-black bg-black/30 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-black/50 transition">CANCEL</button>
+                class="ml-2 text-[10px] font-black bg-black/30 px-3 py-1.5 rounded-lg border border-border_color/10 hover:bg-black/50 transition">CANCEL</button>
         </div>
     </div>
 
@@ -374,7 +395,7 @@
         class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-300">
         <!-- Kept original modal structure mostly same but with refined borders -->
         <div
-            class="relative w-full max-w-5xl aspect-video bg-[#05080f] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 flex flex-col group ring-4 ring-emerald-500/20">
+            class="relative w-full max-w-5xl aspect-video bg-surface rounded-[2.5rem] overflow-hidden shadow-2xl border border-border_color/10 flex flex-col group ring-4 ring-emerald-500/20">
 
             <div
                 class="absolute top-0 left-0 right-0 p-8 bg-gradient-to-b from-black/80 to-transparent z-10 flex justify-between items-start pointer-events-none">
@@ -384,13 +405,13 @@
                             class="w-3 h-3 rounded-full bg-rose-500 animate-pulse absolute top-0 right-0 ring-2 ring-black">
                         </div>
                         <div
-                            class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl border border-white/20">
+                            class="w-14 h-14 rounded-2xl bg-inverse/10 backdrop-blur-md flex items-center justify-center text-2xl border border-white/20">
                             👤</div>
                     </div>
                     <div>
                         <span id="call-status-text"
-                            class="text-white font-black tracking-tight text-lg md:text-xl drop-shadow-md">Connecting...</span>
-                        <div class="text-white/60 text-xs md:text-sm font-bold font-mono mt-1 uppercase tracking-widest bg-black/30 inline-block px-2 py-0.5 rounded"
+                            class="text-heading font-black tracking-tight text-lg md:text-xl drop-shadow-md">Connecting...</span>
+                        <div class="text-heading/60 text-xs md:text-sm font-bold font-mono mt-1 uppercase tracking-widest bg-black/30 inline-block px-2 py-0.5 rounded"
                             id="call-timer">00:00</div>
                     </div>
                 </div>
@@ -407,7 +428,7 @@
             <div
                 class="absolute bottom-0 left-0 right-0 pb-10 pt-24 flex justify-center gap-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10 pointer-events-auto">
                 <button onclick="toggleMute()" id="mute-btn"
-                    class="w-14 h-14 rounded-2xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg">
+                    class="w-14 h-14 rounded-2xl bg-inverse/10 hover:bg-inverse/20 text-heading backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z">
@@ -416,7 +437,7 @@
                 </button>
 
                 <button onclick="endCallSignal()"
-                    class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-white shadow-[0_0_20px_rgba(225,29,72,0.4)] flex items-center justify-center transition focus:scale-95 border-2 border-rose-400/50">
+                    class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-heading shadow-[0_0_20px_rgba(225,29,72,0.4)] flex items-center justify-center transition focus:scale-95 border-2 border-rose-400/50">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L8.228 8.02A1 1 0 007.28 7H6a2 2 0 00-2 2v1z">
@@ -425,7 +446,7 @@
                 </button>
 
                 <button onclick="toggleCam()" id="cam-btn"
-                    class="w-14 h-14 rounded-2xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg">
+                    class="w-14 h-14 rounded-2xl bg-inverse/10 hover:bg-inverse/20 text-heading backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
@@ -481,7 +502,7 @@
                 statusEl.classList.remove('hidden');
                 statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse border border-emerald-400/50 shadow-[0_0_5px_#10b981]"></span> Online`;
             } else {
-                statusEl.innerHTML = `<span class="text-slate-500 font-bold uppercase tracking-widest">Offline</span>`;
+                statusEl.innerHTML = `<span class="text-muted font-bold uppercase tracking-widest">Offline</span>`;
                 statusEl.classList.remove('hidden');
             }
         }
@@ -494,7 +515,7 @@
 
                 if (!list || list.length === 0) {
                     container.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-48 text-slate-500 opacity-60 bg-black/20 rounded-2xl border border-white/5 m-4">
+                        <div class="flex flex-col items-center justify-center h-48 text-muted opacity-60 bg-black/20 rounded-2xl border border-border_color/5 m-4">
                             <span class="text-4xl mb-2">📭</span>
                             <p class="text-xs font-bold uppercase tracking-widest">No chats yet</p>
                         </div>`;
@@ -506,10 +527,10 @@
                     const isActive = currentChatId === c.id;
                     return `
                     <div onclick="selectUser(${c.id}, '${c.username}')" 
-                        class="chat-item p-4 rounded-2xl cursor-pointer flex items-center gap-4 transition group relative overflow-hidden ${isActive ? 'active bg-emerald-500/10' : 'hover:bg-white/5 border border-transparent'}">
+                        class="chat-item p-4 rounded-2xl cursor-pointer flex items-center gap-4 transition group relative overflow-hidden ${isActive ? 'active bg-emerald-500/10' : 'hover:bg-inverse/5 border border-transparent'}">
                         
                         <div class="relative w-12 h-12 flex-shrink-0">
-                             <div class="w-full h-full rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-black border border-white/10 ${isOnline ? 'ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/20' : ''}">
+                             <div class="w-full h-full rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-heading font-black border border-border_color/10 ${isOnline ? 'ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/20' : ''}">
                                 <span class="text-xl">${c.username[0].toUpperCase()}</span>
                             </div>
                             ${isOnline ? '<div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#090e17] rounded-full z-10"></div>' : ''}
@@ -517,10 +538,10 @@
                         
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-baseline mb-1">
-                                <h4 class="font-bold text-slate-200 truncate group-hover:text-white transition ${isActive ? 'text-white' : ''} text-base">${c.username}</h4>
-                                <span class="text-[10px] ${isActive ? 'text-emerald-400' : 'text-slate-500'} font-bold uppercase tracking-widest">${timeAgo(c.messaged_at)}</span>
+                                <h4 class="font-bold text-slate-200 truncate group-hover:text-heading transition ${isActive ? 'text-heading' : ''} text-base">${c.username}</h4>
+                                <span class="text-[10px] ${isActive ? 'text-emerald-400' : 'text-muted'} font-bold uppercase tracking-widest">${timeAgo(c.messaged_at)}</span>
                             </div>
-                            <p class="text-xs truncate ${isActive ? 'text-emerald-200/70' : 'text-slate-400'} group-hover:text-slate-300 transition font-medium">
+                            <p class="text-xs truncate ${isActive ? 'text-emerald-200/70' : 'text-muted'} group-hover:text-body transition font-medium">
                                 ${c.msg_type === 'text' ? (c.sender_username === myUsername ? '<span class="opacity-50">You: </span>' : '') + c.content : '📎 Attachment'}
                             </p>
                         </div>
@@ -538,15 +559,15 @@
             container.innerHTML = users.length ? users.map(u => {
                 const isOnline = activeUsersSet.has(u.username);
                 return `
-                <div onclick="selectUser(${u.id}, '${u.username}')" class="chat-item p-4 rounded-2xl hover:bg-white/5 cursor-pointer flex items-center gap-4 transition group border border-transparent">
+                <div onclick="selectUser(${u.id}, '${u.username}')" class="chat-item p-4 rounded-2xl hover:bg-inverse/5 cursor-pointer flex items-center gap-4 transition group border border-transparent">
                    <div class="relative w-12 h-12 flex-shrink-0">
-                        <div class="w-full h-full rounded-xl bg-slate-800 flex items-center justify-center text-emerald-400 font-bold border border-white/5 group-hover:border-emerald-500/50 transition shadow-inner">
+                        <div class="w-full h-full rounded-xl bg-slate-800 flex items-center justify-center text-emerald-400 font-bold border border-border_color/5 group-hover:border-emerald-500/50 transition shadow-inner">
                             <span class="text-lg">🔍</span>
                         </div>
                     </div>
-                    <p class="font-bold text-slate-200 group-hover:text-white transition text-base">${u.username}</p>
+                    <p class="font-bold text-slate-200 group-hover:text-heading transition text-base">${u.username}</p>
                 </div>
-            `}).join('') : '<div class="text-center text-slate-500 text-xs font-bold uppercase tracking-widest mt-10">No farmers found</div>';
+            `}).join('') : '<div class="text-center text-muted text-xs font-bold uppercase tracking-widest mt-10">No farmers found</div>';
         }
 
         function selectUser(id, name) {
@@ -663,7 +684,7 @@
 
             const container = document.getElementById('smart-replies');
             container.innerHTML = replies.map(r => `
-                <button onclick="sendSmartReply('${r}')" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-bold text-slate-300 transition whitespace-nowrap shadow-sm hover:text-white">
+                <button onclick="sendSmartReply('${r}')" class="px-4 py-2 bg-inverse/5 hover:bg-inverse/10 border border-border_color/10 rounded-xl text-xs font-bold text-body transition whitespace-nowrap shadow-sm hover:text-heading">
                     ${r}
                 </button>
             `).join('');
@@ -697,7 +718,7 @@
                         <div class="msg-bubble ${isMe ? 'my-msg' : 'their-msg'}">
                             ${!isMe ? `<div class="text-[10px] font-black uppercase tracking-widest text-[#10b981] mb-1.5">${m.sender_username}</div>` : ''}
                             ${contentHtml}
-                            <div class="text-[10px] font-bold opacity-50 text-right mt-2 tracking-wider ${isMe ? 'text-teal-100' : 'text-slate-500'}">${new Date(m.messaged_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                            <div class="text-[10px] font-bold opacity-50 text-right mt-2 tracking-wider ${isMe ? 'text-teal-100' : 'text-muted'}">${new Date(m.messaged_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                         </div>
                     </div>
                 `;
@@ -765,10 +786,10 @@
             if (!document.getElementById('accept-btn')) {
                 const controls = document.querySelector('#call-modal .absolute.bottom-0');
                 controls.innerHTML = `
-                    <button onclick="rejectCall()" class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-white font-bold shadow-lg transition flex items-center justify-center border-2 border-rose-400">
+                    <button onclick="rejectCall()" class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-heading font-bold shadow-lg transition flex items-center justify-center border-2 border-rose-400">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <button onclick="acceptCall()" id="accept-btn" class="w-16 h-16 rounded-3xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold shadow-[0_0_20px_rgba(16,185,129,0.5)] transition animate-bounce flex items-center justify-center border-2 border-emerald-300">
+                    <button onclick="acceptCall()" id="accept-btn" class="w-16 h-16 rounded-3xl bg-emerald-500 hover:bg-emerald-400 text-heading font-bold shadow-[0_0_20px_rgba(16,185,129,0.5)] transition animate-bounce flex items-center justify-center border-2 border-emerald-300">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                     </button>
                 `;
@@ -797,7 +818,7 @@
 
             const controls = document.querySelector('#call-modal .absolute.bottom-0');
             controls.innerHTML = `
-                <button onclick="endCallSignal()" class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-white font-bold flex items-center justify-center border-2 border-rose-400">
+                <button onclick="endCallSignal()" class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-heading font-bold flex items-center justify-center border-2 border-rose-400">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>`;
 
@@ -826,9 +847,9 @@
             // Replaces the UI with the 3 connected buttons (Mute, End, Cam)
             const controls = document.querySelector('#call-modal .absolute.bottom-0');
             controls.innerHTML = `
-                <button onclick="toggleMute()" id="mute-btn" class="w-14 h-14 rounded-2xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button>
-                <button onclick="endCallSignal()" class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-white shadow-[0_0_20px_rgba(225,29,72,0.4)] flex items-center justify-center transition border-2 border-rose-400/50"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L8.228 8.02A1 1 0 007.28 7H6a2 2 0 00-2 2v1z"></path></svg></button>
-                <button onclick="toggleCam()" id="cam-btn" class="w-14 h-14 rounded-2xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                <button onclick="toggleMute()" id="mute-btn" class="w-14 h-14 rounded-2xl bg-inverse/10 hover:bg-inverse/20 text-heading backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg></button>
+                <button onclick="endCallSignal()" class="w-16 h-16 rounded-3xl bg-rose-600 hover:bg-rose-500 text-heading shadow-[0_0_20px_rgba(225,29,72,0.4)] flex items-center justify-center transition border-2 border-rose-400/50"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.516l2.257-1.13a1 1 0 00.502-1.21L8.228 8.02A1 1 0 007.28 7H6a2 2 0 00-2 2v1z"></path></svg></button>
+                <button onclick="toggleCam()" id="cam-btn" class="w-14 h-14 rounded-2xl bg-inverse/10 hover:bg-inverse/20 text-heading backdrop-blur-md border border-white/20 flex items-center justify-center transition shadow-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
             `;
         }
 
@@ -895,6 +916,42 @@
             setTimeout(() => { searchUsers(targetUser); }, 500);
         }
     </script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

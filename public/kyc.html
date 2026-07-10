@@ -8,7 +8,28 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7007280990614643" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        base: 'var(--bg-base)',
+                        surface: 'var(--bg-surface)',
+                        card: 'var(--bg-card)',
+                        heading: 'var(--text-heading)',
+                        body: 'var(--text-body)',
+                        muted: 'var(--text-muted)',
+                        border_color: 'var(--border-color)',
+                        inverse: 'var(--inverse-color)'
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         * { box-sizing: border-box; }
         body { margin:0; background:#f8fafc; color:#1e293b; font-family:'Outfit','Inter',sans-serif; overflow-x:hidden; }
@@ -41,12 +62,12 @@
     <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <button onclick="window.history.back()" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition">←</button>
+                <button onclick="window.history.back()" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-muted hover:bg-slate-100 transition">←</button>
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-500/20">🛡️</div>
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-heading text-lg shadow-lg shadow-indigo-500/20">🛡️</div>
                     <div>
                         <h1 class="text-lg font-black bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent tracking-tight leading-none">KYC Verification</h1>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Identity Portal</p>
+                        <p class="text-[10px] text-muted font-bold uppercase tracking-widest mt-0.5">Identity Portal</p>
                     </div>
                 </div>
             </div>
@@ -64,9 +85,9 @@
             <div class="bg-white rounded-3xl border border-emerald-200 p-10 text-center shadow-sm">
                 <div class="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-200 mx-auto flex items-center justify-center text-4xl mb-5">✅</div>
                 <h2 class="text-2xl font-black text-slate-900 mb-2">KYC Verified</h2>
-                <p class="text-slate-500 mb-6">Your identity is verified. You can trade freely on the marketplace.</p>
+                <p class="text-muted mb-6">Your identity is verified. You can trade freely on the marketplace.</p>
                 <div id="verified-details" class="grid grid-cols-2 gap-3 max-w-md mx-auto text-left mb-6"></div>
-                <button onclick="location.href='trading.html'" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl transition">🤝 Go to Trade Hub</button>
+                <button onclick="location.href='trading.html'" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-heading rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl transition">🤝 Go to Trade Hub</button>
             </div>
         </div>
 
@@ -75,7 +96,7 @@
             <div class="bg-white rounded-3xl border border-amber-200 p-10 text-center shadow-sm">
                 <div class="w-20 h-20 rounded-full bg-amber-50 border-2 border-amber-200 mx-auto flex items-center justify-center text-4xl mb-5 animate-pulse">⏳</div>
                 <h2 class="text-2xl font-black text-slate-900 mb-2">Under Review</h2>
-                <p class="text-slate-500 mb-2">Your KYC documents are being verified. This typically takes 24-48 hours.</p>
+                <p class="text-muted mb-2">Your KYC documents are being verified. This typically takes 24-48 hours.</p>
                 <p class="text-sm text-amber-600 font-semibold">You'll receive an email once your verification is complete.</p>
             </div>
         </div>
@@ -87,7 +108,7 @@
                     <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-2xl flex-shrink-0">❌</div>
                     <div>
                         <h2 class="text-xl font-black text-slate-900 mb-1">KYC Rejected</h2>
-                        <p class="text-sm text-slate-500 mb-2">Please fix the issues below and re-submit.</p>
+                        <p class="text-sm text-muted mb-2">Please fix the issues below and re-submit.</p>
                         <div class="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-700" id="rejection-reason"></div>
                     </div>
                 </div>
@@ -112,18 +133,18 @@
                 <div class="step-section active" id="step-1">
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
                         <h2 class="text-xl font-black text-slate-900 mb-1 flex items-center gap-2">👤 Personal Information</h2>
-                        <p class="text-sm text-slate-400 mb-6">Basic identity details for verification</p>
+                        <p class="text-sm text-muted mb-6">Basic identity details for verification</p>
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Aadhaar Number *</label>
+                                    <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">Aadhaar Number *</label>
                                     <div class="relative">
                                         <input type="text" id="aadhaar_number" required maxlength="12" placeholder="123456789012" class="form-input" oninput="validateAadhaar(this)">
                                         <div id="aadhaar-loader" class="verifying-loader">🔍 Verifying with UIDAI...</div>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">PAN Number *</label>
+                                    <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">PAN Number *</label>
                                     <div class="relative">
                                         <input type="text" id="pan_number" required maxlength="10" placeholder="ABCDE1234F" class="form-input uppercase" style="text-transform:uppercase" oninput="validatePAN(this)">
                                         <div id="pan-loader" class="verifying-loader">⚖️ Verifying with IT Dept...</div>
@@ -131,7 +152,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">I am a</label>
+                                <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">I am a</label>
                                 <div class="grid grid-cols-3 gap-3">
                                     <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 hover:border-indigo-200 transition">
                                         <input type="radio" name="role" value="farmer" class="accent-indigo-500"> <span class="text-sm font-medium">🌾 Farmer</span>
@@ -145,25 +166,25 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Full Address</label>
+                                <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">Full Address</label>
                                 <textarea id="address" rows="2" placeholder="House/Plot No., Street, Village/Town" class="form-input resize-none"></textarea>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">State</label>
+                                    <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">State</label>
                                     <input type="text" id="state" placeholder="e.g. Punjab" class="form-input">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">District</label>
+                                    <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">District</label>
                                     <input type="text" id="district" placeholder="e.g. Ludhiana" class="form-input">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pincode</label>
+                                    <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">Pincode</label>
                                     <input type="text" id="pincode" maxlength="6" placeholder="141001" class="form-input" oninput="this.value=this.value.replace(/\D/g,'')">
                                 </div>
                             </div>
                         </div>
-                        <button type="button" onclick="goToStep(2)" class="w-full mt-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl transition text-sm uppercase tracking-wider">Next → Banking Details</button>
+                        <button type="button" onclick="goToStep(2)" class="w-full mt-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-heading rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl transition text-sm uppercase tracking-wider">Next → Banking Details</button>
                     </div>
                 </div>
 
@@ -171,18 +192,18 @@
                 <div class="step-section" id="step-2">
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
                         <h2 class="text-xl font-black text-slate-900 mb-1 flex items-center gap-2">🏦 Banking Details</h2>
-                        <p class="text-sm text-slate-400 mb-6">For receiving payments from sales</p>
+                        <p class="text-sm text-muted mb-6">For receiving payments from sales</p>
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Bank Account Number</label>
+                                    <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">Bank Account Number</label>
                                     <div class="relative">
                                         <input type="text" id="bank_account" placeholder="Account Number" class="form-input" oninput="validateBankAccount(this)">
                                         <div id="bank-loader" class="verifying-loader">⚡ Running Penny Drop Verification...</div>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">IFSC Code</label>
+                                    <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">IFSC Code</label>
                                     <div class="relative">
                                         <input type="text" id="ifsc_code" placeholder="e.g. SBIN0001234" class="form-input uppercase" style="text-transform:uppercase" oninput="validateIFSC(this)">
                                         <div id="ifsc-loader" class="verifying-loader">🏛️ Validating Bank Branch...</div>
@@ -190,7 +211,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">UPI ID (Optional)</label>
+                                <label class="block text-xs font-bold text-muted mb-1.5 uppercase tracking-wider">UPI ID (Optional)</label>
                                 <input type="text" id="upi_id" placeholder="yourname@upi" class="form-input">
                             </div>
                             <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 text-sm text-blue-700">
@@ -199,7 +220,7 @@
                         </div>
                         <div class="flex gap-3 mt-6">
                             <button type="button" onclick="goToStep(1)" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold transition hover:bg-slate-200 text-sm">← Back</button>
-                            <button type="button" onclick="goToStep(3)" class="flex-[2] py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition text-sm uppercase tracking-wider">Next → Upload Documents</button>
+                            <button type="button" onclick="goToStep(3)" class="flex-[2] py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-heading rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition text-sm uppercase tracking-wider">Next → Upload Documents</button>
                         </div>
                     </div>
                 </div>
@@ -208,7 +229,7 @@
                 <div class="step-section" id="step-3">
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
                         <h2 class="text-xl font-black text-slate-900 mb-1 flex items-center gap-2">📄 Upload Documents</h2>
-                        <p class="text-sm text-slate-400 mb-6">Upload clear photos of your ID documents</p>
+                        <p class="text-sm text-muted mb-6">Upload clear photos of your ID documents</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             <!-- Aadhaar Front -->
                             <div class="upload-zone" id="zone-aadhaar_front">
@@ -216,7 +237,7 @@
                                 <div class="pointer-events-none" id="placeholder-aadhaar_front">
                                     <span class="text-3xl block mb-2">🪪</span>
                                     <p class="text-sm font-bold text-slate-600">Aadhaar Front *</p>
-                                    <p class="text-xs text-slate-400 mt-1">Click or drag to upload</p>
+                                    <p class="text-xs text-muted mt-1">Click or drag to upload</p>
                                 </div>
                             </div>
                             <!-- Aadhaar Back -->
@@ -225,7 +246,7 @@
                                 <div class="pointer-events-none" id="placeholder-aadhaar_back">
                                     <span class="text-3xl block mb-2">🪪</span>
                                     <p class="text-sm font-bold text-slate-600">Aadhaar Back</p>
-                                    <p class="text-xs text-slate-400 mt-1">Optional</p>
+                                    <p class="text-xs text-muted mt-1">Optional</p>
                                 </div>
                             </div>
                             <!-- PAN Card -->
@@ -234,7 +255,7 @@
                                 <div class="pointer-events-none" id="placeholder-pan_card">
                                     <span class="text-3xl block mb-2">💳</span>
                                     <p class="text-sm font-bold text-slate-600">PAN Card *</p>
-                                    <p class="text-xs text-slate-400 mt-1">Click or drag to upload</p>
+                                    <p class="text-xs text-muted mt-1">Click or drag to upload</p>
                                 </div>
                             </div>
                             <!-- Selfie -->
@@ -243,7 +264,7 @@
                                 <div class="pointer-events-none" id="placeholder-selfie">
                                     <span class="text-3xl block mb-2">🤳</span>
                                     <p class="text-sm font-bold text-slate-600">Live Selfie *</p>
-                                    <p class="text-xs text-slate-400 mt-1">Clear face photo</p>
+                                    <p class="text-xs text-muted mt-1">Clear face photo</p>
                                 </div>
                             </div>
                             <!-- Bank Proof -->
@@ -252,7 +273,7 @@
                                 <div class="pointer-events-none" id="placeholder-bank_proof">
                                     <span class="text-3xl block mb-2">🏦</span>
                                     <p class="text-sm font-bold text-slate-600">Bank Proof</p>
-                                    <p class="text-xs text-slate-400 mt-1">Passbook / Cheque</p>
+                                    <p class="text-xs text-muted mt-1">Passbook / Cheque</p>
                                 </div>
                             </div>
                             <!-- Farm Certificate -->
@@ -261,7 +282,7 @@
                                 <div class="pointer-events-none" id="placeholder-farm_certificate">
                                     <span class="text-3xl block mb-2">🌿</span>
                                     <p class="text-sm font-bold text-slate-600">Farm Certificate</p>
-                                    <p class="text-xs text-slate-400 mt-1">Optional (Premium badge)</p>
+                                    <p class="text-xs text-muted mt-1">Optional (Premium badge)</p>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +291,7 @@
                         </div>
                         <div class="flex gap-3">
                             <button type="button" onclick="goToStep(2)" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold transition hover:bg-slate-200 text-sm">← Back</button>
-                            <button type="submit" id="submitKYC" class="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-black shadow-lg shadow-emerald-500/20 transition text-sm uppercase tracking-wider hover:shadow-xl active:scale-[0.98]">🚀 Submit KYC for Verification</button>
+                            <button type="submit" id="submitKYC" class="flex-[2] py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-heading rounded-xl font-black shadow-lg shadow-emerald-500/20 transition text-sm uppercase tracking-wider hover:shadow-xl active:scale-[0.98]">🚀 Submit KYC for Verification</button>
                         </div>
                     </div>
                 </div>
@@ -420,10 +441,10 @@
                     document.getElementById('verified-state').classList.remove('hidden');
                     const details = document.getElementById('verified-details');
                     details.innerHTML = `
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">Aadhaar</p><p class="text-sm font-bold text-slate-700">${data.aadhaar || '—'}</p></div>
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">PAN</p><p class="text-sm font-bold text-slate-700">${data.pan || '—'}</p></div>
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">Role</p><p class="text-sm font-bold text-slate-700 capitalize">${data.role || '—'}</p></div>
-                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-slate-400 uppercase">Verified</p><p class="text-sm font-bold text-emerald-600">${data.verified_at ? new Date(data.verified_at).toLocaleDateString('en-IN') : 'Yes'}</p></div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-muted uppercase">Aadhaar</p><p class="text-sm font-bold text-slate-700">${data.aadhaar || '—'}</p></div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-muted uppercase">PAN</p><p class="text-sm font-bold text-slate-700">${data.pan || '—'}</p></div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-muted uppercase">Role</p><p class="text-sm font-bold text-slate-700 capitalize">${data.role || '—'}</p></div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><p class="text-[10px] font-bold text-muted uppercase">Verified</p><p class="text-sm font-bold text-emerald-600">${data.verified_at ? new Date(data.verified_at).toLocaleDateString('en-IN') : 'Yes'}</p></div>
                     `;
                 } else if (status === 'pending') {
                     document.getElementById('pending-state').classList.remove('hidden');
@@ -494,5 +515,41 @@
 
         checkKYCStatus();
     </script>
+
+    <script>
+        // Theme Toggle Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const iconLight = document.getElementById('theme-icon-light');
+            const iconDark = document.getElementById('theme-icon-dark');
+            const htmlEl = document.documentElement;
+            
+            // Default to light theme as requested
+            let isDark = localStorage.getItem('theme') === 'dark';
+            
+            const applyTheme = (dark) => {
+                if (dark) {
+                    htmlEl.classList.add('dark');
+                    iconLight.classList.remove('hidden');
+                    iconDark.classList.add('hidden');
+                } else {
+                    htmlEl.classList.remove('dark');
+                    iconLight.classList.add('hidden');
+                    iconDark.classList.remove('hidden');
+                }
+            };
+            
+            applyTheme(isDark);
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isDark = !isDark;
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    applyTheme(isDark);
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>
