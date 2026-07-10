@@ -28,8 +28,10 @@ function init3D() {
     // 2. Scene & Authentic Camera
     // 2. Scene & Authentic Camera
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x020617); // Deepest Slate/Night
-    scene.fog = new THREE.FogExp2(0x020617, 0.015); // Dense, moody fog
+    const isInitialDark = document.documentElement.classList.contains('dark');
+    const initialBgColor = isInitialDark ? 0x020617 : 0xf1f5f9;
+    scene.background = new THREE.Color(initialBgColor);
+    scene.fog = new THREE.FogExp2(initialBgColor, 0.015); // Dense, moody fog
 
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
     camera.position.set(0, 6, 20); // Slightly lower angle for drama
@@ -157,6 +159,29 @@ function init3D() {
     function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
+
+        // Dynamic theme updates for 3D background
+        const isDark = document.documentElement.classList.contains('dark');
+        const targetBgColor = isDark ? 0x020617 : 0xf1f5f9;
+        const targetGroundColor = isDark ? 0x0f172a : 0xe2e8f0;
+        
+        scene.background.setHex(targetBgColor);
+        scene.fog.color.setHex(targetBgColor);
+        planeMat.color.setHex(targetGroundColor);
+        
+        if (isDark) {
+            hemiLight.color.setHex(0x1e293b);
+            hemiLight.groundColor.setHex(0x0f172a);
+            moonLight.color.setHex(0xcffafe);
+            stemMat.color.setHex(0x22c55e);
+            stemMat.emissive.setHex(0x064e3b);
+        } else {
+            hemiLight.color.setHex(0xe2e8f0);
+            hemiLight.groundColor.setHex(0xf1f5f9);
+            moonLight.color.setHex(0x10b981); // Emerald sun/light source
+            stemMat.color.setHex(0x15803d); // Darker green for contrast
+            stemMat.emissive.setHex(0x166534);
+        }
 
         // Wind Simulation on Plants
         plantsData.forEach((p, i) => {
