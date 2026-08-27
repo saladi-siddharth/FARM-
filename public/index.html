@@ -1,743 +1,455 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Farm Central | AI-Powered Agriculture Marketplace Platform</title>
-    <meta name="description" content="Farm Central is a premium, AI-powered digital agriculture marketplace platform connecting farmers, buyers, and distributors. Get real-time prices, satellite crop analysis, and secure escrow trading.">
-    <meta name="keywords" content="agriculture, marketplace, farming, AI farming, satellite crop analysis, farm trade, B2B agriculture, India agriculture tech">
-    <meta property="og:title" content="Farm Central | Modern Agriculture Platform">
-    <meta property="og:description" content="The all-in-one platform for modern farmers. Trade securely with 0% risk, track finances, and leverage AI satellite health scans.">
-    <meta property="og:type" content="website">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Central & Aethera® | Natural Agricultural Intelligence</title>
+    <meta name="description" content="Farm Central — Modern, natural agricultural management, fair produce marketplace, precision crop diagnostics, and soil health monitoring.">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7007280990614643"
-     crossorigin="anonymous"></script>
-    
-    <!-- Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Farm Central",
-      "url": "https://farmcentral.online",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://farmcentral.online/market.html?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
 
-    
+    <!-- Preload first frames -->
+    <link rel="preload" as="image" href="frames/frame_01_sky.jpg">
+    <link rel="preload" as="image" href="frames/frame_02_aerial.jpg">
+
+    <!-- Cache-busting & Instant Freshness script -->
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        base: 'var(--bg-base)',
-                        surface: 'var(--bg-surface)',
-                        card: 'var(--bg-card)',
-                        heading: 'var(--text-heading)',
-                        body: 'var(--text-body)',
-                        muted: 'var(--text-muted)',
-                        border_color: 'var(--border-color)',
-                        inverse: 'var(--inverse-color)'
-                    }
-                }
-            }
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#090e17">
-    <link href="css/premium-theme.css?v=1.2" rel="stylesheet">
-    <link href="css/mobile-core.css?v=1.2" rel="stylesheet">
-    <style>
-        body {
-            background-color: var(--bg-base);
-            background-image: 
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 50px 50px;
-            color: var(--text-body);
-            font-family: 'Outfit', 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* Abstract glowing orbs for background */
-        .bg-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            z-index: -1;
-            animation: float 12s ease-in-out infinite alternate;
-        }
-
-        .orb-1 {
-            width: 500px;
-            height: 500px;
-            background: #10b981; /* Emerald */
-            top: -100px;
-            left: -100px;
-            opacity: 0.15;
-        }
-
-        .orb-2 {
-            width: 600px;
-            height: 600px;
-            background: #0ea5e9; /* Sky Blue */
-            bottom: -200px;
-            right: -100px;
-            opacity: 0.15;
-            animation-delay: -5s;
-        }
-
-        .orb-3 {
-            width: 400px;
-            height: 400px;
-            background: #8b5cf6; /* Violet */
-            top: 50%;
-            left: 20%;
-            opacity: 0.12;
-            animation-duration: 15s;
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        .delay-100 {
-            animation-delay: 100ms;
-        }
-
-        .delay-200 {
-            animation-delay: 200ms;
-        }
-
-        .delay-300 {
-            animation-delay: 300ms;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-    <script>
-        /* Global access function - improved for maximum reliability */
-        window.enterDashboard = function() {
-            console.log("🚀 Enter Dashboard triggered");
-            
-            // Visual feedback
-            if (typeof toast !== 'undefined') {
-                toast.info('Accessing Farm Central Hub...');
-            }
-
-            const token = localStorage.getItem('token');
-            const hasValidToken = token && token !== 'undefined' && token !== 'null' && token.length > 10;
-
-            setTimeout(() => {
-                if (hasValidToken) {
-                    window.location.assign('dashboard.html');
-                } else {
-                    window.location.assign('login.html');
-                }
-            }, 300);
-        };
-
-        window.navigateTo = function(page) {
-            if (typeof toast !== 'undefined') {
-                toast.info('Navigating to ' + page + '...');
-            }
-            
-            const token = localStorage.getItem('token');
-            const hasValidToken = token && token !== 'undefined' && token !== 'null' && token.length > 10;
-
-            if (hasValidToken) {
-                window.location.assign(page);
-            } else {
-                if (typeof toast !== 'undefined') {
-                    toast.warning('Please login to access this feature.');
-                }
-                setTimeout(() => { window.location.assign('login.html'); }, 1000);
-            }
-        };
-    </script>
-</head>
-
-<body class="selection:bg-emerald-500/30 selection:text-emerald-200 relative overflow-x-hidden">
-    <div id="canvas-bg" class="fixed inset-0 z-[-2]"></div>
-
-    <!-- Background Orbs -->
-    <div class="bg-orb orb-1"></div>
-    <div class="bg-orb orb-2"></div>
-    <div class="bg-orb orb-3"></div>
-
-    <!-- NAVIGATION -->
-    <nav class="fixed top-0 w-full z-50 glass-premium border-b-0 backdrop-blur-3xl transition-all duration-300" id="main-nav">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
-            <div onclick="location.href='index.html'"
-                class="text-xl md:text-2xl font-black tracking-tighter text-heading flex items-center gap-2 md:gap-3 hover:scale-105 transition duration-300 cursor-pointer">
-                <img src="logo.png" alt="Farm Central Logo" class="w-8 h-8 md:w-10 md:h-10 object-contain">
-                <span class="hidden sm:inline">FARM CENTRAL</span>
-                <span class="sm:hidden">FARM</span>
-            </div>
-            
-            <div class="flex gap-2 md:gap-4 items-center">
-                <!-- Desktop Only Items -->
-                <button onclick="navigateTo('satellite.html')" data-i18n="satellite_scan"
-                    class="hidden lg:flex px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-full text-xs font-semibold text-indigo-400 transition hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] items-center gap-2">
-                    <span>🛰️</span> Satellite Scan
-                </button>
-
-                <button id="nav-dashboard-btn" onclick="enterDashboard()" data-i18n="enter_dashboard"
-                    class="hidden md:block px-4 py-2 bg-inverse/5 hover:bg-inverse/10 border border-border_color/10 rounded-full text-xs font-semibold transition hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] relative z-[60]">
-                    Dashboard
-                </button>
-
-                <button onclick="window.location.assign('login.html')" id="nav-login-btn" data-i18n="login"
-                    class="px-5 py-2 md:px-8 md:py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 rounded-full text-xs md:text-sm font-bold shadow-lg shadow-emerald-500/20 text-heading border border-emerald-400/50 relative z-[60]">
-                    Login
-                </button>
-
-                <!-- Mobile Menu Button (Controlled by mobile-nav.js or fallback) -->
-                
-                <button id="theme-toggle" class="p-2 rounded-full border border-inverse/10 bg-inverse/5 hover:bg-inverse/10 transition flex items-center justify-center mr-2 z-[60] relative">
-                    <span id="theme-icon-light" class="hidden">☀️</span>
-                    <span id="theme-icon-dark">🌙</span>
-                </button>
-
-                <button class="mobile-menu-btn md:hidden flex flex-col gap-1.5 p-2 rounded-xl border border-border_color/10 bg-inverse/5" id="mobile-trigger">
-                    <span class="w-5 h-0.5 bg-white rounded-full"></span>
-                    <span class="w-5 h-0.5 bg-white rounded-full"></span>
-                    <span class="w-5 h-0.5 bg-white rounded-full"></span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <section class="min-h-screen flex items-center justify-center pt-24 pb-12 relative overflow-hidden">
-        <div class="text-center px-4 max-w-5xl z-10">
-            <div
-                class="inline-block mb-6 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-bold tracking-widest uppercase fade-in-up">
-                ✨ India's Premium Agri-Marketplace
-            </div>
-            <h1 class="text-5xl md:text-8xl font-black mb-6 leading-[1.1] tracking-tight fade-in-up delay-100">
-                AI-Powered <br> <span class="gradient-text pb-2">Agri-Marketplace.</span>
-            </h1>
-            <p
-                class="text-xl md:text-2xl text-body mb-12 leading-relaxed max-w-3xl mx-auto font-light fade-in-up delay-200">
-                AI-powered agriculture marketplace connecting farmers directly with buyers. Trade securely, get real-time market prices, and leverage smart farming insights to maximize your yield.
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-6 fade-in-up delay-300">
-                <button id="hero-dashboard-btn" onclick="enterDashboard()"
-                    class="btn-premium px-10 py-5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-lg font-bold rounded-2xl shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 border border-emerald-400/30 text-heading relative z-[100]">
-                    <span>🚀</span> <span data-i18n="enter_dashboard">Start Trading Now</span>
-                </button>
-                <button onclick="document.getElementById('features').scrollIntoView()"
-                    class="btn-premium px-10 py-5 glass-premium text-lg font-bold rounded-2xl hover:bg-inverse/10 flex items-center justify-center gap-3 border border-border_color/10 text-heading">
-                    <span>✨</span> <span data-i18n="features">View Platform Features</span>
-                </button>
-            </div>
-            
-            <!-- Trust Badges & Business Model -->
-            <div class="mt-16 pt-8 border-t border-border_color/10 flex flex-wrap justify-center gap-8 md:gap-16 fade-in-up delay-300">
-                <div class="flex items-center gap-3 text-muted">
-                    <span class="text-2xl">🔒</span>
-                    <div class="text-left">
-                        <p class="text-sm font-bold text-heading">Secure Escrow</p>
-                        <p class="text-xs">0% Fraud Risk</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 text-muted">
-                    <span class="text-2xl">🤝</span>
-                    <div class="text-left">
-                        <p class="text-sm font-bold text-heading">Flat 5% Commission</p>
-                        <p class="text-xs">No Hidden Fees</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 text-muted">
-                    <span class="text-2xl">🛡️</span>
-                    <div class="text-left">
-                        <p class="text-sm font-bold text-heading">Verified KYC</p>
-                        <p class="text-xs">Trusted Network</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Dashboard Sneak Peek (CSS Mockup) -->
-            <div class="mt-20 relative fade-in-up delay-300 hidden md:block">
-                <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent z-20 pointer-events-none"></div>
-                <div class="absolute inset-0 bg-gradient-to-b from-surface via-transparent to-surface z-20 pointer-events-none h-full"></div>
-                
-                <div class="relative z-10 glass-premium rounded-t-3xl border border-border_color/10 border-b-0 shadow-2xl overflow-hidden translate-y-10 group hover:-translate-y-2 transition-transform duration-700 ease-out">
-                    <!-- Browser Bar -->
-                    <div class="bg-card p-3 flex items-center gap-2 border-b border-border_color/5">
-                        <div class="w-3 h-3 rounded-full bg-rose-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <div class="mx-auto w-1/3 h-4 bg-inverse/5 rounded"></div>
-                    </div>
-                    <!-- Dashboard Content -->
-                    <div class="bg-surface p-8 flex gap-6 h-[400px]">
-                        <!-- Sidebar -->
-                        <div class="w-1/4 space-y-4">
-                            <div class="h-8 bg-emerald-500/20 rounded-lg border border-emerald-500/30 w-3/4"></div>
-                            <div class="h-8 bg-inverse/5 rounded-lg w-full"></div>
-                            <div class="h-8 bg-inverse/5 rounded-lg w-5/6"></div>
-                            <div class="h-8 bg-inverse/5 rounded-lg w-full"></div>
-                        </div>
-                        <!-- Main Content -->
-                        <div class="w-3/4 space-y-6">
-                            <div class="flex gap-4">
-                                <div class="flex-1 h-24 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-xl border border-emerald-500/20"></div>
-                                <div class="flex-1 h-24 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-500/20"></div>
-                                <div class="flex-1 h-24 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-500/20"></div>
-                            </div>
-                            <div class="flex gap-4 h-full">
-                                <div class="w-2/3 h-full bg-inverse/5 rounded-xl border border-border_color/10 p-4">
-                                    <div class="w-1/3 h-4 bg-inverse/10 rounded mb-4"></div>
-                                    <div class="w-full h-32 bg-gradient-to-t from-emerald-500/20 to-transparent border-b-2 border-emerald-500 mt-auto rounded-b"></div>
-                                </div>
-                                <div class="w-1/3 space-y-4">
-                                    <div class="h-20 bg-inverse/5 rounded-xl border border-border_color/10 p-3">
-                                        <div class="w-1/2 h-3 bg-green-500/40 rounded mb-2"></div>
-                                        <div class="w-full h-2 bg-inverse/10 rounded mb-1"></div>
-                                        <div class="w-3/4 h-2 bg-inverse/10 rounded"></div>
-                                    </div>
-                                    <div class="h-20 bg-inverse/5 rounded-xl border border-border_color/10 p-3">
-                                        <div class="w-1/2 h-3 bg-rose-500/40 rounded mb-2"></div>
-                                        <div class="w-full h-2 bg-inverse/10 rounded mb-1"></div>
-                                        <div class="w-2/3 h-2 bg-inverse/10 rounded"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Glow Effect Behind Mockup -->
-                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-emerald-500/20 blur-[100px] z-0 pointer-events-none"></div>
-            </div>
-        </div>
-
-        <!-- Bottom Fade -->
-        <div class="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-surface to-transparent z-30 pointer-events-none"></div>
-    </section>
-    
-    <!-- STATS COUNTER SECTION -->
-    <section class="py-16 bg-surface relative z-20 border-y border-border_color/5">
-        <div class="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center fade-in-up">
-            <div>
-                <h4 class="text-5xl font-black text-emerald-400 mb-2 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">₹10M+</h4>
-                <p class="text-muted text-sm font-bold uppercase tracking-widest">Trade Volume</p>
-            </div>
-            <div>
-                <h4 class="text-5xl font-black text-blue-400 mb-2 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">15,000+</h4>
-                <p class="text-muted text-sm font-bold uppercase tracking-widest">Verified Farmers</p>
-            </div>
-            <div>
-                <h4 class="text-5xl font-black text-purple-400 mb-2 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]">12</h4>
-                <p class="text-muted text-sm font-bold uppercase tracking-widest">States Covered</p>
-            </div>
-            <div>
-                <h4 class="text-5xl font-black text-pink-400 mb-2 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">0%</h4>
-                <p class="text-muted text-sm font-bold uppercase tracking-widest">Fraud Risk</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- FEATURES SECTION -->
-    <section id="features" class="py-32 relative bg-surface">
-        <div class="max-w-7xl mx-auto px-6 relative z-10">
-            <div class="text-center mb-20 fade-in-up">
-                <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tight"><span data-i18n="features">Explore
-                        Features</span></h2>
-                <p class="text-body max-w-2xl mx-auto font-medium text-lg" data-i18n="why_us">Why Farm Central?</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Feature 1: Market -->
-                <div onclick="navigateTo('market.html')"
-                    class="glass-premium p-8 rounded-[2rem] border-neon-blue cursor-pointer group hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-blue-500/20">
-                        📈</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Live Market APIs</h3>
-                    <p class="text-muted leading-relaxed font-light">Real-time Mandi prices & trends updated daily.</p>
-                </div>
-
-                <!-- Feature 2: Space Scanner -->
-                <div onclick="navigateTo('satellite.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-indigo-500/30 hover:border-indigo-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-indigo-500/20">
-                        🛰️</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">AI Crop Scanner</h3>
-                    <p class="text-muted leading-relaxed font-light">NASA satellite data + Gemini AI analysis.</p>
-                </div>
-
-                <!-- Feature 3: Trade Hub -->
-                <div onclick="navigateTo('trading.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-teal-500/30 hover:border-teal-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(20,184,166,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-teal-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-teal-500/20">
-                        🤝</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Escrow Trade</h3>
-                    <p class="text-muted leading-relaxed font-light">Zero-risk trading with 5% flat commission.</p>
-                </div>
-
-                <!-- Feature 4: KYC Verification -->
-                <div onclick="navigateTo('kyc.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-cyan-500/30 hover:border-cyan-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-cyan-500/20">
-                        🛡️</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Verified Trust</h3>
-                    <p class="text-muted leading-relaxed font-light">Aadhaar/PAN KYC for a safe community.</p>
-                </div>
-
-                <!-- Feature 5: Inventory -->
-                <div onclick="navigateTo('inventory.html')"
-                    class="glass-premium p-8 rounded-[2rem] border-neon-green cursor-pointer group hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-emerald-500/20">
-                        📦</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Smart Inventory</h3>
-                    <p class="text-muted leading-relaxed font-light">Manage stocks and track harvest batches.</p>
-                </div>
-                
-                <!-- Feature 6: WhatsApp Notifications -->
-                <div class="glass-premium p-8 rounded-[2rem] border border-green-500/30 hover:border-green-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-green-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-green-500/20">
-                        📱</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">SMS & WhatsApp</h3>
-                    <p class="text-muted leading-relaxed font-light">Get instant order alerts and reports directly on mobile.</p>
-                    <span class="text-[10px] uppercase font-bold text-green-400 bg-green-500/10 px-2 py-1 rounded mt-2 inline-block">Powered by Twilio</span>
-                </div>
-
-                <!-- Feature 7: Expense Manager -->
-                <div onclick="navigateTo('expenses.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-yellow-500/30 hover:border-yellow-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(234,179,8,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-yellow-500/20">
-                        💰</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Expense Tracker</h3>
-                    <p class="text-muted leading-relaxed font-light">Generate professional PDF financial reports.</p>
-                </div>
-
-                <!-- Feature 8: Community -->
-                <div onclick="navigateTo('community.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-pink-500/30 hover:border-pink-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(236,72,153,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-pink-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-pink-500/20">
-                        💬</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Agri-Forum</h3>
-                    <p class="text-muted leading-relaxed font-light">Discuss trends and solve problems with peers.</p>
-                </div>
-
-                <!-- Feature 9: AI Chatbot -->
-                <div onclick="navigateTo('chat.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-violet-500/30 hover:border-violet-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-violet-500/20">
-                        🤖</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">AI Assistant</h3>
-                    <p class="text-muted leading-relaxed font-light">24/7 AI Chatbot for instant farming guidance.</p>
-                </div>
-
-                <!-- Feature 10: Disease Detection -->
-                <div onclick="navigateTo('doctor.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-rose-500/30 hover:border-rose-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(244,63,94,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-rose-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-rose-500/20">
-                        🌿</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Crop Doctor</h3>
-                    <p class="text-muted leading-relaxed font-light">Upload a photo to instantly identify crop diseases.</p>
-                </div>
-
-                <!-- Feature 11: Weather & Yield -->
-                <div onclick="navigateTo('weather.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-sky-500/30 hover:border-sky-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(14,165,233,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-sky-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-sky-500/20">
-                        ⛅</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Weather AI</h3>
-                    <p class="text-muted leading-relaxed font-light">Hyper-local weather & yield predictions.</p>
-                </div>
-
-                <!-- Feature 12: Fertilizer Guide -->
-                <div onclick="navigateTo('fertilizer.html')"
-                    class="glass-premium p-8 rounded-[2rem] border border-orange-500/30 hover:border-orange-500/80 cursor-pointer group hover:shadow-[0_0_15px_rgba(249,115,22,0.2)]">
-                    <div class="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition group-hover:bg-orange-500/20">
-                        🧪</div>
-                    <h3 class="text-2xl font-bold mb-3 text-heading">Smart Fertilizer</h3>
-                    <p class="text-muted leading-relaxed font-light">AI-driven fertilizer recommendations.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- LIVE PLATFORM STATS -->
-    <section class="py-20 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-12 fade-in-up">
-                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-3">📊 Platform Growth</p>
-                <h2 class="text-4xl md:text-5xl font-black tracking-tight">Trusted by Thousands</h2>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 fade-in-up">
-                <div class="glass-premium p-8 rounded-[2rem] text-center border border-emerald-500/20 group hover:border-emerald-500/50 transition">
-                    <p class="text-4xl md:text-5xl font-black text-emerald-400 mb-2" id="counter-users">0</p>
-                    <p class="text-xs font-bold text-muted uppercase tracking-widest">Registered Users</p>
-                </div>
-                <div class="glass-premium p-8 rounded-[2rem] text-center border border-blue-500/20 group hover:border-blue-500/50 transition">
-                    <p class="text-4xl md:text-5xl font-black text-blue-400 mb-2" id="counter-trades">0</p>
-                    <p class="text-xs font-bold text-muted uppercase tracking-widest">Trades Completed</p>
-                </div>
-                <div class="glass-premium p-8 rounded-[2rem] text-center border border-amber-500/20 group hover:border-amber-500/50 transition">
-                    <p class="text-4xl md:text-5xl font-black text-amber-400 mb-2" id="counter-volume">₹0</p>
-                    <p class="text-xs font-bold text-muted uppercase tracking-widest">Trade Volume</p>
-                </div>
-                <div class="glass-premium p-8 rounded-[2rem] text-center border border-purple-500/20 group hover:border-purple-500/50 transition">
-                    <p class="text-4xl md:text-5xl font-black text-purple-400 mb-2">99.9%</p>
-                    <p class="text-xs font-bold text-muted uppercase tracking-widest">Uptime SLA</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- TESTIMONIALS -->
-    <section class="py-20 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-12 fade-in-up">
-                <p class="text-[10px] font-black text-pink-400 uppercase tracking-[0.3em] mb-3">💬 What Farmers Say</p>
-                <h2 class="text-4xl md:text-5xl font-black tracking-tight">Real Stories, Real Impact</h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 fade-in-up">
-                <div class="glass-premium p-8 rounded-[2rem] border border-border_color/5 hover:border-emerald-500/30 transition relative group">
-                    <div class="text-emerald-400 text-5xl font-black opacity-20 absolute top-4 right-6">"</div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <img src="https://i.pravatar.cc/150?u=farmer1_india" alt="Rajesh Kumar" class="w-12 h-12 rounded-full border-2 border-emerald-500/50 object-cover shadow-lg">
-                        <div>
-                            <p class="font-bold text-heading flex items-center gap-1">Rajesh Kumar <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></p>
-                            <p class="text-xs text-muted">Wheat Farmer, Punjab</p>
-                        </div>
-                    </div>
-                    <p class="text-body text-sm leading-relaxed font-light">"Farm Central transformed my business. The satellite scans helped me detect crop stress 2 weeks early, saving my entire harvest. The trading platform got me 30% better prices than local mandi."</p>
-                    <div class="flex gap-1 mt-4 text-amber-400">⭐⭐⭐⭐⭐</div>
-                </div>
-                <div class="glass-premium p-8 rounded-[2rem] border border-border_color/5 hover:border-blue-500/30 transition relative group">
-                    <div class="text-blue-400 text-5xl font-black opacity-20 absolute top-4 right-6">"</div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <img src="https://i.pravatar.cc/150?u=farmer2_india_f" alt="Priya Sharma" class="w-12 h-12 rounded-full border-2 border-blue-500/50 object-cover shadow-lg">
-                        <div>
-                            <p class="font-bold text-heading flex items-center gap-1">Priya Sharma <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></p>
-                            <p class="text-xs text-muted">Organic Vegetables, Maharashtra</p>
-                        </div>
-                    </div>
-                    <p class="text-body text-sm leading-relaxed font-light">"The escrow system gave me confidence to trade with buyers across states. No more payment delays! The AI assistant helped me plan my crop rotation perfectly."</p>
-                    <div class="flex gap-1 mt-4 text-amber-400">⭐⭐⭐⭐⭐</div>
-                </div>
-                <div class="glass-premium p-8 rounded-[2rem] border border-border_color/5 hover:border-purple-500/30 transition relative group">
-                    <div class="text-purple-400 text-5xl font-black opacity-20 absolute top-4 right-6">"</div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <img src="https://i.pravatar.cc/150?u=trader1_india" alt="Mohammed Javeed" class="w-12 h-12 rounded-full border-2 border-purple-500/50 object-cover shadow-lg">
-                        <div>
-                            <p class="font-bold text-heading flex items-center gap-1">Mohammed Javeed <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></p>
-                            <p class="text-xs text-muted">Rice Trader, Telangana</p>
-                        </div>
-                    </div>
-                    <p class="text-body text-sm leading-relaxed font-light">"As a buyer, I can verify crop quality with satellite data before purchase. The KYC verification ensures I'm dealing with genuine farmers. Best agri platform in India!"</p>
-                    <div class="flex gap-1 mt-4 text-amber-400">⭐⭐⭐⭐⭐</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- TRUST BADGES -->
-    <section class="py-12 relative">
-        <div class="max-w-5xl mx-auto px-6">
-            <div class="glass-premium p-8 rounded-[2rem] border border-border_color/5 flex flex-wrap items-center justify-center gap-8 md:gap-16 fade-in-up">
-                <div class="flex items-center gap-2 text-muted">
-                    <span class="text-2xl">🔒</span>
-                    <div>
-                        <p class="text-xs font-black text-heading">SSL Encrypted</p>
-                        <p class="text-[10px]">256-bit Security</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 text-muted">
-                    <span class="text-2xl">🛡️</span>
-                    <div>
-                        <p class="text-xs font-black text-heading">Escrow Protected</p>
-                        <p class="text-[10px]">0% Payment Risk</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 text-muted">
-                    <span class="text-2xl">✅</span>
-                    <div>
-                        <p class="text-xs font-black text-heading">KYC Verified</p>
-                        <p class="text-[10px]">All Traders Verified</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 text-muted">
-                    <span class="text-2xl">🛰️</span>
-                    <div>
-                        <p class="text-xs font-black text-heading">NASA Powered</p>
-                        <p class="text-[10px]">Satellite Analytics</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CALL TO ACTION -->
-    <section class="py-32 text-center relative overflow-hidden">
-        <div
-            class="glass-premium max-w-5xl mx-auto p-12 md:p-24 rounded-[3rem] border border-emerald-500/20 relative z-10 mx-6 shadow-[0_0_50px_rgba(16,185,129,0.1)] fade-in-up">
-            <h2 class="text-4xl md:text-6xl font-black mb-8 tracking-tight">Ready to Modernize?</h2>
-            <p class="text-xl text-body mb-10 max-w-2xl mx-auto font-light">Join thousands of farmers tracking
-                metrics, predicting yields, and increasing profits with Farm Central.</p>
-            <button onclick="enterDashboard()"
-                class="btn-premium px-12 py-6 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-xl font-bold shadow-2xl shadow-emerald-500/30 text-heading border border-emerald-400/50">
-                Start Your Journey Today
-            </button>
-        </div>
-        <!-- BG Glow -->
-        <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/10 blur-[120px] rounded-full z-0 pointer-events-none">
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="py-12 border-t border-border_color/5 bg-surface relative z-10 block">
-        <div
-            class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-            <div
-                class="text-2xl font-black tracking-tighter text-heading flex items-center justify-center md:justify-start gap-3 w-full md:w-auto">
-                <img src="logo.png" alt="Farm Central Logo" class="w-10 h-10 object-contain">
-                <span>FARM CENTRAL</span>
-            </div>
-            <p class="text-muted text-sm font-medium w-full md:w-auto">&copy; 2026 Farm Central. Built with ❤️ for
-                Farmers.</p>
-            <div class="flex gap-4 text-muted justify-center md:justify-end w-full md:w-auto">
-                <a href="#" class="hover:text-heading transition">Privacy</a>
-                <a href="#" class="hover:text-heading transition">Terms</a>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Simple Intersection Observer for scroll animations (fade-in)
-        document.addEventListener("DOMContentLoaded", function () {
-            // Attach event listeners for maximum reliability
-            const heroBtn = document.getElementById('hero-dashboard-btn');
-            const navBtn = document.getElementById('nav-dashboard-btn');
-
-            if (heroBtn) heroBtn.onclick = window.enterDashboard;
-            if (navBtn) navBtn.onclick = window.enterDashboard;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in-up');
-                        entry.target.style.opacity = "1";
-                        observer.unobserve(entry.target);
+        if ('caches' in window) {
+            caches.keys().then(names => {
+                names.forEach(name => {
+                    if (!name.includes('v6-fresh')) {
+                        caches.delete(name);
                     }
                 });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.glass-premium').forEach((el) => {
-                if (!el.classList.contains('backdrop-blur-3xl')) {
-                    el.style.opacity = "0";
-                    observer.observe(el);
+            });
+        }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.update();
                 }
             });
-        });
-    </script>
-    <script src="js/language-manager.js"></script>
-
-    <script src="js/toast.js"></script>
-
-    <!-- Animated Counters -->
-    <script>
-        function animateCounter(el, target, prefix = '', suffix = '') {
-            let current = 0;
-            const step = Math.max(1, Math.floor(target / 60));
-            const timer = setInterval(() => {
-                current += step;
-                if (current >= target) { current = target; clearInterval(timer); }
-                el.textContent = prefix + current.toLocaleString() + suffix;
-            }, 30);
         }
-        // Fetch real stats
-        fetch('/api/admin/stats/public').then(r => r.json()).then(s => {
-            const usersEl = document.getElementById('counter-users');
-            const tradesEl = document.getElementById('counter-trades');
-            const volumeEl = document.getElementById('counter-volume');
-            if (usersEl) animateCounter(usersEl, s.totalUsers || 27, '', '+');
-            if (tradesEl) animateCounter(tradesEl, s.totalTrades || 0);
-            if (volumeEl) animateCounter(volumeEl, Math.round(s.tradeVolume || 0), '₹');
-        }).catch(() => {
-            // Fallback numbers
-            const usersEl = document.getElementById('counter-users');
-            if (usersEl) animateCounter(usersEl, 27, '', '+');
-        });
     </script>
-    <script src="js/background-3d.js?v=1.2"></script>
-    <script src="js/global-ticker.js"></script>
-    <script src="js/pwa-init.js"></script>
-    <script src="js/mobile-nav.js"></script>
-    <!-- LIVE ACTIVITY FEED (Social Proof) -->
-    <div id="live-feed" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- Typography & Styles (Versioned) -->
+    <link rel="stylesheet" href="css/fonts.css?v=3.0">
+    <link rel="stylesheet" href="css/theme.css?v=3.0">
+    <link rel="stylesheet" href="css/scroll-cinema.css?v=3.0">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        const socket = io();
-        const feedContainer = document.getElementById('live-feed');
-
-        socket.on('live-activity', (data) => {
-            const el = document.createElement('div');
-            el.className = 'glass-premium px-5 py-3 rounded-xl border border-border_color/10 shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-500 bg-surface/80 backdrop-blur-xl';
-            
-            const icon = data.type === 'trade' ? '🤝' : '🎉';
-            const color = data.type === 'trade' ? 'text-emerald-400' : 'text-blue-400';
-
-            el.innerHTML = `
-                <div class="text-2xl">${icon}</div>
-                <div>
-                    <p class="text-sm font-bold text-heading">${data.message}</p>
-                    <p class="text-[10px] ${color} font-bold uppercase tracking-widest mt-0.5">Live • Verified</p>
-                </div>
-            `;
-            
-            feedContainer.prepend(el);
-
-            // Animate in
-            requestAnimationFrame(() => {
-                el.classList.remove('translate-y-10', 'opacity-0');
-            });
-
-            // Remove after 6 seconds
-            setTimeout(() => {
-                el.classList.add('opacity-0', '-translate-x-10');
-                setTimeout(() => el.remove(), 500);
-            }, 6000);
-        });
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: { black: '#000000', gray: '#6F6F6F', white: '#FFFFFF' }
+                    }
+                }
+            }
+        }
     </script>
-    <!-- WhatsApp Floating Support Button -->
-    <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20Farm%20Central,%20I%20need%20help%20with..." 
-       target="_blank"
-       class="fixed bottom-6 right-6 z-50 w-16 h-16 bg-[#25d366] rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 group">
-        <svg class="w-8 h-8 text-heading fill-current" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-        <span class="absolute right-20 bg-white text-black px-3 py-1.5 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-xl whitespace-nowrap pointer-events-none">
-            Need help? Chat with us!
-        </span>
-    </a>
-</body>
 
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+    <style>
+        body { background: #FFFFFF; }
+        .section-dark { background: #0b1117; }
+        .hero-headline {
+            font-family: 'Instrument Serif', Georgia, serif;
+            line-height: 0.95;
+            letter-spacing: -2.46px;
+        }
+        .magnetic-btn {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        }
+        .magnetic-btn:hover { transform: scale(1.03); }
+        .card-natural {
+            background: rgba(18, 26, 36, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.35s ease;
+        }
+        .card-natural:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+
+<body class="bg-white text-black font-sans antialiased overflow-x-hidden selection:bg-emerald-800 selection:text-white">
+
+    <!-- ============================================================
+         0. CINEMA PRELOADER (Clean & Elegant)
+         ============================================================ -->
+    <div id="cinema-loader" aria-hidden="true">
+        <div class="loader-inner">
+            <div class="loader-mark">FARM CENTRAL</div>
+            <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
+            <div class="loader-row">
+                <span>Loading Agricultural Journey</span>
+                <span class="loader-pct" id="loader-pct">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         1. HERO SECTION (Clean White & High-Contrast)
+         ============================================================ -->
+    <div class="relative min-h-screen w-full overflow-hidden bg-white">
+
+        <!-- ── VIDEO BACKGROUND WITH RAF FADE LOOP ── -->
+        <div class="absolute inset-x-0 bottom-0 z-0 pointer-events-none overflow-hidden" style="top: 300px;">
+            <video id="hero-bg-video"
+                class="w-full h-full object-cover opacity-0"
+                muted playsinline preload="auto"
+                style="transition: opacity 0.08s linear;">
+                <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_083109_283f3553-e28f-428b-a723-d639c617eb2b.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white pointer-events-none"></div>
+        </div>
+
+        <!-- ── NAVIGATION BAR ── -->
+        <nav id="main-nav" class="relative z-20 flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
+            <a href="index.html" class="flex items-center">
+                <span class="text-3xl tracking-tight font-serif text-black select-none">
+                    Aethera<sup class="text-sm font-sans font-normal ml-0.5 align-super">®</sup>
+                </span>
+            </a>
+
+            <div class="hidden md:flex items-center space-x-10">
+                <a href="#hero" class="text-sm text-black font-medium transition-colors hover:text-black">Home</a>
+                <a href="#cinema-section" class="text-sm text-[#6F6F6F] font-medium transition-colors hover:text-black">Visual Journey</a>
+                <a href="#features" class="text-sm text-[#6F6F6F] font-medium transition-colors hover:text-black">Features</a>
+                <a href="#portal" class="text-sm text-[#6F6F6F] font-medium transition-colors hover:text-black">Dashboard</a>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="login.html"
+                    class="magnetic-btn rounded-full px-6 py-2.5 text-sm bg-black text-white font-medium shadow-md hover:shadow-black/20 transition-all">
+                    Begin Journey
+                </a>
+            </div>
+        </nav>
+
+        <!-- ── HERO HEADLINE & INTRO ── -->
+        <section id="hero" class="relative z-10 flex flex-col items-center justify-center text-center px-6"
+            style="padding-top: calc(8rem - 75px); padding-bottom: 8rem;">
+
+            <h1 class="hero-headline text-5xl sm:text-7xl md:text-8xl max-w-7xl font-normal text-black animate-fade-rise">
+                Beyond <span class="italic text-[#6F6F6F]">silence,</span> we build <span class="italic text-[#6F6F6F]">the eternal.</span>
+            </h1>
+
+            <p class="text-base sm:text-lg max-w-2xl mt-8 leading-relaxed text-[#6F6F6F] font-normal animate-fade-rise-delay">
+                Building platforms for brilliant minds, fearless makers, and thoughtful souls.
+                Through the noise, we craft digital havens for deep work and pure flows.
+            </p>
+
+            <div class="animate-fade-rise-delay-2">
+                <a href="#cinema-section"
+                    class="magnetic-btn inline-block rounded-full px-14 py-5 text-base bg-black text-white font-medium shadow-2xl hover:shadow-black/30 transition-all mt-12">
+                    Begin Journey
+                </a>
+            </div>
+
+            <div class="mt-20 flex flex-col items-center gap-3 opacity-50 animate-fade-rise-delay-3">
+                <span class="text-[10px] font-mono tracking-[0.25em] uppercase text-[#6F6F6F]">Scroll for Agricultural Story</span>
+                <div class="w-[1px] h-12 bg-gradient-to-b from-black/40 to-transparent relative">
+                    <div class="absolute top-0 w-full h-4 bg-black/60 animate-bounce rounded-full"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============================================================
+         2. CLEAN CANVAS SCROLL SEQUENCE (Natural Frames & Features)
+         ============================================================ -->
+    <div id="cinema-section" style="height: 750vh;">
+        <div id="cinema-sticky">
+            <canvas id="cinema-canvas"></canvas>
+
+            <div class="cinema-scrim"></div>
+
+            <!-- Progress Rail -->
+            <div class="cinema-rail">
+                <div class="cinema-rail-fill" id="cinema-rail-fill"></div>
+            </div>
+            <div class="cinema-rail-label" id="cinema-rail-label">I · Atmosphere</div>
+
+            <!-- Scroll Hint -->
+            <div class="cinema-scroll-hint" id="cinema-scroll-hint">
+                <span>Scroll to Explore</span>
+                <div class="scroll-track"><div class="scroll-bead"></div></div>
+            </div>
+
+            <!-- CHAPTER OVERLAYS -->
+
+            <!-- Zone 1: Atmosphere (0% - 11%) -->
+            <div class="cinema-chapter" id="chapter-eyebrow">
+                <div class="chapter-card">
+                    <span class="chapter-eyebrow">Pure Living Agriculture</span>
+                    <span class="chapter-word">The Natural Atmosphere</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Where morning sunlight, fertile soil, and generational farming wisdom meet modern digital clarity.</p>
+                </div>
+            </div>
+
+            <!-- Zone 2: Plantation Panorama (12% - 24%) -->
+            <div class="cinema-chapter" id="chapter-brand">
+                <div class="chapter-card">
+                    <span class="chapter-index">Farm Central Platform</span>
+                    <span class="chapter-brand">FARM CENTRAL</span>
+                    <span class="chapter-brand-sub">Natural Agricultural Command</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Empowering growers with seamless inventory management, weather telemetry, and verified trade networks.</p>
+                </div>
+            </div>
+
+            <!-- Zone 3: Canopy Grove (25% - 37%) -->
+            <div class="cinema-chapter" id="chapter-plantation">
+                <div class="chapter-card">
+                    <span class="chapter-index">I · The Living Canopy</span>
+                    <span class="chapter-word">Lush Plantation Groves</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Thousands of acres of thriving crops cultivated with natural care, balanced nutrition, and optimal sunlight exposure.</p>
+                </div>
+            </div>
+
+            <!-- Zone 4: Harvest Fruit (38% - 49%) -->
+            <div class="cinema-chapter" id="chapter-harvest">
+                <div class="chapter-card">
+                    <span class="chapter-index">II · Golden Harvest</span>
+                    <span class="chapter-word">Peak Quality Produce</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Bountiful yields grown to perfection, glistening with morning dew and harvested at the peak of freshness.</p>
+                </div>
+            </div>
+
+            <!-- Zone 5: Human Farmer (50% - 61%) -->
+            <div class="cinema-chapter" id="chapter-craft">
+                <div class="chapter-card">
+                    <span class="chapter-index">III · The Farmer's Dedication</span>
+                    <span class="chapter-word">Honoring Honest Craft</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Every crop is nurtured by hardworking hands. We build tools that put power, profit, and transparency back to the grower.</p>
+                </div>
+            </div>
+
+            <!-- Zone 6: Water & Roots (62% - 71%) -->
+            <div class="cinema-chapter" id="chapter-science">
+                <div class="chapter-card">
+                    <span class="chapter-index">IV · Precision Irrigation</span>
+                    <span class="chapter-word">Nourishing Every Root</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Smart drip hydration systems that conserve precious water while providing essential moisture to deep root systems.</p>
+                </div>
+            </div>
+
+            <!-- Zone 7: Crates & Marketplace (72% - 81%) - CLEAN REPLACEMENT FRAME -->
+            <div class="cinema-chapter" id="chapter-marketplace">
+                <div class="chapter-card">
+                    <span class="chapter-index">V · Direct Fair Marketplace</span>
+                    <span class="chapter-word">Zero Middlemen. Fair Rates.</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Sell fresh produce directly in wooden crates to verified wholesale and retail buyers with guaranteed escrow payment security.</p>
+                </div>
+            </div>
+
+            <!-- Zone 8: Sapling & Soil Health (82% - 89%) - CLEAN REPLACEMENT FRAME -->
+            <div class="cinema-chapter" id="chapter-soilhealth">
+                <div class="chapter-card">
+                    <span class="chapter-index">VI · Crop Health & Soil Vitality</span>
+                    <span class="chapter-word">Nurturing from the Seedling</span>
+                    <div class="chapter-rule"></div>
+                    <p class="chapter-caption">Monitor soil fertility, diagnose plant leaf health instantly, and apply natural organic remedies for maximum crop protection.</p>
+                </div>
+            </div>
+
+            <!-- Zone 9: Sunset Finale (90% - 100%) -->
+            <div class="cinema-chapter chapter-closing" id="chapter-closing">
+                <div class="chapter-card">
+                    <span class="chapter-index">Your Farm Command</span>
+                    <span class="chapter-word">Simple, natural, and built for your growth.</span>
+                    <div class="chapter-rule"></div>
+                    <a href="login.html" class="chapter-cta">
+                        Enter Dashboard →
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================================
+         3. KEY WEBSITE FEATURES (Simple, Clean, User-Friendly)
+         ============================================================ -->
+    <main id="features" class="section-dark text-white py-24 px-6 relative z-10 border-t border-white/10">
+        <div class="max-w-7xl mx-auto">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/20">
+                    Core Platform Capabilities
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-serif mt-5 tracking-tight text-white">
+                    Everything You Need to Run a Modern Farm.
+                </h2>
+                <p class="text-slate-400 mt-4 text-base sm:text-lg leading-relaxed">
+                    Designed for clarity, ease of use, and everyday farming operations. No complex clutter — just practical, powerful tools.
+                </p>
+            </div>
+
+            <!-- 4 Distinct Key Feature Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+                
+                <!-- Feature 1: Inventory & Ledger -->
+                <div class="card-natural p-7 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-2xl mb-5">
+                            📦
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Inventory & Stock</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Keep track of harvests, fertilizers, seeds, and equipment in real-time with automatic valuation and batch history.
+                        </p>
+                    </div>
+                    <a href="inventory.html" class="mt-6 text-emerald-400 text-xs font-bold uppercase tracking-wider hover:text-emerald-300 transition flex items-center gap-1.5">
+                        Manage Stocks →
+                    </a>
+                </div>
+
+                <!-- Feature 2: Satellite Field Scanner -->
+                <div class="card-natural p-7 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/25 flex items-center justify-center text-2xl mb-5">
+                            🛰️
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Satellite Field Analysis</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            View vegetation health (NDVI), soil moisture indices, and weather trends using satellite remote sensing data.
+                        </p>
+                    </div>
+                    <a href="satellite.html" class="mt-6 text-cyan-400 text-xs font-bold uppercase tracking-wider hover:text-cyan-300 transition flex items-center gap-1.5">
+                        Launch Scanner →
+                    </a>
+                </div>
+
+                <!-- Feature 3: Crop Doctor & Diagnostics -->
+                <div class="card-natural p-7 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-2xl mb-5">
+                            🌿
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Crop Doctor & Care</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Quickly identify crop diseases from leaf photos, receive treatment recommendations, and prevent pest spread.
+                        </p>
+                    </div>
+                    <a href="doctor.html" class="mt-6 text-amber-400 text-xs font-bold uppercase tracking-wider hover:text-amber-300 transition flex items-center gap-1.5">
+                        Inspect Crops →
+                    </a>
+                </div>
+
+                <!-- Feature 4: Escrow Trading Marketplace -->
+                <div class="card-natural p-7 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-2xl mb-5">
+                            🤝
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Direct Trade & Escrow</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            List produce for sale or purchase directly from verified growers. Payments are held safely in escrow until delivery.
+                        </p>
+                    </div>
+                    <a href="trading.html" class="mt-6 text-indigo-400 text-xs font-bold uppercase tracking-wider hover:text-indigo-300 transition flex items-center gap-1.5">
+                        Explore Market →
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- GATEWAY CALL TO ACTION -->
+            <section id="portal" class="max-w-4xl mx-auto text-center">
+                <div class="card-natural p-10 sm:p-14 rounded-3xl relative overflow-hidden">
+                    <h3 class="text-3xl sm:text-4xl font-serif text-white tracking-tight mb-4">
+                        Ready to Manage Your Farm?
+                    </h3>
+                    <p class="text-slate-300 text-base max-w-xl mx-auto mb-8">
+                        Sign in to access your live dashboard, manage daily farm tasks, track expenses, and view market prices.
+                    </p>
+                    <div class="flex flex-wrap items-center justify-center gap-4">
+                        <a href="login.html"
+                            class="magnetic-btn rounded-full px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg transition">
+                            Sign In to Dashboard
+                        </a>
+                        <a href="dashboard.html"
+                            class="magnetic-btn rounded-full px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm border border-slate-700 transition">
+                            Direct Dashboard Access
+                        </a>
+                    </div>
+                    <p class="mt-6 text-xs text-slate-400 font-mono">
+                        Active Verified User: saladisiddarath@gmail.com
+                    </p>
+                </div>
+            </section>
+
+        </div>
+
+        <footer class="mt-20 pt-8 border-t border-white/5 text-center text-xs text-slate-500 font-mono">
+            © 2026 Farm Central & Aethera®. Natural Agricultural Ecosystem.
+        </footer>
+    </main>
+
+    <!-- ── SCRIPTS ── -->
+    <script>
+    // Video loop RAF controller
+    document.addEventListener('DOMContentLoaded', () => {
+        const video = document.getElementById('hero-bg-video');
+        if (!video) return;
+        let isResetting = false;
+
+        function monitor() {
+            if (video.duration && !isResetting) {
+                const t = video.currentTime;
+                const d = video.duration;
+                const fade = 0.5;
+                if (t < fade) {
+                    video.style.opacity = Math.min(t / fade, 1);
+                } else if (t > d - fade) {
+                    video.style.opacity = Math.max((d - t) / fade, 0);
+                } else {
+                    video.style.opacity = '1';
+                }
+            }
+            requestAnimationFrame(monitor);
+        }
+
+        video.addEventListener('ended', () => {
+            isResetting = true;
+            video.style.opacity = '0';
+            setTimeout(() => {
+                video.currentTime = 0;
+                video.play().catch(() => {});
+                isResetting = false;
+            }, 100);
+        });
+
+        video.play().catch(() => {
+            document.body.addEventListener('click', () => video.play(), { once: true });
+        });
+
+        requestAnimationFrame(monitor);
+    });
+    </script>
+
+    <!-- Canvas Scroll Cinema Engine -->
+    <script src="js/scroll-cinema.js"></script>
+
+</body>
 </html>

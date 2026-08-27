@@ -1,46 +1,102 @@
 const mysql = require('mysql2');
-require('dotenv').config();
+const path = require('path');
+const { adapter: sqliteAdapter, initSQLiteDatabase } = require('./sqlite_adapter');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
+let activeDb = null;
+let isUsingSqlite = false;
+
+// 1. Prepare MySQL Configuration
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'farming',
-    port: process.env.DB_PORT || 3306,
+    port: parseInt(process.env.DB_PORT) || 3306,
     waitForConnections: true,
-    connectionLimit: 100, // Increased from 10 to 100 for scalability
+    connectionLimit: 50,
     queueLimit: 0,
+    connectTimeout: 5000,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0
 };
 
-// 🌩️ Cloud Database Support (TiDB, PlanetScale, AWS)
-// Automatically enable SSL if we are connecting to a remote host
 if (process.env.DB_HOST && process.env.DB_HOST !== 'localhost') {
-    console.log(`☁️ Configuring SSL for Remote Database: ${process.env.DB_HOST}`);
     dbConfig.ssl = {
-        rejectUnauthorized: false // Helps avoid 'Self-signed' errors on Render/Free tiers
+        rejectUnauthorized: false
     };
 }
 
-const pool = mysql.createPool(dbConfig);
+// 2. Initialize Database with automatic fallback
+let mysqlPool = null;
 
-// Test connection on startup with a timeout
-const dbName = process.env.DB_NAME || 'farming';
-pool.getConnection((err, connection) => {
-    if (err) {
-        console.error('\n❌ --- DATABASE CONNECTION CRITICAL ERROR ---');
-        console.error(`ID: [${dbName}] at ${dbConfig.host}:${dbConfig.port}`);
-        console.error(`ERROR: ${err.message}`);
-        console.error('POSSIBLE CAUSES:');
-        console.error('1. TiDB Cloud IP Access List: Did you whitelist 0.0.0.0/0?');
-        console.error('2. Wrong Port: Is it definitely 4000 in Render settings?');
-        console.error('3. SSL: Is SSL enabled (it should be automatically)?');
-        console.error('----------------------------------------------\n');
-    } else {
-        console.log(`✅ Database Connected: [${dbName}]`);
-        connection.release();
+try {
+    mysqlPool = mysql.createPool(dbConfig);
+    activeDb = mysqlPool.promise();
+
+    // Probe connection
+    mysqlPool.getConnection((err, connection) => {
+        if (err) {
+            console.warn(`\n⚠️ MySQL/TiDB connection unavailable (${err.message}).`);
+            console.log('🔄 Seamlessly switching to High-Performance Local Database (SQLite)...');
+            isUsingSqlite = true;
+            activeDb = sqliteAdapter;
+            initSQLiteDatabase().catch(e => console.error('SQLite Init Error:', e.message));
+        } else {
+            console.log(`✅ MySQL Cloud Database Connected: [${dbConfig.database}] on ${dbConfig.host}:${dbConfig.port}`);
+            connection.release();
+        }
+    });
+} catch (err) {
+    console.warn('⚠️ MySQL Init Warning:', err.message);
+    isUsingSqlite = true;
+    activeDb = sqliteAdapter;
+    initSQLiteDatabase().catch(e => console.error('SQLite Init Error:', e.message));
+}
+
+// 3. Proxy Handler for transparent calls
+const dbProxy = {
+    execute: async (sql, params = []) => {
+        try {
+            if (isUsingSqlite) {
+                return await sqliteAdapter.execute(sql, params);
+            }
+            return await activeDb.execute(sql, params);
+        } catch (err) {
+            // If MySQL failed mid-operation, switch to SQLite
+            if (!isUsingSqlite && (err.code === 'ER_ACCESS_DENIED_ERROR' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_CONNECTION_LOST')) {
+                console.warn(`⚠️ MySQL disconnected (${err.code}). Falling back to local SQLite...`);
+                isUsingSqlite = true;
+                activeDb = sqliteAdapter;
+                await initSQLiteDatabase();
+                return await sqliteAdapter.execute(sql, params);
+            }
+            throw err;
+        }
+    },
+    query: async (sql, params = []) => {
+        try {
+            if (isUsingSqlite) {
+                return await sqliteAdapter.query(sql, params);
+            }
+            return await activeDb.query(sql, params);
+        } catch (err) {
+            if (!isUsingSqlite && (err.code === 'ER_ACCESS_DENIED_ERROR' || err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_CONNECTION_LOST')) {
+                console.warn(`⚠️ MySQL disconnected (${err.code}). Falling back to local SQLite...`);
+                isUsingSqlite = true;
+                activeDb = sqliteAdapter;
+                await initSQLiteDatabase();
+                return await sqliteAdapter.query(sql, params);
+            }
+            throw err;
+        }
+    },
+    getConnection: async () => {
+        if (isUsingSqlite) {
+            return await sqliteAdapter.getConnection();
+        }
+        return await activeDb.getConnection();
     }
-});
+};
 
-module.exports = pool.promise();
+module.exports = dbProxy;

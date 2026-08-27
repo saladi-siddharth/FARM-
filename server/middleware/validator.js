@@ -3,9 +3,9 @@ const Joi = require('joi');
 // Validation schemas
 const schemas = {
     signup: Joi.object({
-        username: Joi.string().min(3).max(50).required(),
+        username: Joi.string().min(2).max(50).required(),
         email: Joi.string().email().required(),
-        password: Joi.string().min(6).max(100).required(),
+        password: Joi.string().min(1).max(100).required(),
         phone_number: Joi.string().min(10).max(15).allow('').optional()
     }),
 
@@ -21,7 +21,7 @@ const schemas = {
     resetPassword: Joi.object({
         email: Joi.string().email().required(),
         otp: Joi.string().length(4).required(),
-        newPassword: Joi.string().min(6).max(100).required()
+        newPassword: Joi.string().min(1).max(100).required()
     }),
 
     email: Joi.object({

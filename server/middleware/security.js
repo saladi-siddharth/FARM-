@@ -7,6 +7,7 @@ const authLimiter = rateLimit({
     message: { error: 'Too many authentication attempts, please try again later.' },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { trustProxy: false }
 });
 
 // Rate limiter for general API routes
@@ -16,6 +17,7 @@ const apiLimiter = rateLimit({
     message: { error: 'Too many requests, please try again later.' },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { trustProxy: false }
 });
 
 // Global error handler middleware

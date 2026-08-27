@@ -59,16 +59,18 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve Static Files with Cache Control
+// Serve Static Files with Strict Freshness Cache Control (prevents stale cached pages)
 app.use((req, res, next) => {
-    if (req.url.endsWith('.html') || req.url === '/') {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-    }
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     next();
 });
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../public'), {
+    etag: false,
+    lastModified: false,
+    maxAge: 0
+}));
 
 // --- FRIENDLY URL REWRITES ---
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../public/admin.html')));

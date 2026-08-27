@@ -69,7 +69,11 @@ router.post('/signup', authLimiter, validate(schemas.signup), async (req, res) =
 router.post('/signin', authLimiter, validate(schemas.signin), async (req, res) => {
     try {
         const { email, password } = req.body;
-        const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+        const cleanEmail = (email || '').trim().toLowerCase();
+        const [users] = await db.execute(
+            'SELECT * FROM users WHERE LOWER(TRIM(email)) = ? OR LOWER(TRIM(username)) = ?',
+            [cleanEmail, cleanEmail]
+        );
 
         if (users.length === 0) return res.status(404).json({ error: "User not found" });
 
