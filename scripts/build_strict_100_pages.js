@@ -591,58 +591,58 @@ for (let pIdx = 1; pIdx <= 93; pIdx++) {
 // ----------------------------------------------------------------------------
 
 function drawTitle(doc, text) {
-    doc.fontSize(13).font('Helvetica-Bold').fillColor('#0f172a').text(text, { align: 'center' });
+    doc.fontSize(13).font('Helvetica-Bold').fillColor('#0f172a').text(text, 55, doc.y, { width: 485, align: 'center' });
     doc.moveDown(0.2);
-    doc.strokeColor('#10b981').lineWidth(1.2).moveTo(60, doc.y).lineTo(540, doc.y).stroke();
+    doc.strokeColor('#10b981').lineWidth(1.2).moveTo(55, doc.y).lineTo(540, doc.y).stroke();
     doc.moveDown(0.5);
 }
 
 function drawChapHead(doc, num, title) {
-    doc.fontSize(14).font('Helvetica-Bold').fillColor('#0f172a').text(`CHAPTER ${num}`, { align: 'center' });
+    doc.fontSize(14).font('Helvetica-Bold').fillColor('#0f172a').text(`CHAPTER ${num}`, 55, doc.y, { width: 485, align: 'center' });
     doc.moveDown(0.1);
-    doc.fontSize(12).font('Helvetica-Bold').fillColor('#047857').text(title.toUpperCase(), { align: 'center' });
+    doc.fontSize(12).font('Helvetica-Bold').fillColor('#047857').text(title.toUpperCase(), 55, doc.y, { width: 485, align: 'center' });
     doc.moveDown(0.2);
     const y = doc.y;
-    doc.strokeColor('#10b981').lineWidth(1.2).moveTo(60, y).lineTo(540, y).stroke();
+    doc.strokeColor('#10b981').lineWidth(1.2).moveTo(55, y).lineTo(540, y).stroke();
     doc.y = y + 8;
 }
 
 function drawSecHead(doc, num, title) {
     doc.moveDown(0.4);
-    doc.fontSize(10).font('Helvetica-Bold').fillColor('#0f172a').text(`${num} ${title}`);
+    doc.fontSize(10).font('Helvetica-Bold').fillColor('#0f172a').text(`${num} ${title}`, 55, doc.y, { width: 485, align: 'left' });
     doc.moveDown(0.2);
 }
 
 function drawP(doc, text) {
-    doc.fontSize(8.2).font('Helvetica').fillColor('#334155').text(text, { align: 'justify', lineGap: 1.8 });
+    doc.fontSize(8.2).font('Helvetica').fillColor('#334155').text(text, 55, doc.y, { width: 485, align: 'justify', lineGap: 1.8 });
     doc.moveDown(0.3);
 }
 
 function drawBullet(doc, title, desc) {
-    doc.fontSize(8.2).font('Helvetica-Bold').fillColor('#0f172a').text(`•  ${title}: `, { continued: true });
-    doc.font('Helvetica').fillColor('#334155').text(desc, { align: 'justify', lineGap: 1.8 });
+    doc.fontSize(8.2).font('Helvetica-Bold').fillColor('#0f172a').text(`•  ${title}: `, 55, doc.y, { width: 485, continued: true });
+    doc.font('Helvetica').fillColor('#334155').text(desc, { width: 485, align: 'justify', lineGap: 1.8 });
     doc.moveDown(0.2);
 }
 
 function drawCodeBox(doc, title, code) {
     doc.moveDown(0.2);
-    doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#047857').text(`[Listing] ${title}`);
+    doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#047857').text(`[Listing] ${title}`, 55, doc.y, { width: 485 });
     doc.moveDown(0.15);
     const startY = doc.y;
     const lines = code.split('\n').length;
     const boxHeight = Math.min(180, lines * 9 + 10);
-    doc.rect(60, startY, 480, boxHeight).fillAndStroke('#0f1722', '#334155');
+    doc.rect(55, startY, 485, boxHeight).fillAndStroke('#0f1722', '#334155');
     doc.fillColor('#38bdf8').font('Courier').fontSize(6.8);
-    doc.text(code, 66, startY + 5, { width: 468, lineGap: 1.2 });
+    doc.text(code, 62, startY + 5, { width: 472, lineGap: 1.2 });
     doc.y = startY + boxHeight + 8;
 }
 
 function drawTable(doc, headers, rows, colWidths) {
     doc.moveDown(0.2);
-    const startX = 60;
+    const startX = 55;
     let y = doc.y;
 
-    doc.rect(startX, y, 480, 16).fillAndStroke('#065f46', '#047857');
+    doc.rect(startX, y, 485, 16).fillAndStroke('#065f46', '#047857');
     doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#ffffff');
     let curX = startX;
     headers.forEach((h, i) => {
@@ -653,7 +653,7 @@ function drawTable(doc, headers, rows, colWidths) {
 
     rows.forEach((r, rowIdx) => {
         const bg = rowIdx % 2 === 0 ? '#f8fafc' : '#ffffff';
-        doc.rect(startX, y, 480, 14).fillAndStroke(bg, '#e2e8f0');
+        doc.rect(startX, y, 485, 14).fillAndStroke(bg, '#e2e8f0');
         curX = startX;
         r.forEach((cell, i) => {
             doc.fontSize(7.2).font(i === 0 ? 'Helvetica-Bold' : 'Helvetica').fillColor('#1e293b');
@@ -669,15 +669,15 @@ function drawImage(doc, imgPath, caption, targetH = 120) {
     try {
         if (fs.existsSync(imgPath)) {
             const startY = doc.y;
-            doc.rect(60, startY, 480, targetH + 16).fillAndStroke('#f8fafc', '#cbd5e1');
-            doc.image(imgPath, 65, startY + 4, { width: 470, height: targetH, align: 'center' });
+            doc.rect(55, startY, 485, targetH + 16).fillAndStroke('#f8fafc', '#cbd5e1');
+            doc.image(imgPath, 60, startY + 4, { width: 475, height: targetH, align: 'center' });
             doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#047857');
-            doc.text(caption, 60, startY + targetH + 6, { align: 'center', width: 480 });
+            doc.text(caption, 55, startY + targetH + 6, { align: 'center', width: 485 });
             doc.y = startY + targetH + 20;
         } else {
-            doc.rect(60, doc.y, 480, 35).fillAndStroke('#f1f5f9', '#cbd5e1');
+            doc.rect(55, doc.y, 485, 35).fillAndStroke('#f1f5f9', '#cbd5e1');
             doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#334155');
-            doc.text(`[Figure] ${caption}`, 60, doc.y + 12, { align: 'center', width: 480 });
+            doc.text(`[Figure] ${caption}`, 55, doc.y + 12, { align: 'center', width: 485 });
             doc.y += 42;
         }
     } catch (e) {
