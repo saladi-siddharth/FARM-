@@ -283,6 +283,8 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Internal server error', message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message });
+});
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
