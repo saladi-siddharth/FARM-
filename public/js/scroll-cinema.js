@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * AETHERA® NATURAL SCROLL CINEMA ENGINE
+ * FARM CENTRAL NATURAL SCROLL CINEMA ENGINE
  * ============================================================
  * Clean, natural frame sequencing with:
  * - High-resolution natural agricultural photography
