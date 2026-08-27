@@ -82,7 +82,15 @@ app.get('/sitemap.xml', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/sitemap.xml'));
 });
 
-// --- FRIENDLY URL REWRITES ---
+// --- ROOT & FRIENDLY URL REWRITES ---
+app.get('/', (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+app.get('/index.html', (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../public/admin.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../public/dashboard.html')));
 app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, '../public/profile.html')));
@@ -97,6 +105,24 @@ app.get('/calculator', (req, res) => res.sendFile(path.join(__dirname, '../publi
 app.get('/community', (req, res) => res.sendFile(path.join(__dirname, '../public/community.html')));
 app.get('/reports', (req, res) => res.sendFile(path.join(__dirname, '../public/reports.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../public/login.html')));
+
+// Health Check for Render & uptime monitors
+app.get('/health', async (req, res) => {
+    try {
+        const db = require('./config/db');
+        await db.execute('SELECT 1');
+        const mem = process.memoryUsage();
+        res.json({
+            status: 'OK',
+            db: 'Connected',
+            uptime: Math.floor(process.uptime()) + 's',
+            memory: { heapUsed: (mem.heapUsed / 1024 / 1024).toFixed(1) + 'MB', rss: (mem.rss / 1024 / 1024).toFixed(1) + 'MB' },
+            time: new Date()
+        });
+    } catch (err) {
+        res.status(200).json({ status: 'Degraded', db: err.message, uptime: Math.floor(process.uptime()) + 's' });
+    }
+});
 
 // --- DATABASE AUTO-MIGRATION (for Render/Production) ---
 const setupDatabase = async () => {
@@ -249,26 +275,6 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Internal server error', message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message });
-});
-
-// Health Check — Enhanced with uptime + memory stats
-app.get('/health', async (req, res) => {
-    try {
-        const db = require('./config/db');
-        await db.execute('SELECT 1');
-        const mem = process.memoryUsage();
-        res.json({
-            status: 'OK',
-            db: 'Connected',
-            uptime: Math.floor(process.uptime()) + 's',
-            memory: { heapUsed: (mem.heapUsed / 1024 / 1024).toFixed(1) + 'MB', rss: (mem.rss / 1024 / 1024).toFixed(1) + 'MB' },
-            time: new Date()
-        });
-    } catch (err) {
-        res.status(500).json({ status: 'Error', db: err.message });
-    }
-});
-
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
