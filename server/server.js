@@ -81,6 +81,14 @@ app.get('/sitemap.xml', (req, res) => {
     res.type('application/xml');
     res.sendFile(path.join(__dirname, '../public/sitemap.xml'));
 });
+app.get('/favicon.ico', (req, res) => {
+    res.type('image/x-icon');
+    res.sendFile(path.join(__dirname, '../public/favicon.ico'));
+});
+app.get('/apple-touch-icon.png', (req, res) => {
+    res.type('image/png');
+    res.sendFile(path.join(__dirname, '../public/apple-touch-icon.png'));
+});
 
 // --- ROOT & FRIENDLY URL REWRITES ---
 app.get('/', (req, res) => {
