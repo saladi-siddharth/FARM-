@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <!-- 1. Home Page -->
+    <url>
+        <loc>https://farmcentral.online/</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        <image:image>
+            <image:loc>https://farmcentral.online/frames/frame_04_fruit.jpg</image:loc>
+            <image:title>Farm Central - Natural Agricultural Intelligence</image:title>
+            <image:caption>Bountiful organic harvest and natural farm management</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://farmcentral.online/frames/frame_07_harvest_crates.jpg</image:loc>
+            <image:title>Direct Farmer Produce Marketplace</image:title>
+            <image:caption>Fresh produce in wooden crates traded with zero middlemen</image:caption>
+        </image:image>
+    </url>
+
+    <!-- 2. Command Dashboard -->
+    <url>
+        <loc>https://farmcentral.online/dashboard.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>always</changefreq>
+        <priority>0.95</priority>
+    </url>
+    <url>
+        <loc>https://farmcentral.online/dashboard</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>always</changefreq>
+        <priority>0.95</priority>
+    </url>
+
+    <!-- 3. Mandi Market Prices -->
+    <url>
+        <loc>https://farmcentral.online/market.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://farmcentral.online/market</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- 4. Escrow Produce Trading Hub -->
+    <url>
+        <loc>https://farmcentral.online/trading.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- 5. Satellite NDVI Field Scanner -->
+    <url>
+        <loc>https://farmcentral.online/satellite.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.85</priority>
+    </url>
+
+    <!-- 6. AI Crop Doctor & Disease Diagnostics -->
+    <url>
+        <loc>https://farmcentral.online/doctor.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.85</priority>
+    </url>
+
+    <!-- 7. Inventory Management -->
+    <url>
+        <loc>https://farmcentral.online/inventory.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- 8. Agricultural ROI Calculator -->
+    <url>
+        <loc>https://farmcentral.online/calculator.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- 9. Farmer Community Forum -->
+    <url>
+        <loc>https://farmcentral.online/community.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- 10. Weather Telemetry -->
+    <url>
+        <loc>https://farmcentral.online/weather.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- 11. Farm Expense & Ledger Tracker -->
+    <url>
+        <loc>https://farmcentral.online/expenses.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.75</priority>
+    </url>
+
+    <!-- 12. Task Management -->
+    <url>
+        <loc>https://farmcentral.online/tasks.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.75</priority>
+    </url>
+
+    <!-- 13. Crop Calendar -->
+    <url>
+        <loc>https://farmcentral.online/calendar.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- 14. Bio-Fertilizer Guide -->
+    <url>
+        <loc>https://farmcentral.online/fertilizer.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- 15. User Authentication & Login -->
+    <url>
+        <loc>https://farmcentral.online/login.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://farmcentral.online/login</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- 16. Official Reports -->
+    <url>
+        <loc>https://farmcentral.online/reports.html</loc>
+        <lastmod>2026-08-27T22:50:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.65</priority>
+    </url>
+
+</urlset>

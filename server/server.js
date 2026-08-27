@@ -72,11 +72,30 @@ app.use(express.static(path.join(__dirname, '../public'), {
     maxAge: 0
 }));
 
+// --- SEO & SITEMAP ROUTES ---
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.sendFile(path.join(__dirname, '../public/robots.txt'));
+});
+app.get('/sitemap.xml', (req, res) => {
+    res.type('application/xml');
+    res.sendFile(path.join(__dirname, '../public/sitemap.xml'));
+});
+
 // --- FRIENDLY URL REWRITES ---
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../public/admin.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../public/dashboard.html')));
 app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, '../public/profile.html')));
 app.get('/market', (req, res) => res.sendFile(path.join(__dirname, '../public/market.html')));
+app.get('/trading', (req, res) => res.sendFile(path.join(__dirname, '../public/trading.html')));
+app.get('/satellite', (req, res) => res.sendFile(path.join(__dirname, '../public/satellite.html')));
+app.get('/doctor', (req, res) => res.sendFile(path.join(__dirname, '../public/doctor.html')));
+app.get('/inventory', (req, res) => res.sendFile(path.join(__dirname, '../public/inventory.html')));
+app.get('/tasks', (req, res) => res.sendFile(path.join(__dirname, '../public/tasks.html')));
+app.get('/expenses', (req, res) => res.sendFile(path.join(__dirname, '../public/expenses.html')));
+app.get('/calculator', (req, res) => res.sendFile(path.join(__dirname, '../public/calculator.html')));
+app.get('/community', (req, res) => res.sendFile(path.join(__dirname, '../public/community.html')));
+app.get('/reports', (req, res) => res.sendFile(path.join(__dirname, '../public/reports.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../public/login.html')));
 
 // --- DATABASE AUTO-MIGRATION (for Render/Production) ---
