@@ -1,28 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /api/private/
-Disallow: /admin/config/
 
-# Search Engine Crawlers
-User-agent: Googlebot
-Allow: /
-
-User-agent: Googlebot-Image
-Allow: /frames/
-Allow: /uploads/
-Allow: /logo.png
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Applebot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-# Sitemap Location
 Sitemap: https://farmcentral.online/sitemap.xml

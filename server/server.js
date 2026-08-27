@@ -106,6 +106,13 @@ app.get('/calculator', (req, res) => res.sendFile(path.join(__dirname, '../publi
 app.get('/community', (req, res) => res.sendFile(path.join(__dirname, '../public/community.html')));
 app.get('/reports', (req, res) => res.sendFile(path.join(__dirname, '../public/reports.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../public/login.html')));
+app.get('/weather', (req, res) => res.sendFile(path.join(__dirname, '../public/weather.html')));
+app.get('/fertilizer', (req, res) => res.sendFile(path.join(__dirname, '../public/fertilizer.html')));
+app.get('/calendar', (req, res) => res.sendFile(path.join(__dirname, '../public/calendar.html')));
+app.get('/kyc', (req, res) => res.sendFile(path.join(__dirname, '../public/kyc.html')));
+app.get('/chat', (req, res) => res.sendFile(path.join(__dirname, '../public/chat.html')));
+app.get('/payouts', (req, res) => res.sendFile(path.join(__dirname, '../public/payouts.html')));
+app.get('/disputes', (req, res) => res.sendFile(path.join(__dirname, '../public/disputes.html')));
 
 // Health Check for Render & uptime monitors
 app.get('/health', async (req, res) => {
