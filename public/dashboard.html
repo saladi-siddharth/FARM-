@@ -32,24 +32,29 @@
     <meta property="og:description" content="Live agricultural telemetry, inventory valuation, satellite scans, and trade management on Farm Central.">
     <meta property="og:image" content="https://farmcentral.online/frames/frame_04_fruit.jpg">
 
-    <!-- Cache-busting & Instant Freshness script -->
+    <!-- Zero-Stale Cache Control for Mobile & Desktop -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Universal Cache-Busting & Service Worker Killer Script -->
     <script>
-        if ('caches' in window) {
-            caches.keys().then(names => {
-                names.forEach(name => {
-                    if (!name.includes('v6-fresh')) {
-                        caches.delete(name);
+        (function() {
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (var i = 0; i < names.length; i++) {
+                        caches.delete(names[i]);
                     }
                 });
-            });
-        }
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) {
-                    registration.update();
-                }
-            });
-        }
+            }
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (var j = 0; j < registrations.length; j++) {
+                        registrations[j].unregister();
+                    }
+                });
+            }
+        })();
     </script>
 
     <!-- Typography -->

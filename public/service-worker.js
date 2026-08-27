@@ -1,32 +1,25 @@
-const CACHE_NAME = 'farm-central-v6-fresh';
-
+// Self-Purging Service Worker (Force Clears all mobile & desktop caches)
 self.addEventListener('install', event => {
     self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    return caches.delete(cacheName);
-                })
-            );
-        }).then(() => self.clients.claim())
+        caches.keys().then(keys =>
+            Promise.all(keys.map(k => caches.delete(k)))
+        ).then(() => {
+            return self.registration.unregister();
+        }).then(() => {
+            return self.clients.claim();
+        }).then(() => {
+            return self.clients.matchAll().then(clients => {
+                clients.forEach(client => client.navigate(client.url));
+            });
+        })
     );
 });
 
-// Network-First for everything to ensure users always see latest changes
+// Always fetch directly from network — never serve stale cache
 self.addEventListener('fetch', event => {
-    if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
-
-    event.respondWith(
-        fetch(event.request)
-            .then(response => {
-                return response;
-            })
-            .catch(() => {
-                return caches.match(event.request);
-            })
-    );
+    event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request)));
 });
