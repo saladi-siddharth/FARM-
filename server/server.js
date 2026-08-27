@@ -92,6 +92,7 @@ app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, '../public/admin.html')));
+app.get('/blog', (req, res) => res.sendFile(path.join(__dirname, '../public/blog.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../public/dashboard.html')));
 app.get('/profile', (req, res) => res.sendFile(path.join(__dirname, '../public/profile.html')));
 app.get('/market', (req, res) => res.sendFile(path.join(__dirname, '../public/market.html')));
